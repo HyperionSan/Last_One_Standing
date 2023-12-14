@@ -1,0 +1,188 @@
+# File produced by Kranc
+
+
+shares: GenericFD
+
+USES CCTK_INT assume_stress_energy_state
+
+
+shares: MethodOfLines
+
+USES CCTK_INT MoL_Num_Evolved_Vars
+USES CCTK_INT MoL_Num_ArrayEvolved_Vars
+
+restricted:
+CCTK_INT verbose "verbose" STEERABLE=ALWAYS
+{
+  *:* :: ""
+} 0
+
+restricted:
+CCTK_INT other_timelevels "Number of active timelevels for non-evolved grid functions" STEERABLE=RECOVER
+{
+  0:3 :: ""
+} 1
+
+restricted:
+CCTK_REAL sigma "sigma"
+{
+  "*:*" :: ""
+} 0
+
+restricted:
+CCTK_REAL v0 "v0"
+{
+  "*:*" :: ""
+} 0
+
+restricted:
+CCTK_REAL amp "amp"
+{
+  "*:*" :: ""
+} 0
+
+restricted:
+CCTK_INT tile_size "Loop tile size"
+{
+  *:* :: ""
+} -1
+
+private:
+KEYWORD initial_data "initial_data"
+{
+  "sine" :: ""
+  "shock" :: ""
+} "sine"
+
+restricted:
+CCTK_INT Advect_MaxNumEvolvedVars "Number of evolved variables used by this thorn" ACCUMULATOR-BASE=MethodofLines::MoL_Num_Evolved_Vars STEERABLE=RECOVER
+{
+  1:1 :: "Number of evolved variables used by this thorn"
+} 1
+
+restricted:
+CCTK_INT Advect_MaxNumArrayEvolvedVars "Number of Array evolved variables used by this thorn" ACCUMULATOR-BASE=MethodofLines::MoL_Num_ArrayEvolved_Vars STEERABLE=RECOVER
+{
+  0:0 :: "Number of Array evolved variables used by this thorn"
+} 0
+
+restricted:
+CCTK_INT timelevels "Number of active timelevels" STEERABLE=RECOVER
+{
+  0:3 :: ""
+} 3
+
+restricted:
+CCTK_INT rhs_timelevels "Number of active RHS timelevels" STEERABLE=RECOVER
+{
+  0:3 :: ""
+} 1
+
+restricted:
+CCTK_INT advect_initial_sine_calc_every "advect_initial_sine_calc_every" STEERABLE=ALWAYS
+{
+  *:* :: ""
+} 1
+
+restricted:
+CCTK_INT advect_initial_shock_calc_every "advect_initial_shock_calc_every" STEERABLE=ALWAYS
+{
+  *:* :: ""
+} 1
+
+restricted:
+CCTK_INT advect_evol_calc_every "advect_evol_calc_every" STEERABLE=ALWAYS
+{
+  *:* :: ""
+} 1
+
+restricted:
+CCTK_INT advect_flux_calc_every "advect_flux_calc_every" STEERABLE=ALWAYS
+{
+  *:* :: ""
+} 1
+
+restricted:
+CCTK_INT advect_initial_sine_calc_offset "advect_initial_sine_calc_offset" STEERABLE=ALWAYS
+{
+  *:* :: ""
+} 0
+
+restricted:
+CCTK_INT advect_initial_shock_calc_offset "advect_initial_shock_calc_offset" STEERABLE=ALWAYS
+{
+  *:* :: ""
+} 0
+
+restricted:
+CCTK_INT advect_evol_calc_offset "advect_evol_calc_offset" STEERABLE=ALWAYS
+{
+  *:* :: ""
+} 0
+
+restricted:
+CCTK_INT advect_flux_calc_offset "advect_flux_calc_offset" STEERABLE=ALWAYS
+{
+  *:* :: ""
+} 0
+
+private:
+KEYWORD rho_bound "Boundary condition to implement" STEERABLE=ALWAYS
+{
+  "flat" :: "Flat boundary condition"
+  "none" :: "No boundary condition"
+  "static" :: "Boundaries held fixed"
+  "radiative" :: "Radiation boundary condition"
+  "scalar" :: "Dirichlet boundary condition"
+  "newrad" :: "Improved radiative boundary condition"
+  "skip" :: "skip boundary condition code"
+} "skip"
+
+private:
+KEYWORD rho_group_bound "Boundary condition to implement" STEERABLE=ALWAYS
+{
+  "flat" :: "Flat boundary condition"
+  "none" :: "No boundary condition"
+  "static" :: "Boundaries held fixed"
+  "radiative" :: "Radiation boundary condition"
+  "scalar" :: "Dirichlet boundary condition"
+  "newrad" :: "Improved radiative boundary condition"
+  "skip" :: "skip boundary condition code"
+} "none"
+
+private:
+CCTK_REAL rho_bound_speed "characteristic speed at boundary" STEERABLE=ALWAYS
+{
+  "0:*" :: "outgoing characteristic speed > 0"
+} 1.
+
+private:
+CCTK_REAL rho_group_bound_speed "characteristic speed at boundary" STEERABLE=ALWAYS
+{
+  "0:*" :: "outgoing characteristic speed > 0"
+} 1.
+
+private:
+CCTK_REAL rho_bound_limit "limit value for r -> infinity" STEERABLE=ALWAYS
+{
+  "*:*" :: "value of limit value is unrestricted"
+} 0.
+
+private:
+CCTK_REAL rho_group_bound_limit "limit value for r -> infinity" STEERABLE=ALWAYS
+{
+  "*:*" :: "value of limit value is unrestricted"
+} 0.
+
+private:
+CCTK_REAL rho_bound_scalar "Dirichlet boundary value" STEERABLE=ALWAYS
+{
+  "*:*" :: "unrestricted"
+} 0.
+
+private:
+CCTK_REAL rho_group_bound_scalar "Dirichlet boundary value" STEERABLE=ALWAYS
+{
+  "*:*" :: "unrestricted"
+} 0.
+

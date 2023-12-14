@@ -1,0 +1,4 @@
+# Configuration definition for thorn IOBasic
+# $Header$
+
+REQUIRES IOUtil

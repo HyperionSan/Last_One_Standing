@@ -1,0 +1,76 @@
+
+ActiveThorns = "coordbase SymBase NaNChecker carpetReduce CartGrid3D carpet carpetlib carpetadaptiveregrid Boundary IOBasic IOUtil carpetIOScalar carpetIOASCII IDWaveMoL carpetSlab WaveMoL Time MoL reflectionsymmetry"
+
+
+IDWaveMoL::initial_data = "gaussian"
+
+wavemol::bound = "radiation"
+
+mol::initial_data_is_crap = "yes"
+
+##carpet::adaptive_stepsize = "yes"
+
+##carpet::veryverbose = "yes"
+
+grid::domain = "full"
+grid::type = "coordbase"
+grid::avoid_origin = "no"
+
+coordbase::xmin = -0.5
+coordbase::ymin = -0.5
+coordbase::zmin =  0.0
+coordbase::xmax =  0.5
+coordbase::ymax =  0.5
+coordbase::zmax =  0.5
+
+coordbase::dx = 0.02
+coordbase::dy = 0.02
+coordbase::dz = 0.02
+
+reflectionsymmetry::reflection_z = yes
+reflectionsymmetry::avoid_origin_z = no
+coordbase::boundary_size_z_lower = 2
+coordbase::boundary_shiftout_z_lower = 1
+
+carpet::prolongation_order_space = 3
+carpet::prolongation_order_time = 2
+driver::ghost_size = 2
+time::dtfac = 0.5
+
+carpet::domain_from_coordbase = yes
+
+carpet::max_refinement_levels = 2
+carpet::init_3_timelevels = yes
+carpetadaptiveregrid::max_error = 1.e-6
+carpetadaptiveregrid::pad = 2
+carpetadaptiveregrid::min_width = 6
+carpetadaptiveregrid::error_var = "mol::errorestimate[0]"
+#carpetadaptiveregrid::error_var = "wavemol::phi"
+carpetadaptiveregrid::regrid_every = 1
+
+#carpetadaptiveregrid::verbose = yes
+#carpetadaptiveregrid::veryverbose = yes
+#carpet::verbose = yes
+#carpet::veryverbose = yes
+
+cactus::terminate = "time"
+cactus::cctk_final_time = 0.5
+
+iobasic::outInfo_every = 1
+iobasic::outInfo_vars = "wavemol::phi mol::errorestimate[0]"
+
+ioscalar::outScalar_every = 1
+ioscalar::outScalar_vars = "wavemol::phi mol::errorestimate"
+
+ioascii::out1D_every = 1
+ioascii::out1D_vars = "wavemol::scalarevolvemol_scalar mol::errorestimate"
+
+IO::out_dir = $parfile
+
+#mol::ode_method = "Generic"
+#mol::mol_intermediate_steps = 4
+#mol::mol_num_scratch_levels = 3
+mol::ode_method = "RK45"
+mol::mol_intermediate_steps = 6
+mol::mol_num_scratch_levels = 6
+mol::adaptive_stepsize = "no"

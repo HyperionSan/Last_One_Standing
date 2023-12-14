@@ -1,0 +1,13 @@
+# $Header$
+
+!DESC "Cactus PETSc Toolkit"
+
+!REPOSITORY_TYPE pserver
+!REPOSITORY_LOCATION cvs.cactuscode.org
+!REPOSITORY_NAME /cactus
+          
+CactusPUGH/PUGH      
+CactusElliptic/EllBase
+CactusElliptic/EllPETSc
+CactusExternal/PETSc
+

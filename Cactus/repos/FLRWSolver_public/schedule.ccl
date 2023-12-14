@@ -1,0 +1,38 @@
+# Schedule definitions for thorn FLRWSolver
+
+if (CCTK_Equals(FLRW_perturb, "no"))
+{
+  schedule FLRW_NoPerturb IN HydroBase_Initial
+  {
+   LANG: Fortran
+   } "Sets up initial data for FLRW spacetime"
+}
+
+if ( (CCTK_Equals(FLRW_perturb, "yes")) && (CCTK_Equals(FLRW_perturb_type,"single_mode")) )
+{
+  schedule FLRW_SingleMode IN HydroBase_Initial
+  {
+    LANG: Fortran
+  } "Sets up initial data for a single-mode perturbation to FLRW spacetime"
+}
+
+else if ( (CCTK_Equals(FLRW_perturb, "yes")) && (CCTK_Equals(FLRW_perturb_type,"powerspectrum")) )
+{
+  schedule FLRW_Powerspectrum IN HydroBase_Initial
+  {
+    LANG: Fortran
+  } "Sets up initial data for a power spectrum of perturbations to FLRW spacetime"
+}
+
+else if ( (CCTK_Equals(FLRW_perturb, "yes")) && (CCTK_Equals(FLRW_perturb_type,"fileread")) )
+{
+  schedule FLRW_FileRead IN HydroBase_Initial
+  {
+    LANG: Fortran
+  } "Sets up initial data for linear perturbations to FLRW spacetime from user-specified ascii files"
+}
+
+schedule FLRW_ParamCheck AT CCTK_PARAMCHECK
+{
+ LANG: Fortran
+} "Check some parameters are set correctly"

@@ -1,0 +1,41 @@
+# $Header$
+
+!DESC "Thorns for testing Cactus APIs"
+
+!REPOSITORY_TYPE pserver
+!REPOSITORY_LOCATION cvs.cactuscode.org
+!REPOSITORY_NAME /cactus
+                
+CactusBase/Boundary        
+CactusBase/CoordBase
+CactusBase/CartGrid3D      
+CactusBase/IOUtil          
+CactusBase/IOASCII
+CactusBase/IOBasic
+CactusBase/Time            
+CactusBase/SymBase
+
+CactusPUGH/PUGH
+CactusPUGH/PUGHInterp    
+CactusPUGH/PUGHReduce
+CactusPUGH/PUGHSlab
+
+CactusTest/TestAllTypes
+CactusTest/TestArrays
+CactusTest/TestComplex
+CactusTest/TestCoordinates
+CactusTest/TestFortranDependencies1
+CactusTest/TestFortranDependencies2
+CactusTest/TestFpointerNULL
+CactusTest/TestFreeF90
+CactusTest/TestGlobalReduce
+CactusTest/TestInclude1
+CactusTest/TestInclude2
+CactusTest/TestLocalReduce
+CactusTest/TestReduce
+CactusTest/TestSchedule
+CactusTest/TestStrings
+CactusTest/TestTable
+CactusTest/TestTimers
+CactusTest/TestTypes
+

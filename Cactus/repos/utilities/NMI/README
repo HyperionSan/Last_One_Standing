@@ -1,0 +1,53 @@
+Building and Testing Cactus at NMI <https://nmi.cs.wisc.edu/>
+
+Erik Schnetter, 2010-02-10
+
+
+
+This directory contains scripts and input files for checking out,
+building, and testing Cactus at the NMI Build and Test Lab
+<https://nmi.cs.wisc.edu/>.
+
+
+
+Instructions:
+
+1. You will need an account at NMI.  Go to <https://nmi.cs.wisc.edu/>
+   and follow the instructions to obtain an account.
+
+2. Check out this repository (i.e., the Cactus Utilities repository)
+   on one of the NMI front ends.
+
+3. Submit the main test script "wavetoy.submit" with the command
+
+   nmi_submit wavetoy.submit
+
+4. Watch the progress on the web page
+   <http://nmi-web.cs.wisc.edu/nmi/index.php?page=results/overview>.
+   You may want to choose the project "Cactus" to narrow down the
+   results.
+
+5. After the test is complete you will receive an email containing a
+   report.  This report is currently sent to <schnetter@cct.lsu.edu>;
+   this email address is specified in the submission script
+   "wavetoy.submit".
+
+6. Note that submission scripts can be set to auto-resubmit.  If this
+   is set, then you should obviously not submit the script more than
+   once.  Type
+   
+   condor_q <USER-ID>
+   
+   to see what jobs you have in the queue, and use
+   
+   condor_rm <JOB-ID>
+   
+   to delete them.
+
+
+
+Some urls for convenience:
+
+All Cactus results:           <http://nmi-s001.cs.wisc.edu:80/nmi/index.php?page=results/overview&opt_project=Cactus>
+All WaveToy results:          <http://nmi-s001.cs.wisc.edu:80/nmi/index.php?page=results/overview&opt_project=Cactus&opt_component=EinsteinToolkit>
+All Einstein Toolkit results: <http://nmi-s001.cs.wisc.edu:80/nmi/index.php?page=results/overview&opt_project=Cactus&opt_component=WaveToy>

@@ -1,0 +1,15 @@
+ &Model_Input
+ Mass                  = 1.
+ R_a                   = 1.0
+ t_0                   = -90
+ eps                   = 1.0e-2
+ p_0                   = 0.01001
+ a_inf                 = 1.
+ model_switch          = 0
+ L_inf_switch          = 1
+ null_evolution_switch = 1
+ io_conv_skip          = 1
+ red_t_min             = -1.99
+ red_t_max             = -1.5
+ p_switch              = F
+/

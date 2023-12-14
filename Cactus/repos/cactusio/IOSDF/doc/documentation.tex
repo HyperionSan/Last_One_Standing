@@ -1,0 +1,171 @@
+\documentclass{article}
+
+% Use the Cactus ThornGuide style file
+% (Automatically used from Cactus distribution, if you have a 
+%  thorn without the Cactus Flesh download this from the Cactus
+%  homepage at www.cactuscode.org)
+\usepackage{../../../../doc/latex/cactus}
+
+\begin{document}
+
+\title{SDF Output with {\tt IOSDF}}
+\author{Thomas Radke}
+\date{$ $Date$ $}
+
+\maketitle
+
+% Do not delete next line
+% START CACTUS THORNGUIDE
+
+\begin{abstract}
+Thorn {\tt IOSDF} provides I/O methods for 1D, 2D, and 3D output of
+grid arrays and grid functions into files in SDF format. The precise
+format is designed for visualisation using the clients {\tt xvs} and
+{\tt DV} (see \url{http://www.cactuscode.org/VizTools/DataVaultXVSutils.html} for details).
+\end{abstract}
+
+\section{Purpose}
+Thorn {\tt IOSDF} registers three I/O methods named {\tt
+IOSDF\_1D}, {\tt IOSDF\_2D}, and {\tt IOSDF\_3D} with the I/O
+interface in the flesh.
+
+\begin{itemize}
+  \item {\tt IOSDF\_1D}\\
+    creates one-dimensional output of 1D, 2D and
+    3D grid functions and arrays by slicing through the edge (in the
+    octant case) or center (in all origin centered cases) of the grid in
+    the coordinate directions.  In addition, output is provided
+    along a diagonal of the grid, in this case the diagonal always starts
+    at the first grid point (that is, in Fortran notation {\tt var(1,1,1)})
+    and the line taken uses grid points increasing by 1 in each direction.
+    [NOTE: The diagonal output is not available for staggered variables].\\
+    Output for each direction can be selected individually via parameters.\\
+    Data is written in SDF format and goes into files with the names:
+   \begin{center}
+    {\tt <variable\_name>\_<slice>\_<center\_i><center\_j>.sdf}
+   \end{center}
+    and for diagonals:
+    \begin{center}{\tt <variable\_name>\_3D\_diagonal.sdf}
+    \end{center}
+    These files can be processed directly by {\tt xvs} and {\tt DV}.
+
+  \item {\tt IOSDF\_2D}
+    outputs two-dimensional slices of grid functions and arrays planes.
+    Again, slicing is done through the edge (in the octant case) or center
+    (in all origin centered cases).\\
+    Data is written in SDF format and goes into files named
+\begin{center}
+    {\tt <variable\_name>\_<plane>\_<center>.sdf}
+\end{center}
+    These files can be visualized by {\tt DV}.
+
+  \item {\tt IOSDF\_3D}
+    outputs three-dimensional grid functions and arrays as a whole.\\
+    Data is written in SDF format and goes into files named
+\begin{center}
+    {\tt <variable\_name>\_3D.sdf}
+\end{center}
+    These files can be visualized by {\tt DV}.
+\end{itemize}
+%
+%
+\section{{\tt IOSDF} Parameters}
+%
+General parameters to control all {\tt IOSDF}'s I/O methods are:
+\begin{itemize}
+  \item {\tt IOSDF::out[123]D\_every} (steerable)\\
+        How often to do periodic {\tt IOSDF} output. If this parameter is set in the
+        parameter file, it will override the setting of the shared
+        {\tt IO::out\_every} parameter. The output frequency can also be set
+        for individual variables using the {\tt out\_every} option in an option string appended to the {\tt IOSDF::out[123]D\_vars} parameter.
+  \item {\tt IOSDF::out[123]D\_vars} (steerable)\\
+        The list of variables to output using an {\tt IOSDF} I/O method.
+        The variables must be given by their fully qualified variable or group
+        name. The special keyword {\it all} requests {\tt IOSDF} output for
+        all variables. Multiple names must be separated by whitespaces.\\
+        An option string can be appended in curly braces to the
+        group/variable name. The only option supported so far is {\tt out\_every}
+        which sets the output frequency for an individual variable (overriding
+        {\tt IOSDF::out[123]D\_every} and {\tt IO::out\_every}).
+  \item {\tt IOSDF::out[123]D\_dir}\\
+        The directory in which to place the {\tt IOSDF} output files.
+        If the directory doesn't exist at startup it will be created.\\
+        If this parameter is set to an empty string {\tt IOSDF} output will go
+        to the standard output directory as specified in {\tt IO::out\_dir}.
+\end{itemize}
+%
+Additional parameters to control the {\tt IOSDF\_1D} I/O method are:
+\begin{itemize}
+  \item {\tt IOSDF::out1D\_[xyzd]} (steerable)\\
+        Chooses the directions to output in 1D {\tt IOSDF} format ({\tt d}
+        stands for diagonal direction).
+  \item {\tt IOSDF::out1D\_[xyz]line\_[xyz], IOSDF::out1D\_[xyz]line\_[xyz]i}\\
+        Chooses the slice centers for 1D lines from {\tt IOSDF\_1D}. These
+        can be set either in physical or index coordinates. If they are set
+        these parameters will override the default slice center parameters
+        {\tt IO::out\_[xyz]line[xyz], IO::out\_[xyz]line[xyz]i}.\\
+        Note that the slice center can only be set for grid functions so far.
+        For {\tt CCTK\_ARRAY} variables the slices will always start in the
+        origin, ie. (0, 0, 0) in C ordering.
+\end{itemize}
+%
+Additional parameters to control the {\tt IOSDF\_2D} I/O method are:
+\begin{itemize}
+  \item {\tt IOSDF::out2D\_[{xy}{xz}{yz}]plane\_[xyz], IOSDF::out2D\_[{xy}{xz}{yz}]plane\_[xyz]i}\\
+        Chooses the slice centers for 2D planes from {\tt IOSDF\_2D}. These
+        can be set either in physical or index coordinates. If they are set
+        these parameters will override the default slice center parameters
+        {\tt IO::out\_[{xy}{xz}{yz}]plane[xyz], IO::out\_[{xy}{xz}{yz}]plane[xyz]i}.
+\end{itemize}
+%
+Additional {\tt IOUtil} parameters to control the {\tt IOSDF\_[123]D} I/O methods are:
+\begin{itemize}
+  \item {\tt IO::out\_downsample\_[xyz]}\\
+        Chooses downsampling factors for individual dimensions (default is 1
+        meaning no downsampling).
+\end{itemize}
+%
+%
+\section{Comments}
+%
+{\bf Getting Output from {\tt IOSDF}'s I/O Mehtods}\\
+%
+You obtain output by an I/O method by either
+%
+\begin{itemize}
+  \item setting the appropriate I/O parameters
+  \item calling one the routines of the I/O function interface provided by the flesh
+\end{itemize}
+%
+For a description of basic I/O parameters and the I/O function interface to
+invoke I/O methods by application thorns please see the documentation of thorn
+{\tt IOUtil} and the flesh.\\[3ex]
+%
+{\bf Building Cactus configurations with {\tt IOSDF}}\\
+%
+Thorn {\tt IOSDF} requires the capability {\tt SDF} which is provided eg.
+by thorn {\tt CactusExternal/SDF}. You will need to include this thorn
+in your ThornList.
+
+Since {\tt IOSDF} uses parameters from {\tt IOUtil} it also needs this I/O
+helper thorn be compiled into Cactus and activated at runtime in the
+{\tt ActiveThorns} parameter in your parameter file.
+%
+%
+\begin{thebibliography}{9}
+
+\bibitem{DataVaultXVSutils_package}
+\url{http://www.cactuscode.org/VizTools/DataVaultXVSutils.html}
+
+\bibitem{xvs_documentation}
+\url{http://laplace.physics.ubc.ca/\~matt/410/Doc/xvs/}
+
+\bibitem{DV_tutorial}
+\url{http://laplace.physics.ubc.ca/Doc/DV/}
+\end{thebibliography}
+
+
+% Do not delete next line
+% END CACTUS THORNGUIDE
+
+\end{document}

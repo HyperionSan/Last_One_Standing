@@ -1,0 +1,14 @@
+#! /bin/bash
+#SBATCH --account=@ALLOCATION@
+#SBATCH --time=@WALLTIME@
+#SBATCH --nodes=@NODES@ --ntasks=@NUM_PROCS@ --cpus-per-task=@(int(32/@NODE_PROCS@))@
+#SBATCH --mem @MEMORY@MB
+#SBATCH @("@CHAINED_JOB_ID@" != "" ? "--dependency=afterany:@CHAINED_JOB_ID@" : "")@
+#SBATCH --export=ALL
+#SBATCH --job-name=@SHORT_SIMULATION_NAME@
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=@EMAIL@
+#SBATCH --output=@RUNDIR@/@SIMULATION_NAME@.out
+#SBATCH --error=@RUNDIR@/@SIMULATION_NAME@.err
+cd @SOURCEDIR@
+@SIMFACTORY@ run @SIMULATION_NAME@ --basedir=@BASEDIR@ --machine=@MACHINE@ --restart-id=@RESTART_ID@ @FROM_RESTART_COMMAND@

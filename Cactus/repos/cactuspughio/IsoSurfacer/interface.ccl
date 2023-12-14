@@ -1,0 +1,16 @@
+# Interface definition for thorn isosurfacer
+# $Header$
+
+implements: isosurfacer
+inherits: Grid IO
+
+# USES INCLUDE HEADER: sstream.hpp
+# USES INCLUDE HEADER: Server.hpp
+# USES INCLUDE HEADER: CactusCommands.hpp
+# USES INCLUDE HEADER: http_GHExtensions.hpp # no connection to HTTP yet
+
+CCTK_INT FUNCTION Coord_GroupSystem  \
+  (CCTK_POINTER_TO_CONST IN GH,      \
+   CCTK_STRING IN groupname)
+
+REQUIRES FUNCTION Coord_GroupSystem

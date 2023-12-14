@@ -1,0 +1,12 @@
+ &particle_input
+ p_mass     = 0.0d-6
+ p1         = 9.0d0
+ p2         = 1.0d0
+ p3         = 0.0d0
+ v1         = -1.222791434
+ v2         = -3.674619836
+ v3         = 0.0d0
+ p_patchN   = T
+ io_particle= 10
+ U_2        = 0.0370370370d0
+/

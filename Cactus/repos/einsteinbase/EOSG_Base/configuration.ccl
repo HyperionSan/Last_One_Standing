@@ -1,0 +1,8 @@
+# Configuration definitions for thorn EOSBase_General
+# $Header$
+
+PROVIDES EOSBase_General
+{
+  SCRIPT
+  LANG
+}

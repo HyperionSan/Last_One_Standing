@@ -1,0 +1,42 @@
+#!/bin/bash
+
+echo "Preparing:"
+set -x                          # Output commands
+set -e                          # Abort on errors
+
+echo "Checking:"
+pwd
+hostname
+date
+
+echo "Environment:"
+export CACTUS_NUM_PROCS=@NUM_PROCS@
+export CACTUS_NUM_THREADS=@NUM_THREADS@
+export OMP_NUM_THREADS=@NUM_THREADS@
+#env | sort > SIMFACTORY/ENVIRONMENT
+
+echo "Job setup:"
+echo "   Allocated:"
+echo "      Nodes:                      @NODES@"
+echo "      Cores per node:             @PPN@"
+echo "   Running:"
+echo "      MPI processes:              @NUM_PROCS@"
+echo "      OpenMP threads per process: @NUM_THREADS@"
+echo "      MPI processes per node:     @NODE_PROCS@"
+echo "      OpenMP threads per core:    @(1.0*(@NODE_PROCS@*@NUM_THREADS@)/@PPN@)@"
+echo "      OpenMP threads per node:    @(@NODE_PROCS@*@NUM_THREADS@)@"
+
+echo "Starting:"
+export CACTUS_STARTTIME=$(date +%s)
+
+if [ @RUNDEBUG@ -eq 0 ]; then
+    # TODO: check if one needs to manually prune the hostfile so that running
+    # with 1 taks per node works otherwise OpenMPI is sometimes picky with
+    # ranks and sockets
+    mpirun -np @NUM_PROCS@ --map-by numa:PE=@NUM_THREADS@ @EXECUTABLE@ -L 3 @PARFILE@
+else
+    gdb --args @EXECUTABLE@ -L 3 @PARFILE@
+fi
+
+echo "Stopping:"
+date

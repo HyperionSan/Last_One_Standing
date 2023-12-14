@@ -1,0 +1,78 @@
+# Schedule definitions for thorn ADMConstraints
+# $Header$
+
+schedule ADMConstraints_ParamCheck at CCTK_PARAMCHECK
+{
+  LANG: C
+  OPTIONS: global
+} "Check that we can deal with this metric_type"
+
+schedule ADMConstraint_InitSymBound at CCTK_WRAGH
+{
+  LANG: Fortran
+  OPTIONS: global
+} "Register GF symmetries for ADM Constraints"
+
+if (constraints_persist)
+{
+  if (constraints_timelevels == 1)
+  {
+    STORAGE: hamiltonian[1], normalized_hamiltonian[1], momentum[1]
+  }
+  else if (constraints_timelevels == 2)
+  {
+    STORAGE: hamiltonian[2], normalized_hamiltonian[2], momentum[2]
+  }
+  else if (constraints_timelevels == 3)
+  {
+    STORAGE: hamiltonian[3], normalized_hamiltonian[3], momentum[3]
+  }
+  
+  schedule GROUP ADMConstraintsGroup at CCTK_POSTINITIAL after (MoL_PostStep MoL_PostInitial)
+  {
+  } "Evaluate ADM constraints, and perform symmetry boundary conditions"
+  
+  schedule GROUP ADMConstraintsGroup at CCTK_POST_RECOVER_VARIABLES after (MoL_PostStep MoL_PostInitial)
+  {
+  } "Evaluate ADM constraints, and perform symmetry boundary conditions"
+  
+  schedule GROUP ADMConstraintsGroup at CCTK_EVOL after MoL_Evolution
+  {
+  } "Evaluate ADM constraints, and perform symmetry boundary conditions"
+  
+  schedule GROUP ADMConstraintsBoundariesGroup at CCTK_POSTREGRID after MoL_PostStep
+  {
+  } "Set ADM constraints on the boundary"
+  
+  schedule GROUP ADMConstraintsBoundariesGroup at CCTK_POSTRESTRICT after MoL_PostStep
+  {
+  } "Set ADM constraints on the boundary"
+}
+else
+{
+  schedule GROUP ADMConstraintsGroup at CCTK_ANALYSIS
+  {
+    STORAGE: hamiltonian[1], normalized_hamiltonian[1], momentum[1]
+    TRIGGERS: hamiltonian, normalized_hamiltonian, momentum
+  } "Evaluate ADM constraints, and perform symmetry boundary conditions"
+}
+
+schedule ADMConstraints in ADMConstraintsGroup
+{		
+  LANG: Fortran
+} "Evaluate ADM constraints"
+
+schedule GROUP ADMConstraintsBoundariesGroup in ADMConstraintsGroup after ADMConstraints
+{
+} "Set ADM constraints on the boundary"
+
+schedule ADMConstraints_Boundaries in ADMConstraintsBoundariesGroup
+{
+  LANG: Fortran
+  OPTIONS: level
+  SYNC: hamiltonian, normalized_hamiltonian, momentum
+} "Select boundary conditions for the ADM constraints"
+
+schedule GROUP ApplyBCs as ADMConstraints_ApplyBCs in ADMConstraintsBoundariesGroup after ADMConstraints_Boundaries
+{
+} "Apply boundary conditions to the ADM constraints"

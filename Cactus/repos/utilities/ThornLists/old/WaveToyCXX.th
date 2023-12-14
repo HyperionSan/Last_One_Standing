@@ -1,0 +1,24 @@
+# $Header$
+
+!DESC "WaveToy Application in C++"
+
+!REPOSITORY_TYPE pserver
+!REPOSITORY_LOCATION cvs.cactuscode.org
+!REPOSITORY_NAME /cactus
+
+CactusWave/WaveToyCXX        
+CactusWave/IDScalarWaveCXX   
+
+CactusBase/Boundary          
+CactusBase/CartGrid3D        
+CactusBase/CoordBase
+CactusBase/IOASCII  
+CactusBase/IOBasic           
+CactusBase/IOUtil            
+CactusBase/LocalReduce
+CactusBase/SymBase       
+CactusBase/Time              
+
+CactusPUGH/PUGH              
+CactusPUGH/PUGHReduce
+CactusPUGH/PUGHSlab

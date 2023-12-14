@@ -1,0 +1,224 @@
+# Interface definition for thorn TestRotatingSymmetry180
+implements: TestRotatingSymmetry180
+inherits: Grid
+
+#########################################
+###  Aliased functions from Boundary  ###
+#########################################
+
+CCTK_INT FUNCTION Boundary_SelectGroupForBC(CCTK_POINTER_TO_CONST IN GH, \
+  CCTK_INT IN faces, CCTK_INT IN boundary_width, CCTK_INT IN table_handle, \
+  CCTK_STRING IN group_name, CCTK_STRING IN bc_name)
+
+REQUIRES FUNCTION Boundary_SelectGroupForBC
+
+########################################
+###  Aliased functions from SymBase  ###
+########################################
+
+CCTK_INT FUNCTION                         \
+    GetSymmetryBoundaries                 \
+        (CCTK_POINTER_TO_CONST IN cctkGH, \
+         CCTK_INT IN size,                \
+         CCTK_INT OUT ARRAY symbnd)
+
+REQUIRES FUNCTION GetSymmetryBoundaries
+
+
+private:
+
+CCTK_INT num_diffs "the number of detected differences"
+
+CCTK_REAL gf_none_single type=GF "single GF without tags"
+CCTK_REAL gf_none_vector[5] type=GF "vector GF without tags"
+
+CCTK_REAL gf_scalar_single type=GF tags="tensortypealias='scalar'" "single GF of type scalar"
+CCTK_REAL gf_scalar_vector[5] type=GF tags="tensortypealias='scalar'" "vector GF of type scalar"
+
+CCTK_REAL gf_4scalar_single type=GF tags="tensortypealias='4scalar'" "single GF of type 4scalar"
+CCTK_REAL gf_4scalar_vector[5] type=GF tags="tensortypealias='4scalar'" "vector GF of type 4scalar"
+
+# all tensor grid functions MUST end in '_' followed by their tensor index this
+# is used by the C code to decide how to initialize them
+
+CCTK_REAL gf_u_single type=GF tags="tensortypealias='u'"
+{
+  gf_u_single_x, gf_u_single_y, gf_u_single_z
+} "single GF of type u"
+CCTK_REAL gf_u_vector[5] type=GF tags="tensortypealias='u'"
+{
+  gf_u_vector_x, gf_u_vector_y, gf_u_vector_z
+} "vector GF of type u"
+
+CCTK_REAL gf_d_single type=GF tags="tensortypealias='d'"
+{
+  gf_d_single_x, gf_d_single_y, gf_d_single_z
+} "single GF of type d"
+CCTK_REAL gf_d_vector[5] type=GF tags="tensortypealias='d'"
+{
+  gf_d_vector_x, gf_d_vector_y, gf_d_vector_z
+} "vector GF of type d"
+
+CCTK_REAL gf_4u_single type=GF tags="tensortypealias='4u'"
+{
+  gf_4u_single_t, gf_4u_single_x, gf_4u_single_y, gf_4u_single_z
+} "single GF of type 4u"
+CCTK_REAL gf_4u_vector[5] type=GF tags="tensortypealias='4u'"
+{
+  gf_4u_vector_t, gf_4u_vector_x, gf_4u_vector_y, gf_4u_vector_z
+} "vector GF of type 4u"
+
+CCTK_REAL gf_4d_single type=GF tags="tensortypealias='4d'"
+{
+  gf_4d_single_t, gf_4d_single_x, gf_4d_single_y, gf_4d_single_z
+} "single GF of type 4d"
+CCTK_REAL gf_4d_vector[5] type=GF tags="tensortypealias='4d'"
+{
+  gf_4d_vector_t, gf_4d_vector_x, gf_4d_vector_y, gf_4d_vector_z
+} "vector GF of type 4d"
+
+CCTK_REAL gf_uu_sym_single type=GF tags="tensortypealias='uu_sym'"
+{
+  gf_uu_sym_single_xx, gf_uu_sym_single_xy, gf_uu_sym_single_xz,
+  gf_uu_sym_single_yy, gf_uu_sym_single_yz, gf_uu_sym_single_zz
+} "single GF of type uu_sym"
+CCTK_REAL gf_uu_sym_vector[5] type=GF tags="tensortypealias='uu_sym'"
+{
+  gf_uu_sym_vector_xx, gf_uu_sym_vector_xy, gf_uu_sym_vector_xz,
+  gf_uu_sym_vector_yy, gf_uu_sym_vector_yz, gf_uu_sym_vector_zz
+} "vector GF of type uu_sym"
+
+CCTK_REAL gf_dd_sym_single type=GF tags="tensortypealias='dd_sym'"
+{
+  gf_dd_sym_single_xx, gf_dd_sym_single_xy, gf_dd_sym_single_xz,
+  gf_dd_sym_single_yy, gf_dd_sym_single_yz, gf_dd_sym_single_zz
+} "single GF of type dd_sym"
+CCTK_REAL gf_dd_sym_vector[5] type=GF tags="tensortypealias='dd_sym'"
+{
+  gf_dd_sym_vector_xx, gf_dd_sym_vector_xy, gf_dd_sym_vector_xz,
+  gf_dd_sym_vector_yy, gf_dd_sym_vector_yz, gf_dd_sym_vector_zz
+} "vector GF of type dd_sym"
+
+CCTK_REAL gf_uu_single type=GF tags="tensortypealias='uu'"
+{
+  gf_uu_single_xx, gf_uu_single_xy, gf_uu_single_xz, gf_uu_single_yy,
+  gf_uu_single_yx, gf_uu_single_yz, gf_uu_single_zx, gf_uu_single_zy,
+  gf_uu_single_zz
+} "single GF of type uu"
+CCTK_REAL gf_uu_vector[5] type=GF tags="tensortypealias='uu'"
+{
+  gf_uu_vector_xx, gf_uu_vector_xy, gf_uu_vector_xz, gf_uu_vector_yy,
+  gf_uu_vector_yx, gf_uu_vector_yz, gf_uu_vector_zx, gf_uu_vector_zy,
+  gf_uu_vector_zz
+} "vector GF of type uu"
+
+CCTK_REAL gf_dd_single type=GF tags="tensortypealias='dd'"
+{
+  gf_dd_single_xx, gf_uu_single_xy, gf_uu_single_xz, gf_uu_single_yy,
+  gf_uu_single_yx, gf_uu_single_yz, gf_uu_single_zx, gf_uu_single_zy,
+  gf_uu_single_zz
+} "single GF of type dd"
+CCTK_REAL gf_dd_vector[5] type=GF tags="tensortypealias='dd'"
+{
+  gf_dd_vector_xx, gf_uu_vector_xy, gf_uu_vector_xz, gf_uu_vector_yy,
+  gf_uu_vector_yx, gf_uu_vector_yz, gf_uu_vector_zx, gf_uu_vector_zy,
+  gf_uu_vector_zz
+} "vector GF of type dd"
+
+CCTK_REAL gf_du_single type=GF tags="tensortypealias='du'"
+{
+  gf_du_single_xx, gf_uu_single_xy, gf_uu_single_xz, gf_uu_single_yy,
+  gf_uu_single_yx, gf_uu_single_yz, gf_uu_single_zx, gf_uu_single_zy,
+  gf_uu_single_zz
+} "single GF of type du"
+CCTK_REAL gf_du_vector[5] type=GF tags="tensortypealias='du'"
+{
+  gf_du_vector_xx, gf_uu_vector_xy, gf_uu_vector_xz, gf_uu_vector_yy,
+  gf_uu_vector_yx, gf_uu_vector_yz, gf_uu_vector_zx, gf_uu_vector_zy,
+  gf_uu_vector_zz
+} "vector GF of type du"
+
+CCTK_REAL gf_ud_single type=GF tags="tensortypealias='ud'"
+{
+  gf_ud_single_xx, gf_uu_single_xy, gf_uu_single_xz, gf_uu_single_yy,
+  gf_uu_single_yx, gf_uu_single_yz, gf_uu_single_zx, gf_uu_single_zy,
+  gf_uu_single_zz
+} "single GF of type ud"
+CCTK_REAL gf_ud_vector[5] type=GF tags="tensortypealias='ud'"
+{
+  gf_ud_vector_xx, gf_uu_vector_xy, gf_uu_vector_xz, gf_uu_vector_yy,
+  gf_uu_vector_yx, gf_uu_vector_yz, gf_uu_vector_zx, gf_uu_vector_zy,
+  gf_uu_vector_zz
+} "vector GF of type ud"
+
+CCTK_REAL gf_ddd_sym_single type=GF tags="tensortypealias='ddd_sym'"
+{
+  gf_ddd_sym_single_xxx, gf_ddd_sym_single_xxy, gf_ddd_sym_single_xxz,
+  gf_ddd_sym_single_xyy, gf_ddd_sym_single_xyz, gf_ddd_sym_single_xzz,
+  gf_ddd_sym_single_yxx, gf_ddd_sym_single_yxy, gf_ddd_sym_single_yxz,
+  gf_ddd_sym_single_yyy, gf_ddd_sym_single_yyz, gf_ddd_sym_single_yzz,
+  gf_ddd_sym_single_zxx, gf_ddd_sym_single_zxy, gf_ddd_sym_single_zxz,
+  gf_ddd_sym_single_zyy, gf_ddd_sym_single_zyz, gf_ddd_sym_single_zzz
+} "single GF of type ddd_sym"
+CCTK_REAL gf_ddd_sym_vector[5] type=GF tags="tensortypealias='ddd_sym'"
+{
+  gf_ddd_sym_vector_xxx, gf_ddd_sym_vector_xxy, gf_ddd_sym_vector_xxz,
+  gf_ddd_sym_vector_xyy, gf_ddd_sym_vector_xyz, gf_ddd_sym_vector_xzz,
+  gf_ddd_sym_vector_yxx, gf_ddd_sym_vector_yxy, gf_ddd_sym_vector_yxz,
+  gf_ddd_sym_vector_yyy, gf_ddd_sym_vector_yyz, gf_ddd_sym_vector_yzz,
+  gf_ddd_sym_vector_zxx, gf_ddd_sym_vector_zxy, gf_ddd_sym_vector_zxz,
+  gf_ddd_sym_vector_zyy, gf_ddd_sym_vector_zyz, gf_ddd_sym_vector_zzz
+} "vector GF of type ddd_sym"
+
+CCTK_REAL gf_4uu_sym_single type=GF tags="tensortypealias='4uu_sym'"
+{
+  gf_4uu_sym_single_tt, gf_4uu_sym_single_tx, gf_4uu_sym_single_ty,
+  gf_4uu_sym_single_tz, gf_4uu_sym_single_xx, gf_4uu_sym_single_xy,
+  gf_4uu_sym_single_xz, gf_4uu_sym_single_yy, gf_4uu_sym_single_yz,
+  gf_4uu_sym_single_zz
+} "single GF of type 4uu_sym"
+CCTK_REAL gf_4uu_sym_vector[5] type=GF tags="tensortypealias='4uu_sym'"
+{
+  gf_4uu_sym_vector_tt, gf_4uu_sym_vector_tx, gf_4uu_sym_vector_ty,
+  gf_4uu_sym_vector_tz, gf_4uu_sym_vector_xx, gf_4uu_sym_vector_xy,
+  gf_4uu_sym_vector_xz, gf_4uu_sym_vector_yy, gf_4uu_sym_vector_yz,
+  gf_4uu_sym_vector_zz
+} "vector GF of type 4uu_sym"
+
+CCTK_REAL gf_4dd_sym_single type=GF tags="tensortypealias='4dd_sym'"
+{
+  gf_4dd_sym_single_tt, gf_4dd_sym_single_tx, gf_4dd_sym_single_ty,
+  gf_4dd_sym_single_tz, gf_4dd_sym_single_xx, gf_4dd_sym_single_xy,
+  gf_4dd_sym_single_xz, gf_4dd_sym_single_yy, gf_4dd_sym_single_yz,
+  gf_4dd_sym_single_zz
+} "single GF of type 4dd_sym"
+CCTK_REAL gf_4dd_sym_vector[5] type=GF tags="tensortypealias='4dd_sym'"
+{
+  gf_4dd_sym_vector_tt, gf_4dd_sym_vector_tx, gf_4dd_sym_vector_ty,
+  gf_4dd_sym_vector_tz, gf_4dd_sym_vector_xx, gf_4dd_sym_vector_xy,
+  gf_4dd_sym_vector_xz, gf_4dd_sym_vector_yy, gf_4dd_sym_vector_yz,
+  gf_4dd_sym_vector_zz
+} "vector GF of type 4dd_sym"
+
+CCTK_REAL gf_weylscalars_real_single type=GF tags="tensortypealias='weylscalars_real'"
+{
+  gf_weylscalars_real_single_0_re, gf_weylscalars_real_single_0_im,
+  gf_weylscalars_real_single_1_re, gf_weylscalars_real_single_1_im,
+  gf_weylscalars_real_single_2_re, gf_weylscalars_real_single_2_im,
+  gf_weylscalars_real_single_3_re, gf_weylscalars_real_single_3_im,
+  gf_weylscalars_real_single_4_re, gf_weylscalars_real_single_4_im
+} "single GF of type weylscalars_real"
+CCTK_REAL gf_weylscalars_real_vector[5] type=GF tags="tensortypealias='weylscalars_real'"
+{
+  gf_weylscalars_real_vector_0_re, gf_weylscalars_real_vector_0_im,
+  gf_weylscalars_real_vector_1_re, gf_weylscalars_real_vector_1_im,
+  gf_weylscalars_real_vector_2_re, gf_weylscalars_real_vector_2_im,
+  gf_weylscalars_real_vector_3_re, gf_weylscalars_real_vector_3_im,
+  gf_weylscalars_real_vector_4_re, gf_weylscalars_real_vector_4_im
+} "vector GF of type weylscalars_real"
+
+CCTK_REAL gf_veld[3] type=GF tags="tensortypealias='d'" "GF if type veld"
+CCTK_REAL gf_velu[3] type=GF tags="tensortypealias='u'" "GF if type velu"
+
+CCTK_REAL gf_vel4d[4] type=GF tags="tensortypealias='4d'" "GF if type vel4d"
+CCTK_REAL gf_vel4u[4] type=GF tags="tensortypealias='4u'" "GF if type vel4u"

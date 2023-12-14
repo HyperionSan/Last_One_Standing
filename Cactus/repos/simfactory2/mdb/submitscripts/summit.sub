@@ -1,0 +1,15 @@
+#! /bin/bash
+#BSUB -P @ALLOCATION@
+#BSUB -q @QUEUE@
+#BSUB -W @WALLTIME_HH@:@WALLTIME_MM@
+#BSUB -nnodes @NODES@
+#BSUB -alloc_flags gpumps
+#BSUB -J @SHORT_SIMULATION_NAME@
+#BSUB -o @RUNDIR@/@SIMULATION_NAME@.out
+#BSUB -e @RUNDIR@/@SIMULATION_NAME@.err
+#BSUB -B -N -u @USER@
+@("@CHAINED_JOB_ID@" != "" ? "#BSUB -w ended(@CHAINED_JOB_ID@)" : "")@
+# bsub does not like empty #BSUB lines
+
+cd @SOURCEDIR@
+@SIMFACTORY@ run @SIMULATION_NAME@ --basedir=@BASEDIR@ --machine=@MACHINE@ --restart-id=@RESTART_ID@ @FROM_RESTART_COMMAND@

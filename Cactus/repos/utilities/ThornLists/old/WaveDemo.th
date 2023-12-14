@@ -1,0 +1,45 @@
+# $Header$
+
+!DESC "Demo Parameter File Using WaveToy Application With Cool Tools"
+
+!REPOSITORY_TYPE pserver
+!REPOSITORY_LOCATION cvs.cactuscode.org
+!REPOSITORY_NAME /cactus
+
+CactusBase/Boundary        
+CactusBase/CartGrid3D      
+CactusBase/CoordBase
+CactusBase/IOASCII      
+CactusBase/IOBasic         
+CactusBase/IOUtil          
+CactusBase/LocalReduce 
+CactusBase/SymBase
+CactusBase/Time           
+
+CactusConnect/HTTPD
+CactusConnect/HTTPDExtra 
+CactusConnect/Socket
+
+CactusElliptic/EllBase
+
+CactusExternal/jpeg6b
+
+CactusPUGH/PUGH            
+CactusPUGH/PUGHReduce
+CactusPUGH/PUGHSlab
+
+CactusPUGHIO/IsoSurfacer
+
+CactusIO/IOJpeg
+
+CactusWave/IDScalarWave
+CactusWave/IDScalarWaveC
+CactusWave/IDScalarWaveCXX
+CactusWave/IDScalarWaveElliptic
+CactusWave/WaveToyC
+CactusWave/WaveToyCXX
+CactusWave/WaveToyExtra
+CactusWave/WaveToyF77
+CactusWave/WaveToyF90
+CactusWave/WaveToyFreeF90
+CactusWave/WaveBinarySource

@@ -1,0 +1,429 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="google-site-verification"
+          content="xqjLntCMQhbymUvrrIrwKGEtFLFb-ZWn6AVxpsbtyAI" />
+    <title>Carpet &mdash; AMR for Cactus</title>
+  </head>
+  
+  <body>
+
+    <h1 align="center">Carpet &mdash; Adaptive Mesh Refinement for the
+      Cactus Framework</h1>
+
+<table>
+<tr>
+<td valign="top" bgcolor="#ffcc77" width="1%">
+
+<a href="logo/Sierpinski.pdf"><img src="logo/Sierpinski.png" width="150" alt="Carpet logo (a Sierpiński carpet)" /></a>
+
+<p><b>CarpetCode</b><br />
+<a href="http://www.carpetcode.org/">home page</a></p>
+
+<p><b>Documentation</b><br />
+<a href="doc/documentation.pdf">Introduction</a>&nbsp;(PDF,&nbsp;170&nbsp;kB)<br />
+<a href="doc/first-steps.pdf">First&nbsp;Steps</a>&nbsp;(PDF,&nbsp;90&nbsp;kB)<br />
+<a href="doc/scheduling.pdf">Scheduling</a>&nbsp;(PDF,&nbsp;160&nbsp;kB)<br />
+<a href="doc/domain-decomposition.pdf">Grid&nbsp;Structure</a>&nbsp;(PDF,&nbsp;120&nbsp;kB)<br />
+<a href="doc/internals.pdf">Internals</a>&nbsp;(PDF,&nbsp;130&nbsp;kB)<br />
+<a href="humour.html">Other Carpets</a></p>
+
+<p><b>Mailing Lists</b><br />
+<a href="http://cactuscode.org/community/mailinglists/">List&nbsp;Management</a><br />
+<a href="http://cactuscode.org/mailman/listinfo/developers">Subscribe</a><br />
+<a href="http://cactuscode.org/pipermail/developers/">List&nbsp;Archive</a><br />
+</p>
+
+<p><b>Development</b><br />
+<a href="get-carpet.html">Download</a><br />
+<a href="http://trac.einsteintoolkit.org/">Bug&nbsp;Reports</a><br />
+<a href="contributors.html">Contributors</a></p>
+<!-- These are outdated
+<a href="feature-requests.html">Missing&nbsp;features</a><br />
+<a href="status-reports.html">Status&nbsp;reports</a><br />
+-->
+
+<p><b>Visualisation</b><br />
+<a href="visualisation-tools.html">Tools</a><br />
+<a href="https://mailserv.aei.mpg.de/mailman/listinfo/visualization/">Mailing&nbsp;List</a></p>
+
+<p><b>Results</b><br />
+<a href="publications/publications.html">Publications</a></p>
+
+<p><b>Related</b><br />
+<a href="http://www.cactuscode.org/">Cactus</a><br />
+<a href="http://relativity.phys.lsu.edu/">LSU Relativity Group</a><br />
+<a href="http://www.cct.lsu.edu/numerical/">numrel@CCT</a><br />
+<a href="http://numrel.aei.mpg.de/">numrel@aei</a><br />
+<a href="http://www.whiskycode.org/">Whisky</a><br />
+<a href="http://relativity.phys.lsu.edu/postdocs/matt/taka.php">Taka</a><br />
+<a href="http://sbir.nasa.gov/SBIR/abstracts/05/sttr/phase1/STTR-05-1-T4.02-9864.html?solicitationId=STTR_05_P1">ParCa</a></p>
+
+<p><b>Carpet Users</b><br />
+<a href="http://numrel.aei.mpg.de/">AEI&nbsp;Potsdam</a><br />
+<!-- <a href="http://www.as.arizona.edu/">University&nbsp;of&nbsp;Arizona</a><br /> -->
+<!-- <a href="http://www.astro.auth.gr/Science-Subjects/Gravity.html">AUTH</a><br /> -->
+Barcelona<br />
+<a href="http://www.tapir.caltech.edu/">Caltech</a><br />
+<!-- <a href="http://astrosun2.astro.cornell.edu/research/projects/blackholes/">Cornell</a><br /> -->
+<a href="http://www.cra.gatech.edu/">Georgia&nbsp;Tech</a><br />
+<!-- <a href="http://ww2.tpi.uni-jena.de/gravity/">Jena</a><br /> -->
+<a href="http://www.kisti.re.kr/english/">KISTI</a><br />
+<a href="http://www.cct.lsu.edu/">LSU</a><br />
+<!-- <a href="http://www.mpa-garching.mpg.de/hydro/index.shtml">MPA&nbsp;Garching</a><br /> -->
+<a href="http://astrophysics.gsfc.nasa.gov/gravity/research/numrel.html">NASA&nbsp;Goddard</a><br />
+<a href="http://www.fis.unipr.it/numrel/">Parma</a><br />
+<!-- <a href="http://www.gravity.psu.edu/numrel/">Penn&nbsp;State</a><br /> -->
+<a href="http://astrophysics.rit.edu/">RIT</a><br />
+<a href="http://www.sissa.it/ap/RelAstro/">SISSA</a><br />
+<a href="http://www.maths.soton.ac.uk/applied/relativity/">Southampton</a><br />
+<a href="http://www.tat.physik.uni-tuebingen.de/">TAT/CPT</a><br />
+<a href="http://numrel.aei.mpg.de/People/personal_webpages/baiotti.html">Tokyo&nbsp;University</a><br />
+<!-- <a href="http://www2.polito.it/ricerca/relgrav/">Torino</a><br /> -->
+<a href="http://research.physics.uiuc.edu/CTA/IRG/">UIUC</a><br />
+<a href="http://www.nuclecu.unam.mx/~gravit/Gravit/">UNAM</a><br />
+<!-- <a href="http://cgwa.phys.utb.edu/">UTB</a><br /> -->
+<a href="http://wugrav.wustl.edu/">WashU</a><br />
+<a href="http://www.yukawa.kyoto-u.ac.jp/english/contents/labs/astro.html">YITP</a></p>
+
+<p><b>Feedback</b><br />
+<a href="mailto:schnetter@carpetcode.org">Send&nbsp;email</a></p>
+
+</td>
+<td valign="top">
+
+    <p>Carpet is an adaptive mesh refinement and multi-patch driver for
+    the <a href="http://www.cactuscode.org/">Cactus Framework</a>.
+    Cactus is a software framework for solving time-dependent partial
+    differential equations on block-structured grids, and Carpet acts
+    as <i>driver layer</i> providing adaptive mesh refinement,
+    multi-patch capability, as well as parallelisation and efficient
+    I/O.</p>
+
+    <p>Carpet was created in 2001
+    by <a href="http://www.cct.lsu.edu/~eschnett/">Erik Schnetter</a>
+    at the <a href="http://www.tat.physik.uni-tuebingen.de/">TAT</a>
+    (Theoretische Astrophysik Tübingen) and subsequently brought into
+    production use by Erik Schnetter, Scott Hawley, and Ian Hawke at
+    the <a href="http://www.aei.mpg.de/">AEI</a> (Max-Planck-Institut
+    für Gravitationsphysik, Albert-Einstein-Institut).  Carpet is
+    currently maintained at
+    the <a href="http://www.cct.lsu.edu/">CCT</a> (Center for
+    Computation &amp; Technology)
+    at <a href="http://www.lsu.edu/">LSU</a>.  These pages describe
+    Carpet and its current development.</p>
+
+    <hr />
+
+    <h2>News</h2>
+
+    <p><b>February 15, 2011:</b>
+    The <a href="get-carpet.html">download instructions</a> for Carpet
+    now also point to <a href="http://code.google.com/">Google
+    Code</a>, where the current development version is availble for
+    download.</p>
+
+    <p><b>November 23, 2010:</b> We are pleased to announce the second
+    release (code name
+    "<a href="http://en.wikipedia.org/wiki/Subrahmanyan_Chandrasekhar">Chandrasekhar</a>")
+    of the Einstein Toolkit, an open, community developed software
+    infrastructure for relativistic astrophysics. This release is
+    mainly a maintenance release incorporating fixes accumulated since
+    the previous release in June 2010, as well as additional test
+    suites.</p>
+
+    <p><b>August 30, 2010:</b> Notes from our
+    <a href="http://ccrg.rit.edu/~carpet/wiki/Main_Page">Carpet
+    Developer Workshop</a> at RIT are now available.</p>
+
+    <p><b>June 17, 2010:</b> We are pleased to announce the first
+    release (code name
+    "<a href="http://en.wikipedia.org/wiki/Bohr-Einstein_debates">Bohr</a>")
+    of the Einstein Toolkit, an open, community developed software
+    infrastructure for relativistic astrophysics. The Einstein Toolkit
+    is a collection of over 130 software components and tools for
+    simulating and analyzing general relativistic astrophysical
+    systems that builds on numerous software efforts in the numerical
+    relativity community including CactusEinstein, the Whisky
+    hydrodynamics code, and the Carpet AMR infrastructure.</p>
+
+    <p><a href="olds.html"><b>Old News...</b></a></p>
+
+    <hr />
+
+    <h2>Documentation</h2>
+
+    <p>We have accumulated a few pieces of documentation:</p>
+    <ul>
+      <li>An <a href="doc/documentation.pdf">introduction</a>
+      (PDF,&nbsp;210&nbsp;kB) to Carpet, as well as a guide to the
+      first steps for using it.  Everybody should have read this.
+      (This is the same as the Arrangement Guide from the Carpet
+      sources.)</li>
+
+      <li><a
+      href="http://www.gravity.psu.edu/numrel/people/sperhake_ulrich.html">Ulrich
+      Sperhake</a> wrote a tutorial outlining the <a
+      href="doc/first-steps.pdf">first steps</a> (PDF,&nbsp;130&nbsp;kB)
+      that one has to take to install Carpet and run an example
+      application.</li>
+
+      <li>An explanation of the <a href="doc/internals.pdf">internal
+      workings</a> (PDF,&nbsp;120&nbsp;kB) of Carpet.  You should read
+      this if you want to modify Carpet.</li>
+
+      <li>An explanation of
+      <a href="doc/scheduling.pdf">how scheduling works</a>
+      (PDF,&nbsp;120&nbsp;kB) in (PUGH and) Carpet.  This may be
+      useful for setting up mixtures of local and global operations.</li>
+
+      <li>The individual Thorn Guides of Carpet.  They are available
+      with the source code.  They give details about the thorns' APIs
+      and user interfaces.</li>
+
+      <li>Thanks to <a
+      href="http://www.stack.nl/~dimitri/doxygen/">Doxygen</a>, we now
+      have an <a href="doxygen/html/index.html">overview</a> over all
+      the routines and data structures in Carpet.  Most individual
+      Doxygen tags are still missing, but the extracted documentation
+      is already very useful.  (The online documentation might not
+      always be up to date; in case of doubt, extract the
+      documentation yourself.)</li>
+    </ul>
+
+    <hr />
+
+    <h2>Interacting with the developers</h2>
+
+<!-- outdated
+    <p>Most discussions about Carpet, i.e. user questions, feature
+    requests, and bug reports, are held on the Carpet developers'
+    mailing list <a
+    href="mailto:developers@lists.carpetcode.org">developers@lists.carpetcode.org</a>.
+    You can subscribe and unsubscribe from our <a
+    href="http://lists.carpetcode.org/">list management web page</a>.
+    You will also find the mailing list archive there.  We thank <a
+    href="http://www.tat.physik.uni-tuebingen.de/~kobras/">Daniel
+    Kobras</a> for managing the mailing list server.</p>
+-->
+    <p>Most discussions about Carpet, i.e. user questions, feature
+    requests, and bug reports, are held on the Cactus developers'
+    mailing
+    list <a href="mailto:developers@cactuscode.org">developers@cactuscode.org</a>.
+    You can subscribe and unsubscribe from
+    our <a href="http://cactuscode.org/community/mailinglists/">list
+    management web page</a>. You will also find the mailing list
+    archive there.</p>
+
+<!-- outdated
+    <p>We have started to use <a
+    href="http://www.bugzilla.org/">Bugzilla</a> to keep track of
+    requested features or reported bugs in Carpet.  You can submit or
+    comment on issues from our <a
+    href="http://bugs.carpetcode.org/">Bugzilla pages</a> once you
+    have created an account there.  The old <a
+    href="feature-requests.html">list of missing features</a> have not
+    yet been moved over to Bugzilla.</p>
+-->
+
+    <p>We use <a href="http://trac.edgewall.org/">TRAC</a> to keep
+    track of requested features or reported bugs in Carpet. You can
+    submit or comment on issues from
+    our <a href="http://trac.einsteintoolkit.org/">TRAC site</a>.</p>
+
+    <hr />
+
+    <h2>Pretty pictures</h2>
+
+    <p>Here are some pretty pictures of simulations that were
+    performed with Carpet:</p>
+
+    <table>
+    <tr>
+
+      <td valign="top" width="10%">
+      <p><a href="pictures/meudon-lapse-height.png"><img
+      src="pictures/thumbnail-meudon-lapse-height.png" height="80"
+      width="80" alt="lapse height field" /></a></p>
+      </td>
+
+      <td valign="top" width="38%">
+      <p>Cut through a binary black hole system.  Height field of the
+      lapse function (approximately the time dilatation) in a binary
+      black hole system calculated from Meudon initial data.  The
+      system is cut between the two black holes, so that only one
+      black hole is visible.  The white boxes indicate the hierarchy
+      of refinement regions.</p>
+      </td>
+
+      <td valign="top" width="4">
+      </td>
+
+      <td valign="top" width="10">
+      <p><a href="pictures/quadrupole.jpeg"><img
+      src="pictures/thumbnail-quadrupole.jpeg" height="80" width="80"
+      alt="quadrupole wave" /></a></p>
+      </td>
+
+      <td valign="top" width="38%">
+      <p>A quadrupole wave.  Two rotating scalar charges create a
+      quadrupolar wave, mimicking the gravitational wave trail of a
+      binary black hole system.  The small bumps and riddles are
+      artifacts caused by the discontinuous charge distribution.  To
+      be improved.</p>
+      </td>
+
+    </tr>
+    <tr>
+
+      <td valign="top">
+      <p><a href="pictures/meudon-lapse-iso.png"><img
+      src="pictures/thumbnail-meudon-lapse-iso.png" height="80"
+      width="80" alt="lapse isosurfaces" /></a></p>
+      </td>
+
+      <td valign="top">
+      <p>Lapse isosurfaces in a binary black hole system.  The same
+      system as above, but the lapse function is rendered as
+      isosurfaces.</p>
+      </td>
+
+      <td valign="top">
+      </td>
+
+      <td valign="top">
+      <p><a href="pictures/collapse-vel-x.png"><img
+      src="pictures/thumbnail-collapse-vel-x.png" height="80"
+      width="80" alt="velocity component" /></a></p>
+      </td>
+
+      <td valign="top">
+      <p>A velocity component in a stellar core collapse.  The x
+      component of the fluid velocity in a stellar core collapse.
+      This simulation was performed by Christian Ott.</p>
+      </td>
+
+    </tr>
+    <tr>
+
+      <td valign="top">
+      <p><a href="pictures/multipatch-3phi-error.jpeg"><img
+      src="pictures/thumbnail-multipatch-3phi-error.jpeg" height="80"
+      width="80" alt="error function" /></a></p>
+      </td>
+
+      <td valign="top">
+      <p>The error in a multipatch numerical simulation of scalar wave
+      propagation in a hollow spherical shell.  The coarse- and fine-grid
+      surface show the numerical errors (computed solution - exact solution)
+      computed at two different resolutions, with the low resolution error
+      divided by 16.  The fact that the two surfaces overlap nicely shows
+      that the errors scale as the 4th power of the grid resolution.
+      This simulation was performed by Jonathan Thornburg.</p>
+      </td>
+
+      <td valign="top">
+      </td>
+
+      <td valign="top">
+      <p><a href="pictures/matter-density.jpeg"><img
+      src="pictures/thumbnail-matter-density.jpeg" height="80"
+      width="80" alt="matter density" /></a></p>
+      </td>
+
+      <td valign="top">
+      <p>The fate of a proto-neutron-star bar-mode deformation.
+      Matter density at z=0 during the transition from an m=2 deformed star
+      to an m=1 deformed one. The light on the right is used to emphasizes
+      the spiral arms which are responsible for a small mass loss.
+      This simulation was performed by Gian Mario Manca.</p>
+      </td>
+
+    </tr>
+    </table>
+
+    <p>Moving pictures: We can show
+    a <a href="movies/waveamr.gif">movie</a> (animated gif,
+    3.3&nbsp;MB) of a scalar wave equation with adaptive mesh
+    refinement.  The refinement criterion is a very simplistic local
+    truncation error estimate.  We also have
+    a <a href="movies/bh2.gif">movie</a> (animated gif, 730&nbsp;kB)
+    of a moving refinement region tracking a black hole.</p>
+
+    <hr />
+
+    <h2>Making sense of results</h2>
+
+    <p>Three-dimensional time-dependent simulation results are
+    difficult enough to interpret when the grid is uniform.  With mesh
+    refinement, the sheer amount of available data makes it necessary
+    to use professional tools to examine the data.  This is not only
+    the case for "big physics runs", where one (should) know in
+    advance what to expect, but especially during development, where
+    things do not always go as planned.
+    Christian Reisswig was kind enough to write
+    a <a href="http://www.cactuscode.org/Visualization/VisIt/">database
+    plugin</a> for the visualisation
+    tool <a href="https://www.llnl.gov/visit/">VisIt</a>.  There is
+    also
+    an <a href="http://www.cactuscode.org/Visualization/ImportCarpetHDF5">import
+    module</a> for the visualisation
+    tool <a href="http://www.research.ibm.com/dx/">OpenDX</a>
+    available, implemented by
+    <a href="http://www.aei.mpg.de/~tradke/">Thomas Radke</a>.</p>
+
+    <hr />
+
+    <h2>Related projects</h2>
+
+    <ul>
+    <li>Physics: <a href="http://www.cactuscode.org/">Cactus</a>, <a
+    href="http://numrel.aei.mpg.de/">numrel@aei</a>, <a
+    href="http://www.whiskycode.org/">Whisky</a></li>
+
+    <li>I/O: <a href="http://www.hdfgroup.org/HDF5/">HDF5</a>, <a
+    href="http://www.fiberbundle.net/">F5</a></li>
+
+    <li>Visualisation: <a href="http://www.amiravis.com/">Amira</a>,
+    <a href="https://www.llnl.gov/visit/">VisIt</a>,
+    (<a href="http://www.opendx.org/">OpenDX</a>)</li>
+    </ul>
+
+    <hr />
+
+    <p>
+      <a href="http://www.xemacs.org/About/created.html"><img
+      src="cbxSmall.jpg" alt="Created with XEmacs!" height="36"
+      width="100" /></a>
+      
+      <a href="http://www.anybrowser.org/campaign/"><img
+      src="logoab8.png" alt="Best Viewed With Any Browser" height="31"
+      width="88" /></a>
+
+      <a href="http://validator.w3.org/check?uri=referer"><img
+      src="valid-xhtml10-blue.png" alt="Valid XHTML 1.0!" height="31"
+      width="88" /></a>
+
+<!--
+      <script type="text/javascript"
+      src="http://boastology.com/tools/pr/?style=2&amp;p=1"></script>
+-->
+    </p>
+    
+    <address><a href="mailto:schnetter@cct.lsu.edu">Erik Schnetter</a></address>
+<p>
+<!-- Created: Tue Aug 12 12:12:08 CEST 2003 -->
+<!-- hhmts start -->
+Last modified: Tue Feb 15 2011
+<!-- hhmts end -->
+</p>
+
+</td>
+</tr>
+</table>
+  </body>
+</html>

@@ -1,0 +1,12 @@
+CVS info   : $Header:$
+
+Cactus Code Thorn WorldTube
+Thorn Author(s)     : Christian Reisswig <reisswig@aei.mpg.de>
+Thorn Maintainer(s) : Christian Reisswig <reisswig@aei.mpg.de>
+--------------------------------------------------------------------------
+
+Purpose of the thorn:
+
+This thorn is ment as an interface between Cauchy and characteristic codes.
+
+It can also just output metric components and find spheres of constant areal radius.

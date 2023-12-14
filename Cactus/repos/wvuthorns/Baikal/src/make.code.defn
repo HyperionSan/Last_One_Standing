@@ -1,0 +1,24 @@
+# Main make.code.defn file for thorn Baikal
+
+# Source files in this directory that need compiled:
+SRCS = \
+       enforce_detgammahat_constraint_Baikal.c \
+       rhs_eval_Baikal_order_2.c \
+       Ricci_eval_Baikal_order_2.c \
+       BSSN_constraints_Baikal_order_2.c \
+       rhs_eval_Baikal_order_4.c \
+       Ricci_eval_Baikal_order_4.c \
+       BSSN_constraints_Baikal_order_4.c \
+       T4DD_to_T4UU_Baikal.c \
+       ADM_to_BSSN_Baikal.c \
+       Banner_Baikal.c \
+       BSSN_to_ADM_Baikal.c \
+       floor_the_lapse_Baikal.c \
+       MoL_registration_Baikal.c \
+       RegisterSlicing_Baikal.c \
+       specify_Driver_BoundaryConditions_Baikal.c \
+       specify_BoundaryConditions_aux_gfs_Baikal.c \
+       specify_BoundaryConditions_evolved_gfs_Baikal.c \
+       specify_NewRad_BoundaryConditions_parameters_Baikal.c \
+       Symmetry_registration_oldCartGrid3D_Baikal.c \
+       zero_rhss_Baikal.c 

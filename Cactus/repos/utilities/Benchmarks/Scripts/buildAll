@@ -1,0 +1,21 @@
+#!/bin/bash
+
+benchmarks=$(cat <<EOF
+BenchIO_FlexIO
+BenchIO_HDF5
+Bench_BSSN_Carpet
+Bench_BSSN_PUGH
+Bench_Whisky_Carpet
+EOF
+)
+
+hostname=$(hostname)
+
+for benchmark in $benchmarks
+do
+
+    echo 'yes' |
+    make $benchmark-config options=options/$hostname THORNLIST=BENCHMARKS/$benchmark.thornlist
+    make -j4 $benchmark
+
+done

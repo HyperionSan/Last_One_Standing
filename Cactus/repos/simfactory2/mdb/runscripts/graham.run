@@ -1,0 +1,82 @@
+#! /bin/bash
+
+echo "Preparing:"
+set -euxo pipefail
+
+cd @RUNDIR@-active
+
+echo "Job setup:"
+echo "   Allocated:"
+echo "      Nodes:                      @NODES@"
+echo "      Cores per node:             @PPN@"
+echo "   Running:"
+echo "      MPI processes:              @NUM_PROCS@"
+echo "      OpenMP threads per process: @NUM_THREADS@"
+echo "      MPI processes per node:     @NODE_PROCS@"
+echo "      OpenMP threads per core:    @NUM_SMT@"
+echo "      OpenMP threads per node:    @PPN_USED@"
+
+echo "Checking:"
+date
+env
+hostname
+pwd
+
+module list
+
+scontrol show hostnames
+hostfile="SIMFACTORY/NODES"
+scontrol show hostnames |
+    awk '{ print $1, "slots=@NODE_PROCS@"; }' >"$hostfile" 
+
+/sbin/ifconfig || true
+
+ompi_info
+
+case @NUM_THREADS@ in
+    (1) bind_to=core; map_by=ppr:1:core;;
+    (2) bind_to=socket; map_by=ppr:8:socket;;
+    (4) bind_to=socket; map_by=ppr:4:socket;;
+    (8) bind_to=socket; map_by=ppr:2:socket;;
+    (16) bind_to=socket; map_by=ppr:1:socket;;
+    (32) bind_to=none; map_by=ppr:1:node;;
+    (*) bind_to=none; map_by=node;;
+esac
+
+echo "Environment:"
+export "SIMULATION_ID=@SIMULATION_ID@"
+export "CACTUS_MAX_MEMORY=@(@MEMORY@ * 1024)@" # Byte
+export "CACTUS_NUM_PROCS=@NUM_PROCS@"
+export "CACTUS_NUM_THREADS=@NUM_THREADS@"
+export "CACTUS_SET_THREAD_BINDINGS=1"
+export "GLIBCXX_FORCE_NEW=1"
+export "GMON_OUT_PREFIX=gmon.out"
+export "OMP_DISPLAY_ENV=TRUE"
+export "OMP_NUM_THREADS=@NUM_THREADS@"
+export "OMP_PLACES=cores"       # threads, cores, sockets
+export "OMP_PROC_BIND=FALSE"    # false, true, master, close, spread
+export "OMP_STACKSIZE=8192"     # kByte
+env | sort >"SIMFACTORY/ENVIRONMENT"
+
+# ulimit -c unlimited
+
+echo "Starting:"
+date
+export CACTUS_STARTTIME=$(date +%s)
+
+time						\
+    mpiexec					\
+    --hostfile "${hostfile}"			\
+    --n @NUM_PROCS@				\
+    --map-by "${map_by}"			\
+    --display-map				\
+    --bind-to "${bind_to}"			\
+    --report-bindings				\
+    "@EXECUTABLE@"				\
+    -L 3					\
+    "@PARFILE@"
+
+echo "Stopping:"
+date
+
+echo "Done."

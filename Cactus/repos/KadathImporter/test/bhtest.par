@@ -1,0 +1,153 @@
+ActiveThorns = "
+SystemTopology
+AEILocalInterp
+CoordBase 
+SymBase 
+Boundary 
+NanChecker 
+CartGrid3d 
+Time
+MoL 
+CarpetIOScalar 
+CarpetSlab
+Carpet
+CarpetLib 
+CarpetIOHDF5
+ADMBase 
+CarpetReduce
+StaticConformal 
+SpaceMask 
+CoordGauge
+ADMCoupling 
+LoopControl
+TMuNuBase 
+SphericalSurface 
+ADMMacros
+CarpetInterp 
+LocalInterp2
+"
+
+
+ActiveThorns = "LocalReduce InitBase HydroBase"
+ActiveThorns = "IOASCII IOBasic IOUtil"
+ActiveThorns = "KadathImporter"
+
+Cactus::cctk_itlast		= 0
+Cactus::terminate                         = "iteration"
+
+Time::dtfac			= 0.25
+
+#############################################################
+# Grid
+#############################################################
+
+CoordBase::domainsize                   = minmax
+
+CoordBase::boundary_size_x_lower        = 5
+CoordBase::boundary_size_y_lower        = 5
+CoordBase::boundary_size_z_lower        = 5
+CoordBase::boundary_shiftout_x_lower    = 1
+CoordBase::boundary_shiftout_y_lower    = 1
+CoordBase::boundary_shiftout_z_lower    = 1
+
+CoordBase::boundary_size_x_upper        = 5
+CoordBase::boundary_size_y_upper        = 5
+CoordBase::boundary_size_z_upper        = 5
+CoordBase::boundary_shiftout_x_upper    = 0
+CoordBase::boundary_shiftout_y_upper    = 0
+CoordBase::boundary_shiftout_z_upper    = 0
+
+CartGrid3D::type                        = "coordbase"
+CartGrid3D::domain                      = "full"
+CartGrid3D::avoid_origin                = "no"
+
+CoordBase::xmin                         = -4
+CoordBase::ymin                         = -4
+CoordBase::zmin                         = -4
+
+CoordBase::xmax                         = 4
+CoordBase::ymax                         = 4
+CoordBase::zmax                         = 4
+
+CoordBase::dx                           = 0.1
+CoordBase::dy                           = 0.1
+CoordBase::dz                           = 0.1
+
+#############################################################
+# Carpet
+#############################################################
+
+Carpet::domain_from_coordbase           = "yes"
+Carpet::ghost_size                      = 5
+Carpet::init_fill_timelevels            = "yes"
+Carpet::poison_new_timelevels           = yes
+
+Boundary::radpower                     = 2
+ADMBase::metric_type			= "physical"
+ADMBase::initial_data		= "Kadath"
+ADMBase::initial_lapse   		= "Kadath"
+ADMBase::initial_shift   		= "Kadath"
+ADMBase::initial_dtlapse   		= "zero"
+ADMBase::initial_dtshift   		= "zero"
+KadathImporter::type = "BH"
+KadathImporter::filename = "bhtest.info"
+
+ADMBase::lapse_evolution_method	= "static"
+
+IO::out_dir			= $parfile
+IO::out_fileinfo		= "axis labels"
+
+IOBasic::outScalar_every	= 0
+
+IOASCII::out1D_every		= 0
+
+CarpetIOHDF5::out2D_every       		= 0
+
+ActiveThorns="AHFinderDirect"
+
+AHFinderDirect::N_horizons		= 1
+AHFinderDirect::find_every		= 10
+AHFinderDirect::output_h_every		= 0
+AHFinderDirect::max_Newton_iterations__initial	= 50
+AHFinderDirect::max_Newton_iterations__subsequent	= 50
+AHFinderDirect::max_allowable_Theta_growth_iterations	= 10
+AHFinderDirect::max_allowable_Theta_nonshrink_iterations	= 10
+AHFinderDirect::geometry_interpolator_name	= "Lagrange polynomial interpolation"
+AHFinderDirect::geometry_interpolator_pars	= "order=4"
+AHFinderDirect::surface_interpolator_name	= "Lagrange polynomial interpolation"
+AHFinderDirect::surface_interpolator_pars	= "order=4"
+AHFinderDirect::verbose_level		= "physics details"
+AHFinderDirect::move_origins		= "no"
+
+AHFinderDirect::origin_x[1]		= 0.
+
+#works for non-spinning backgrounds
+AHFinderDirect::initial_guess__coord_sphere__x_center[1]	= 0.
+AHFinderDirect::initial_guess__coord_sphere__y_center[1]	= 0.0
+AHFinderDirect::initial_guess__coord_sphere__z_center[1]	= 0.0
+AHFinderDirect::initial_guess__coord_sphere__radius[1]	= 0.45
+
+ActiveThorns = "SphericalSurface"
+SphericalSurface::nsurfaces             = 2
+SphericalSurface::maxntheta             = 140
+SphericalSurface::maxnphi               = 240
+SphericalSurface::verbose               = yes
+
+SphericalSurface::ntheta        [0]     = 120
+SphericalSurface::nphi  	[0]     = 240
+SphericalSurface::nghoststheta  [0]     = 2
+SphericalSurface::nghostsphi    [0]     = 2
+SphericalSurface::radius        [0]     = 50
+SphericalSurface::set_spherical	[0]	= yes
+
+SphericalSurface::ntheta        [1]     = 55
+SphericalSurface::nphi          [1]     = 96
+SphericalSurface::nghoststheta  [1]     = 2
+SphericalSurface::nghostsphi    [1]     = 2
+SphericalSurface::radius        [1]     = 14
+SphericalSurface::set_spherical	[1]	= no
+
+ActiveThorns = "CarpetMask"
+CarpetMask::excluded_surface	[0]	= 1
+CarpetMask::excluded_surface_factor	[0]	= 1
+

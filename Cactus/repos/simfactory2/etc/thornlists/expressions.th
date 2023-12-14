@@ -1,0 +1,47 @@
+# Component list for the Einstein Toolkit <http://einsteintoolkit.org/>
+
+!CRL_VERSION = 1.0
+
+!DEFINE ROOT = CactusMin
+!DEFINE ARR  = $ROOT/arrangements
+!DEFINE COMPONENTLIST_TARGET = $ROOT/thornlists/
+
+!DEFINE ET_RELEASE = master
+
+
+# Cactus Flesh
+!TARGET   = $ROOT
+!TYPE     = git
+!URL      = https://bitbucket.org/cactuscode/cactus.git
+!REPO_BRANCH = $ET_RELEASE
+!NAME     = flesh
+!CHECKOUT = .clang-format CONTRIBUTORS COPYRIGHT doc lib Makefile src
+
+
+# Simulation Factory
+!TARGET   = $ROOT
+!TYPE     = git
+!URL      = https://bitbucket.org/simfactory/simfactory2.git
+!REPO_BRANCH = $ET_RELEASE
+!REPO_PATH=$1
+!NAME     = simfactory2
+!CHECKOUT = ./simfactory
+
+# CactusTest thorns
+!TARGET   = $ARR
+!TYPE     = git
+!URL      = https://bitbucket.org/cactuscode/cactustest.git
+!REPO_BRANCH = $ET_RELEASE
+!REPO_PATH= $2
+!CHECKOUT =
+CactusTest/TestPar
+# will be enabled to test --reconfig
+## CactusTest/TestMath
+
+
+# Additional Cactus thorns
+!TARGET   = $ARR
+!TYPE     = svn
+!URL      = https://github.com/EinsteinToolkit/$1-$2.git/trunk
+!CHECKOUT =
+ExternalLibraries/MPI

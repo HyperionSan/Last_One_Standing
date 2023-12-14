@@ -1,0 +1,146 @@
+# File produced by Kranc
+
+implements: ML_hydro
+
+inherits:   Boundary GenericFD Grid
+
+
+
+USES INCLUDE: loopcontrol.h
+USES INCLUDE: Symmetry.h
+USES INCLUDE: Boundary.h
+
+CCTK_INT FUNCTION MoLRegisterEvolved(CCTK_INT IN EvolvedIndex, CCTK_INT IN RHSIndex)
+USES FUNCTION MoLRegisterEvolved
+
+SUBROUTINE Diff_coeff(CCTK_POINTER_TO_CONST IN cctkGH, CCTK_INT IN dir, CCTK_INT IN nsize, CCTK_INT OUT ARRAY imin, CCTK_INT OUT ARRAY imax, CCTK_REAL OUT ARRAY q, CCTK_INT IN table_handle)
+USES FUNCTION Diff_coeff
+
+CCTK_INT FUNCTION MultiPatch_GetMap(CCTK_POINTER_TO_CONST IN cctkGH)
+USES FUNCTION MultiPatch_GetMap
+
+CCTK_INT FUNCTION MultiPatch_GetBbox(CCTK_POINTER_TO_CONST IN cctkGH, CCTK_INT IN size, CCTK_INT OUT ARRAY bbox)
+USES FUNCTION MultiPatch_GetBbox
+
+CCTK_INT FUNCTION GetBoundarySpecification(CCTK_INT IN size, CCTK_INT OUT ARRAY nboundaryzones, CCTK_INT OUT ARRAY is_internal, CCTK_INT OUT ARRAY is_staggered, CCTK_INT OUT ARRAY shiftout)
+USES FUNCTION GetBoundarySpecification
+
+CCTK_INT FUNCTION MultiPatch_GetBoundarySpecification(CCTK_INT IN map, CCTK_INT IN size, CCTK_INT OUT ARRAY nboundaryzones, CCTK_INT OUT ARRAY is_internal, CCTK_INT OUT ARRAY is_staggered, CCTK_INT OUT ARRAY shiftout)
+USES FUNCTION MultiPatch_GetBoundarySpecification
+
+CCTK_INT FUNCTION SymmetryTableHandleForGrid(CCTK_POINTER_TO_CONST IN cctkGH)
+USES FUNCTION SymmetryTableHandleForGrid
+
+CCTK_INT FUNCTION Boundary_SelectGroupForBC(CCTK_POINTER_TO_CONST IN GH, CCTK_INT IN faces, CCTK_INT IN boundary_width, CCTK_INT IN table_handle, CCTK_STRING IN group_name, CCTK_STRING IN bc_name)
+USES FUNCTION Boundary_SelectGroupForBC
+
+CCTK_INT FUNCTION Driver_SelectGroupForBC(CCTK_POINTER_TO_CONST IN GH, CCTK_INT IN faces, CCTK_INT IN boundary_width, CCTK_INT IN table_handle, CCTK_STRING IN group_name, CCTK_STRING IN bc_name)
+USES FUNCTION Driver_SelectGroupForBC
+
+CCTK_INT FUNCTION Boundary_SelectVarForBC(CCTK_POINTER_TO_CONST IN GH, CCTK_INT IN faces, CCTK_INT IN boundary_width, CCTK_INT IN table_handle, CCTK_STRING IN var_name, CCTK_STRING IN bc_name)
+USES FUNCTION Boundary_SelectVarForBC
+
+CCTK_INT FUNCTION Driver_SelectVarForBC(CCTK_POINTER_TO_CONST IN GH, CCTK_INT IN faces, CCTK_INT IN boundary_width, CCTK_INT IN table_handle, CCTK_STRING IN var_name, CCTK_STRING IN bc_name)
+USES FUNCTION Driver_SelectVarForBC
+
+public:
+CCTK_REAL mass_group type=GF timelevels=3 tags='tensortypealias="Scalar" tensorweight=0'
+{
+  mass
+} "mass_group"
+
+public:
+CCTK_REAL mom_group type=GF timelevels=3 tags='tensortypealias="D" tensorweight=0'
+{
+  mom1,
+  mom2,
+  mom3
+} "mom_group"
+
+public:
+CCTK_REAL ene_group type=GF timelevels=3 tags='tensortypealias="Scalar" tensorweight=0'
+{
+  ene
+} "ene_group"
+
+public:
+CCTK_REAL rho_group type=GF timelevels=1 tags='tensortypealias="Scalar" tensorweight=0'
+{
+  rho
+} "rho_group"
+
+public:
+CCTK_REAL vel_group type=GF timelevels=1 tags='tensortypealias="U" tensorweight=0'
+{
+  vel1,
+  vel2,
+  vel3
+} "vel_group"
+
+public:
+CCTK_REAL eps_group type=GF timelevels=1 tags='tensortypealias="Scalar" tensorweight=0'
+{
+  eps
+} "eps_group"
+
+public:
+CCTK_REAL press_group type=GF timelevels=1 tags='tensortypealias="Scalar" tensorweight=0'
+{
+  press
+} "press_group"
+
+public:
+CCTK_REAL vol_group type=GF timelevels=1 tags='tensortypealias="Scalar" tensorweight=0'
+{
+  vol
+} "vol_group"
+
+public:
+CCTK_REAL massflux_group type=GF timelevels=1 tags='tensortypealias="U" tensorweight=0'
+{
+  massflux1,
+  massflux2,
+  massflux3
+} "massflux_group"
+
+public:
+CCTK_REAL momflux_group type=GF timelevels=1 tags='tensortypealias="DU" tensorweight=0'
+{
+  momflux11,
+  momflux12,
+  momflux13,
+  momflux21,
+  momflux22,
+  momflux23,
+  momflux31,
+  momflux32,
+  momflux33
+} "momflux_group"
+
+public:
+CCTK_REAL eneflux_group type=GF timelevels=1 tags='tensortypealias="U" tensorweight=0'
+{
+  eneflux1,
+  eneflux2,
+  eneflux3
+} "eneflux_group"
+
+public:
+CCTK_REAL ene_grouprhs type=GF timelevels=3 tags='tensortypealias="Scalar" tensorweight=0 Prolongation="None"'
+{
+  enerhs
+} "ene_grouprhs"
+
+public:
+CCTK_REAL mass_grouprhs type=GF timelevels=3 tags='tensortypealias="Scalar" tensorweight=0 Prolongation="None"'
+{
+  massrhs
+} "mass_grouprhs"
+
+public:
+CCTK_REAL mom_grouprhs type=GF timelevels=3 tags='tensortypealias="D" tensorweight=0 Prolongation="None"'
+{
+  mom1rhs,
+  mom2rhs,
+  mom3rhs
+} "mom_grouprhs"

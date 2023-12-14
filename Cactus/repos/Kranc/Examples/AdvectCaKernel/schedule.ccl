@@ -1,0 +1,49 @@
+# File produced by Kranc
+
+STORAGE: phi_g[other_timelevels]
+schedule AdvectCaKernel_Startup at STARTUP
+{
+  LANG: C
+  OPTIONS: meta
+} "create banner"
+
+schedule AdvectCaKernel_RegisterSymmetries in SymmetryRegister
+{
+  LANG: C
+  OPTIONS: meta
+} "register symmetries"
+
+schedule CAKERNEL_Launch_initial_gaussian as initial_gaussian AT INITIAL
+{
+  LANG: C
+  TAGS: Device=1
+  READS: grid::x(Everywhere)
+  WRITES: AdvectCaKernel::phi(Everywhere)
+} "initial_gaussian"
+
+schedule AdvectCaKernel_SelectBoundConds in MoL_PostStep
+{
+  LANG: C
+  OPTIONS: level
+} "select boundary conditions"
+
+schedule AdvectCaKernel_CheckBoundaries at BASEGRID
+{
+  LANG: C
+  OPTIONS: meta
+} "check boundaries treatment"
+
+schedule AdvectCaKernel_RegisterVars in MoL_Register
+{
+  LANG: C
+  OPTIONS: meta
+} "Register Variables for MoL"
+
+schedule AdvectCaKernel_Init in CCTK_BASEGRID after Accelerator_SetDevice
+{
+  LANG: C
+  OPTIONS: local
+} "Initialize CUDA Device"
+schedule group ApplyBCs as AdvectCaKernel_ApplyBCs in MoL_PostStep after AdvectCaKernel_SelectBoundConds
+{
+} "Apply boundary conditions controlled by thorn Boundary"

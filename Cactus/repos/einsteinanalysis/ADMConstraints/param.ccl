@@ -1,0 +1,76 @@
+# Parameter definitions for thorn ADMConstraints
+# $Header$
+
+shares: spacemask
+
+USES BOOLEAN use_mask
+
+shares: ADMBase
+
+USES KEYWORD metric_type
+
+shares: StaticConformal
+
+USES KEYWORD conformal_storage
+
+shares: ADMMacros
+
+USES INT spatial_order
+
+private:
+
+BOOLEAN constraints_persist "Keep storage of ham and mom* around for use in special tricks?"
+{
+} "no"
+
+INT constraints_timelevels "Number of time levels for the constraints"
+{
+  1:3 :: ""
+} 1
+
+KEYWORD constraints_prolongation_type "The kind of boundary prolongation for the constraints"
+{
+  "Lagrange" :: "standard prolongation (requires several time levels)"
+  "copy"     :: "use data from the current time level (requires only one time level)"
+  "none"     :: "no prolongation (use this if you do not have enough time levels active)"
+} "Lagrange"
+
+# Deprecated in Beta 13
+BOOLEAN constraint_communication "THIS PARAMETER IS NOT USED"
+{
+} "no"
+
+KEYWORD bound "Which boundary condition to apply"
+{
+  "flat" :: "Flat (copy) boundary condition"
+  "static" :: "Static (don't do anything) boundary condition"
+} "flat"
+
+# Deprecated in Beta 13
+BOOLEAN cartoon "THIS PARAMETER IS NOT USED"
+{
+} "no"
+
+# Deprecated
+BOOLEAN excise "THIS PARAMETER IS NOT USED"
+{
+} "no" 
+
+REAL excised_value "Value to use for any excised regions"
+{
+ *:*  :: "Any value"
+} 0.0
+ 
+BOOLEAN check_excision_bitmask "check for excision bitmask"
+{
+} "no"
+
+string excision_mask_name "The name of the bitfield chosen for excision"
+{
+  "" :: "Anything goes"
+} "Hydro_Excision"
+
+string excision_type_excised "The name of the type for the excised region"
+{
+  "" :: "Anything goes"
+} "excised"

@@ -1,0 +1,30 @@
+Cactus Code Thorn CarpetIOF5
+Thorn Author(s)     : Erik Schnetter <schnetter@aei.mpg.de>
+Thorn Maintainer(s) : Erik Schnetter <schnetter@aei.mpg.de>
+--------------------------------------------------------------------------
+
+Purpose of the thorn:
+
+Input and output data using the HDF5 based F5 file format.
+
+
+
+An F5 file contains the following hierarchy:
+
+        Bundle
+        Slice
+        Grid
+        Topology
+        Representation
+        Field
+
+We have a class hierarchy:
+
+        file
+        timestep (slice)
+        simulation (grid) [grid hierarchy of one patch]
+        topology (topology) [one refinement level]
+        coordinate_system (representation)
+        physical_quantity (field)
+        data_region
+        tensor_component

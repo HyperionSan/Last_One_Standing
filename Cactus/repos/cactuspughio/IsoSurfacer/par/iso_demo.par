@@ -1,0 +1,31 @@
+!DESC "Orbiting binary sources ... example of new isosurfacer"
+
+ActiveThorns = "symbase localreduce boundary time wavetoyc pugh pughslab pughreduce coordbase cartgrid3d ioutil ioascii iobasic idscalarwavec wavebinarysource isosurfacer"
+
+time::dtfac = 0.25
+
+idscalarwave::initial_data= "none"
+
+wavebinarysource::binary_omega  = 26 
+wavebinarysource::binary_charge = .0001
+wavebinarysource::binary_radius = 0.2
+wavebinarysource::binary_size   = 0.1
+
+wavetoy::bound = "radiation"
+ 
+grid::type   = "ByRange"
+grid::domain = "full"
+grid::xyzmin = -1
+grid::xyzmax = 1
+
+driver::global_nsize = 80
+
+cactus::cctk_itlast = 50000000
+
+IO::out_every = 10
+
+IOBasic::outInfo_vars  = "WAVETOY::phi"
+
+IsoSurfacer::out_format="SOCK"
+IsoSurfacer::out_vars = "WAVETOY::phi"
+isosurfacer::isovalue=0.35

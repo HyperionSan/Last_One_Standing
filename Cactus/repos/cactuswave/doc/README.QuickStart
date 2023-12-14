@@ -1,0 +1,126 @@
+
+Quick Start Guide to Cactus
+===========================
+
+Initial version: September 12th 1999
+Updated:         February 19th 1999
+
+This document is designed for those who want to checkout Cactus,
+compile it, run it, and look at some results without having to
+wade through all the documentation. Of course, we heartily 
+recommend that you read all the documentation before trying 
+this at home, but for the impatient:
+
+0. We are going to explain how to run the WaveToy examples
+   in Cactus. These demonstrate 3D evolutions of the scalar wave 
+   equation, using different initial data and boundary conditions. 
+   The WaveToy application is our standard example, it is one of the 
+   simplest applications you would want to use Cactus for, yet is
+   representative of a wide class of problems. 
+
+1. Get hold of a copy of the latest version of the Cactus Code, 
+   preferably from our CVS server. The simplest way is to use the
+   GetCactus script which you can find on the web pages at 
+
+   http://www.cactuscode.org/Download/GetCactus
+ 
+   To run this type
+
+   > perl ./GetCactus
+
+   This script helps you get the Cactus core code (or flesh), which will
+   be put in a directory called Cactus. Now you need modules (or thorns) 
+   for the WaveToy application. Change to the Cactus directory and type
+
+   > gmake checkout
+
+   and then follow the instructions to checkout one or more 
+   of the "WaveToy" examples. Note that if you choose to take
+   only the C WaveToy example, you do not need a Fortran compiler 
+   installed on your machine.
+
+2. Now compile the code, if you want to compile with MPI, your
+   best chance if you are on a T3E or Origin machine is to type
+
+   gmake wave-config MPI=NATIVE
+
+   or if you know your machine has MPICH installed try
+
+   gmake wave-config MPI=MPICH
+
+   If you want to compile without MPI, the command is just
+
+   gmake wave-config
+
+   If you run in to problems at this stage, you really need
+   to look at the documentation in the Users Guide for compiling
+   Cactus. Here it explains how to customise the compilers and MPI
+   libraries used etc.
+
+3. If you have configured OK, the next stage is to compile
+   the code. Type
+
+   > gmake wave
+
+   You will then be asked if you want to edit the ThornList, 
+   if you have followed the above instructions you can say no here. 
+   Hopefully the code will now compile, and produce an executable 
+   exe/cactus_wave
+
+4. Now it is time to test the code. The WaveToy thorns contain
+   several "test suites" which contain the results from an 
+   earlier run, so that we can check the same answers are given.
+   Type
+
+   > gmake wave-testsuite
+
+   and follow the instructions, you should only need to use
+   the default values. Hopefully you should then see messages 
+   telling you the test suites have all passed.
+
+5. Finally, we can look at the parameter files that come with 
+   the WaveToy application. Type 
+
+   > gmake wave-thornparfiles
+
+   which should move all the parameter files from the WaveToy
+   application into the directory "thornparfiles". To run a 
+   parameter file with Cactus use 
+
+   e.g. with MPI
+
+   > mpirun -np 2 ./exe/cactus_wave 
+                     thornparfiles/<par file from thornparfiles>
+
+   or with no MPI
+
+   > ./exe/cactus_wave thornparfiles/<par file from thornparfiles>
+
+   The output from the run should be in a directory with the same name as
+   the parameter file (this is specified in the parameter file). In this
+   directory there are 1D output files containing the evolution of
+   the scalar wave, called "phi.xl" (the value along the x-axis), and
+   "phi.dl" (the value along the diagonal). They are output in xgraph 
+   format, try
+ 
+   > xgraph phi.dl -dl 300 -a 
+
+   to see an animated evolution of the wave. Most of the parameter files 
+   specify that the evolution should take place in just an octant of a 
+   full grid to save memory/time. 
+   Try running e.g wavetoyf90_rad.par and wavetoy90_none.par,
+   these both start with a gaussian wave, but one implements radiation
+   boundary conditions so that the wave goes smoothly off the grid,
+   while the other uses no boundary condition and the wave is reflected 
+   back.
+
+ 
+If you have any problems checking out, compiling, or running Cactus
+please contact cactusmaint@cactuscode.org, submit a report to our 
+Bug Tracking System available from the web pages, or read the documentation.
+
+We would also like to have feedback on how helpful this documentation
+has been, and how it could be improved.
+
+- the Cactus Team, cactusmaint@cactuscode.org
+

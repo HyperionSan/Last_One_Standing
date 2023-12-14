@@ -1,0 +1,8 @@
+# Main make.code.defn file for thorn CarpetCG
+
+# Source files in this directory
+SRCS = CG.cc
+
+# Subdirectories containing source files
+SUBDIRS = 
+

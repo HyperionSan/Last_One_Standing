@@ -1,0 +1,186 @@
+# arrangement/thorn                # implements (inherits) [friend] {shares}
+#
+AEIThorns/AEILocalInterp           # AEILocalInterp ( ) [ ] { }
+AEIThorns/AHFinderDirect           # AHFinderDirect (Grid,ADMBase,StaticConformal,SpaceMask,SphericalSurface,IO) [ ] {grid,ADMBase,SpaceMask,IO,SphericalSurface}
+AEIThorns/BAM_Elliptic             # BAM_Elliptic (ADMBase,StaticConformal,grid) [ ] {cactus,admbase,StaticConformal,grid,ellbase}
+AEIThorns/BAM_VecLap               # BAM_VecLap (ADMBase,staticconformal,coordgauge) [BAM_Elliptic] {admbase}
+AEIThorns/BSSN_MoL                 # adm_bssn (admbase,admmacros,coordgauge,spacemask,staticconformal) [admcoupling] {grid,driver,spacemask,admbase,ADMMacros,boundary,MethodOfLines}
+AEIThorns/CalcK                    # CalcK (ADMBase,StaticConformal) [ ] {ADMBase}
+AEIThorns/Dissipation              # Dissipation (grid,SphericalSurface,SpaceMask) [ ] {SpaceMask}
+AEIThorns/EHFinder                 # ehfinder (grid,admbase,coordgauge,staticconformal,spacemask,boundary) [ ] {grid,admbase,spacemask,MethodOfLines}
+AEIThorns/Exact                    # exact (admbase,grid,coordgauge,staticconformal) [ADMCoupling] {admbase,StaticConformal}
+AEIThorns/FiniteDifferencing       # FiniteDifferencing ( ) [ ] { }
+AEIThorns/Formaline                # Formaline ( ) [ ] {IO}
+AEIThorns/Fortran                  # Fortran ( ) [ ] { }
+AEIThorns/GSL                      # GSL ( ) [ ] { }
+AEIThorns/HyperWave                # HyperWave (grid) [ ] {MethodOfLines}
+AEIThorns/HyperWave0               # HyperWave0 (grid) [ ] { }
+AEIThorns/IDConstraintViolate      # idconstraintviolate (admbase,grid) [ ] {ADMBase}
+AEIThorns/IDFileADM                # IDFileADM (ADMBase,StaticConformal,IO) [ ] {ADMBase,StaticConformal,IO}
+AEIThorns/IOAHFinderHDF5           # IOAHFinderHDF5 ( ) [ ] {IO}
+AEIThorns/LightCone2               # LightCone2 (ADMBase,StaticConformal) [ ] { }
+AEIThorns/Nice                     # nice ( ) [ ] { }
+AEIThorns/Noise                    # Noise (grid) [ ] { }
+AEIThorns/Norms                    # Norms ( ) [ ] { }
+AEIThorns/POWERClock               # POWERClock ( ) [ ] { }
+AEIThorns/SphericalSurface         # SphericalSurface ( ) [ ] { }
+AEIThorns/TSCClock                 # TSCClock ( ) [ ] { }
+AEIThorns/TensorTypes              # TensorTypes ( ) [ ] { }
+AEIThorns/TestInterpBase           # testinterp (grid) [ ] { }
+AEIThorns/TestInterpLocal_Large    # testinterplocal ( ) [ ] { }
+AEIThorns/TestInterpLocal_Small    # testinterplocal ( ) [ ] { }
+AEIThorns/TestInterpPUGH_Small     # testinterppugh ( ) [ ] { }
+AEIThorns/TriggerTermination       # TriggerTermination ( ) [ ] { }
+CactusBase/Boundary                # boundary ( ) [ ] { }
+CactusBase/CartGrid3D              # grid (coordbase) [ ] {driver}
+CactusBase/CoordBase               # CoordBase ( ) [ ] { }
+CactusBase/IOASCII                 # IOASCII ( ) [ ] {IO}
+CactusBase/IOBasic                 # IOBasic (IO) [ ] {IO}
+CactusBase/IOUtil                  # IO ( ) [ ] { }
+CactusBase/LocalInterp             # LocalInterp ( ) [ ] { }
+CactusBase/LocalReduce             # LocalReduce ( ) [ ] { }
+CactusBase/MoL                     # MethodOfLines ( ) [ ] { }
+CactusBase/SymBase                 # SymBase ( ) [ ] { }
+CactusBase/Time                    # time ( ) [ ] {cactus}
+CactusBench/BenchADM               # benchadm (ADMBase) [ ] {time,admbase}
+CactusBench/BenchIO                # benchio ( ) [ ] { }
+CactusConnect/HTTPD                # HTTPD (Socket) [ ] {Cactus}
+CactusConnect/HTTPDExtra           # http_utils ( ) [ ] { }
+CactusConnect/Socket               # Socket ( ) [ ] { }
+CactusEOS/EOS_1D_Base              # EOS_1D_Base ( ) [ ] { }
+CactusEOS/EOS_1D_Ideal_Polytrope   # EOS_1D_Ideal_Polytrope (EOS_1D_Base) [ ] { }
+CactusEOS/EOS_Base                 # EOS_Base ( ) [ ] { }
+CactusEOS/EOS_Ideal_Fluid          # EOS_Ideal_Fluid (EOS_Base) [ ] { }
+CactusEOS/EOS_Test                 # EOS_Test (EOS_Base) [ ] { }
+CactusEinstein/ADM                 # adm (ADMBase,StaticConformal,CoordGauge,boundary,ADMMacros,Grid) [ ] {grid,time,ADMBase,ADMMacros,StaticConformal}
+CactusEinstein/ADMAnalysis         # ADMAnalysis (ADMBase,StaticConformal,Grid,ADMMacros) [ ] {ADMBase}
+CactusEinstein/ADMBase             # ADMBase (grid) [ ] { }
+CactusEinstein/ADMConstraints      # admconstraints (ADMBase,StaticConformal,SpaceMask,grid,ADMMacros) [ADMCoupling] {spacemask,ADMBase,StaticConformal,ADMMacros}
+CactusEinstein/ADMCoupling         # ADMCoupling ( ) [ ] { }
+CactusEinstein/ADMMacros           # ADMMacros ( ) [ ] { }
+CactusEinstein/AHFinder            # AHFinder (ADMBase,StaticConformal,SpaceMask,Grid,IO,ADMMacros) [ ] {IO,grid,admbase,ADMMacros,spacemask}
+CactusEinstein/CoordGauge          # CoordGauge ( ) [ ] {ADMBase}
+CactusEinstein/EvolSimple          # simple_adm (admbase,boundary) [ ] {admbase}
+CactusEinstein/Extract             # extract (grid,ADMBase,staticconformal,io) [ ] {grid,io,ADMBase}
+CactusEinstein/IDAnalyticBH        # idanalyticbh (ADMBase,StaticConformal,Grid) [ ] {ADMBase,StaticConformal}
+CactusEinstein/IDAxiBrillBH        # idaxibrillbh (ADMBase,grid,StaticConformal) [ ] {ADMBase}
+CactusEinstein/IDBrillData         # IDBrillData (grid,ADMBase,StaticConformal,ellbase) [ ] {ADMBase,StaticConformal}
+CactusEinstein/IDLinearWaves       # idlinearwaves (ADMBase,StaticConformal,Grid) [ ] {ADMBase,StaticConformal}
+CactusEinstein/IDSimple            # IDSimple (ADMBase,StaticConformal,grid) [ ] {ADMBase,StaticConformal}
+CactusEinstein/Maximal             # maximal (ADMBase,ellbase,StaticConformal,CoordGauge) [ADMCoupling] {grid,admbase}
+CactusEinstein/PsiKadelia          # GRscalars (ADMBase,StaticConformal,grid) [ ] {ADMBase}
+CactusEinstein/SpaceMask           # SpaceMask (grid) [ ] { }
+CactusEinstein/StaticConformal     # StaticConformal (grid) [ ] {ADMBase}
+CactusEinstein/TimeGeodesic        # timegeodesic (grid,admbase,staticconformal,coordgauge) [ ] {StaticConformal,admbase,grid}
+CactusElliptic/EllBase             # ellbase ( ) [ ] { }
+CactusElliptic/EllPETSc            # ellpetsc (ellbase,driver) [ ] {grid,ellbase}
+CactusElliptic/EllSOR              # ellsor (ellbase,boundary) [ ] {ellbase}
+CactusExamples/DemoInterp          # DemoInterp ( ) [ ] { }
+CactusExamples/FleshInfo           # FleshInfo ( ) [ ] { }
+CactusExamples/HelloWorld          # helloworld ( ) [ ] { }
+CactusExamples/IDWaveMoL           # idwavemol (wavemol,grid) [ ] { }
+CactusExamples/SampleBoundary      # LinExtrapBnd ( ) [ ] { }
+CactusExamples/SampleIO            # SampleIO (IO) [ ] {IO}
+CactusExamples/TimerInfo           # timerinfo ( ) [ ] { }
+CactusExamples/WaveMoL             # wavemol ( ) [ ] {MethodOfLines}
+CactusExamples/WaveToy1DF77        # wavetoy1d (boundary) [ ] { }
+CactusExamples/WaveToy2DF77        # wavetoy2d (boundary) [ ] { }
+CactusExternal/BLAS                # BLAS ( ) [ ] { }
+CactusExternal/FlexIO              # FlexIO ( ) [ ] { }
+CactusExternal/HDF5                # HDF5 ( ) [ ] { }
+CactusExternal/LAPACK              # LAPACK ( ) [ ] { }
+CactusExternal/LORENE              # LORENE ( ) [ ] { }
+CactusExternal/PETSc               # PETSC ( ) [ ] { }
+CactusExternal/SDF                 # SDF ( ) [ ] { }
+CactusExternal/jpeg6b              # jpeg6b ( ) [ ] { }
+CactusIO/IOJpeg                    # IOJpeg (IO) [ ] {IO}
+CactusIO/IOSDF                     # IOSDF (IO) [ ] {IO}
+CactusPUGH/PUGH                    # Driver ( ) [ ] {cactus}
+CactusPUGH/PUGHInterp              # Interp ( ) [ ] { }
+CactusPUGH/PUGHReduce              # Reduce ( ) [ ] { }
+CactusPUGH/PUGHSlab                # Hyperslab ( ) [ ] { }
+CactusPUGHIO/IOFlexIO              # IOFlexIO (IO) [ ] {IO}
+CactusPUGHIO/IOHDF5                # IOHDF5 ( ) [ ] {IO}
+CactusPUGHIO/IOHDF5Util            # IOHDF5Util (IO) [ ] {IO}
+CactusPUGHIO/IOPanda               # IOPanda (IO) [ ] {IO}
+CactusPUGHIO/IOStreamedHDF5        # IOStreamedHDF5 (IO) [ ] {IO}
+CactusPUGHIO/IsoSurfacer           # isosurfacer (Grid,IO) [ ] {IO}
+CactusTest/TestAllTypes            # TestTypes ( ) [ ] { }
+CactusTest/TestArrays              # Arrays ( ) [ ] { }
+CactusTest/TestComplex             # testcomplex ( ) [ ] { }
+CactusTest/TestCoordinates         # testgrid ( ) [ ] { }
+CactusTest/TestFortranDependencies1 # TestFortranDependencies1 ( ) [ ] { }
+CactusTest/TestFortranDependencies2 # TestFortranDependencies2 ( ) [ ] { }
+CactusTest/TestFpointerNULL        # TestFpointerNULL ( ) [ ] { }
+CactusTest/TestFreeF90             # TestFreeF90 ( ) [ ] { }
+CactusTest/TestGlobalReduce        # testglobalreduce (grid) [ ] { }
+CactusTest/TestInclude1            # include1 ( ) [ ] { }
+CactusTest/TestInclude2            # include2 ( ) [ ] { }
+CactusTest/TestLocalReduce         # TestLocalReduce ( ) [ ] { }
+CactusTest/TestReduce              # testreduce ( ) [ ] { }
+CactusTest/TestSchedule            # TestSchedule ( ) [ ] { }
+CactusTest/TestStrings             # teststrings ( ) [ ] { }
+CactusTest/TestTable               # TestTable ( ) [ ] { }
+CactusTest/TestTimers              # testtimers ( ) [ ] { }
+CactusTest/TestTypes               # TestTypes ( ) [ ] { }
+CactusUtils/NaNChecker             # NaNChecker (Reduce) [ ] { }
+CactusUtils/TimerReport            # timerreport ( ) [ ] {IO}
+CactusWave/IDScalarWave            # idscalarwave (wavetoy,grid) [ ] {grid}
+CactusWave/IDScalarWaveC           # idscalarwave (wavetoy,grid) [ ] {grid}
+CactusWave/IDScalarWaveCXX         # idscalarwave (wavetoy,grid) [ ] {grid}
+CactusWave/IDScalarWaveElliptic    # IDScalarWaveElliptic (Grid,WaveToy,EllBase,IDScalarWave) [ ] {idscalarwave}
+CactusWave/WaveBinarySource        # binarysource (wavetoy,grid,idscalarwave) [ ] { }
+CactusWave/WaveToyC                # wavetoy (grid) [ ] { }
+CactusWave/WaveToyCXX              # wavetoy (grid) [ ] { }
+CactusWave/WaveToyExtra            # wavetoyextra (wavetoy) [ ] {wavetoy}
+CactusWave/WaveToyF77              # wavetoy (grid) [ ] { }
+CactusWave/WaveToyF90              # wavetoy (grid) [ ] { }
+CactusWave/WaveToyFreeF90          # wavetoy (grid) [ ] { }
+Carpet/Carpet                      # Driver ( ) [ ] {Cactus,IO}
+Carpet/CarpetEvolutionMask         # CarpetEvolutionMask ( ) [ ] { }
+Carpet/CarpetIOASCII               # IOASCII ( ) [ ] {IO}
+Carpet/CarpetIOHDF5                # IOHDF5 ( ) [ ] {IO,Cactus}
+Carpet/CarpetIOScalar              # IOScalar ( ) [ ] {IO}
+Carpet/CarpetIOStreamedHDF5        # IOStreamedHDF5 (IO) [ ] {IO}
+Carpet/CarpetInterp                # interp ( ) [ ] { }
+Carpet/CarpetLib                   # CarpetLib ( ) [ ] { }
+Carpet/CarpetReduce                # reduce ( ) [ ] { }
+Carpet/CarpetRegrid                # CarpetRegrid ( ) [ ] { }
+Carpet/CarpetSlab                  # Hyperslab ( ) [ ] { }
+Carpet/CarpetTest                  # CarpetTest ( ) [ ] { }
+CarpetAttic/CarpetIOFlexIO         # IOFlexIO ( ) [ ] {IO}
+CarpetAttic/CarpetIOFlexIOCheckpoint # IOFlexIO ( ) [ ] {IO,Carpet,IO}
+CarpetAttic/Cart3dTest             # Cart3dTest (grid) [ ] { }
+CarpetDev/CarpetAdaptiveRegrid     # CarpetAdaptiveRegrid ( ) [ ] { }
+CarpetDev/CarpetCG                 # CarpetCG (TATelliptic) [ ] { }
+CarpetDev/CarpetJacobi             # CarpetJacobi (TATelliptic) [ ] { }
+CarpetDev/CarpetMG                 # CarpetMG (TATelliptic) [ ] { }
+CarpetExtra/CarpetIOSer            # IOSer (Hyperslab) [ ] {IO}
+CarpetExtra/CarpetIntegrateTest    # CarpetIntegrateTest (Reduce,Grid,Driver) [ ] { }
+CarpetExtra/CarpetRegridTest       # CarpetRegridTest (grid) [ ] { }
+CarpetExtra/FOWaveToyF77           # FOwavetoy (grid) [ ] { }
+CarpetExtra/HydroToy               # hydrotoy (boundary,grid) [ ] { }
+CarpetExtra/IDFOScalarWave         # idfoscalarwave (fowavetoy,grid) [ ] { }
+CarpetExtra/IDHydroToy             # idhydrotoy (hydrotoy,grid) [ ] { }
+CarpetExtra/IDScalarWave           # idscalarwave (wavetoy,grid) [ ] { }
+CarpetExtra/IDScalarWaveExpl       # IDScalarWaveExpl (Grid,WaveToyExpl) [ ] { }
+CarpetExtra/IDScalarWaveFO         # IDScalarWaveFO (Grid,WaveToyFO) [ ] { }
+CarpetExtra/IDScalarWaveMoL        # IDScalarWaveMoL (Grid,WaveToyMoL) [ ] { }
+CarpetExtra/IDSpaceTimeToy         # idspacetimetoy (spacetimetoy,hydrotoy,grid) [ ] {hydrotoy}
+CarpetExtra/SpaceTimeToy           # spacetimetoy (hydrotoy,grid) [ ] {hydrotoy}
+CarpetExtra/WaveToyExpl            # WaveToyExpl (grid) [ ] { }
+CarpetExtra/WaveToyF77             # wavetoy (grid) [ ] { }
+CarpetExtra/WaveToyFO              # WaveToyFO (grid) [ ] {MethodOfLines}
+CarpetExtra/WaveToyMoL             # WaveToyMoL (grid) [ ] {MethodOfLines}
+EUHydro/EOS_Polytrope              # EOS_2d_Polytrope (EOS_Base) [ ] { }
+EUHydro/Whisky                     # Whisky (ADMBase,StaticConformal,Boundary) [ADMCoupling] {ADMBase,MethodOfLines}
+EUHydro/Whisky_Analysis            # whisky_analysis (whisky,grid) [whisky] { }
+EUHydro/Whisky_DriftCorrect        # whisky_driftcorrect (admbase,grid,adm_bssn) [ ] { }
+EUHydro/Whisky_Dust                # whisky_dust (whisky,grid) [whisky,maximal] {ADMBase,whisky}
+EUHydro/Whisky_IVP                 # Whisky_IVP (ADMBase,BAM_Elliptic,BAM_VecLap,ADMMacros,Whisky) [ADMCoupling,Whisky] {ADMBase,ADMMacros,Whisky}
+EUHydro/Whisky_Init_Data           # whisky_init_data (whisky,grid) [whisky] {ADMBase,whisky}
+EUHydro/Whisky_MeudonData          # whisky_MeudonData (whisky,grid) [whisky] {ADMBase,whisky}
+EUHydro/Whisky_RNSID               # rnsid (ADMBase,whisky) [whisky] {whisky,ADMBase}
+EUHydro/Whisky_Steer               # Whisky_Steer (HTTPD) [ ] { }
+EUHydro/Whisky_TOVSolver           # WhiskyTOVSolver (ADMBase,StaticConformal,Whisky) [ADMCoupling] {admbase,Whisky}
+EUHydro/Whisky_TOVSolverC          # WhiskyTOVSolver (ADMBase,StaticConformal,Whisky) [ADMCoupling] {admbase,StaticConformal,Whisky}

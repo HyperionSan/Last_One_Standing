@@ -1,0 +1,457 @@
+% *======================================================================*
+%  Cactus Thorn template for ThornGuide documentation
+%  Author: Ian Kelley
+%  Date: Sun Jun 02, 2002
+%  $Header$
+%
+%  Thorn documentation in the latex file doc/documentation.tex
+%  will be included in ThornGuides built with the Cactus make system.
+%  The scripts employed by the make system automatically include
+%  pages about variables, parameters and scheduling parsed from the
+%  relevant thorn CCL files.
+%
+%  This template contains guidelines which help to assure that your
+%  documentation will be correctly added to ThornGuides. More
+%  information is available in the Cactus UsersGuide.
+%
+%  Guidelines:
+%   - Do not change anything before the line
+%       % START CACTUS THORNGUIDE",
+%     except for filling in the title, author, date, etc. fields.
+%        - Each of these fields should only be on ONE line.
+%        - Author names should be separated with a \\ or a comma.
+%   - You can define your own macros, but they must appear after
+%     the START CACTUS THORNGUIDE line, and must not redefine standard
+%     latex commands.
+%   - To avoid name clashes with other thorns, 'labels', 'citations',
+%     'references', and 'image' names should conform to the following
+%     convention:
+%       ARRANGEMENT_THORN_LABEL
+%     For example, an image wave.eps in the arrangement CactusWave and
+%     thorn WaveToyC should be renamed to CactusWave_WaveToyC_wave.eps
+%   - Graphics should only be included using the graphicx package.
+%     More specifically, with the "\includegraphics" command.  Do
+%     not specify any graphic file extensions in your .tex file. This
+%     will allow us to create a PDF version of the ThornGuide
+%     via pdflatex.
+%   - References should be included with the latex "\bibitem" command.
+%   - Use \begin{abstract}...\end{abstract} instead of \abstract{...}
+%   - Do not use \appendix, instead include any appendices you need as
+%     standard sections.
+%   - For the benefit of our Perl scripts, and for future extensions,
+%     please use simple latex.
+%
+% *======================================================================*
+%
+% Example of including a graphic image:
+%    \begin{figure}[ht]
+%       \begin{center}
+%          \includegraphics[width=6cm]{MyArrangement_MyThorn_MyFigure}
+%       \end{center}
+%       \caption{Illustration of this and that}
+%       \label{MyArrangement_MyThorn_MyLabel}
+%    \end{figure}
+%
+% Example of using a label:
+%   \label{MyArrangement_MyThorn_MyLabel}
+%
+% Example of a citation:
+%    \cite{MyArrangement_MyThorn_Author99}
+%
+% Example of including a reference
+%   \bibitem{MyArrangement_MyThorn_Author99}
+%   {J. Author, {\em The Title of the Book, Journal, or periodical}, 1 (1999),
+%   1--16. {\tt http://www.nowhere.com/}}
+%
+% *======================================================================*
+
+% If you are using CVS use this line to give version information
+% $Header$
+
+\documentclass{article}
+
+% Use the Cactus ThornGuide style file
+% (Automatically used from Cactus distribution, if you have a
+%  thorn without the Cactus Flesh download this from the Cactus
+%  homepage at www.cactuscode.org)
+\usepackage{../../../../doc/latex/cactus}
+
+\begin{document}
+
+% The author of the documentation
+\author{Ian Hawke \textless ih@maths.soton.ac.uk\textgreater}
+
+% The title of the document (not necessarily the name of the Thorn)
+\title{General equations of state}
+
+% the date your document was last changed, if your document is in CVS,
+% please use:
+%    \date{$ $Date$ $}
+\date{March 15 2005}
+
+\maketitle
+
+% Do not delete next line
+% START CACTUS THORNGUIDE
+
+% Add all definitions used in this documentation here
+%   \def\mydef etc
+
+% Add an abstract for this thorn's documentation
+\begin{abstract}
+  This thorn provides a generalized equation of state interface.
+\end{abstract}
+
+% The following sections are suggestive only.
+% Remove them or add your own.
+
+\section{Equations of state}
+
+In solving the equations of hydrodynamics there are five independent
+variables (typically $\rho, v^i, \epsilon$ for the rest mass density,
+velocity and specific internal energy) and further variables, such as
+the pressure $P$ which depend on the independent variables. Such
+dependent variables are specified by an {\em equation of state} (EOS)
+that closes the system of equations. Simple EOSs depend only on the
+independent variables and are usually given in terms of the pressure,
+i.e.\ $P = P(\rho, \epsilon)$ which then implicitly defines other
+variables such as the temperature $T$, pressure derivatives $P_{\rho},
+P_{\epsilon}$ and the speed of sound $c_s$.
+
+However there is no physical reason to prefer such simple EOSs. A
+realistic EOS will depend on the composition of the fluid as well as
+the independent variables. This thorn is meant to provide an interface
+so that a hydrodynamics code can depend on such a realistic EOS
+without having to know about the details of the composition --
+without, in fact, needing an knowledge of the additional variables
+required by the EOS at all.
+
+\section{Calling an EOS}
+
+The most efficient way of using the EOS is to call it to set grid
+functions. The interface is simple on the face of it; one function
+call will give you a {\em call handle}, and another function call will
+actually set the EOS. The complexity comes in setting up the key value
+tables involved in the function calls.
+
+\begin{FunctionDescription}{EOS\_SetupCall}
+  \label{Whisky_Dev_EOSBase_General_EOS_SetupCall}
+
+  Sets up an equation of state call. If the call handle is stored
+  (which is recommended) then this only needs to be performed once at
+  startup time, and the call handle can be reused.
+
+  \begin{SynopsisSection}
+    \begin{Synopsis}{C}
+\begin{verbatim}
+CCTK_INT call_handle = EOS_SetupCall(CCTK_INT table_handle)
+\end{verbatim}
+    \end{Synopsis}
+    \begin{Synopsis}{Fortran}
+\begin{verbatim}
+CCTK_INT call_handle = EOS_SetupCall(CCTK_INT table_handle)
+\end{verbatim}
+    \end{Synopsis}
+  \end{SynopsisSection}
+
+  \begin{ResultSection}
+    \begin{ResultNote}
+      The {\tt call\_handle} return must be stored for later use in
+      the EOS call. The value should be $\geq 0$. Typically a level
+      0 warning will be given rather than returning an error code.
+    \end{ResultNote}
+    \begin{Result}{$\geq 0$}
+      The call handle, to be stored for later use.
+    \end{Result}
+  \end{ResultSection}
+  
+  \begin{ParameterSection}
+    \begin{Parameter}{table\_handle}
+      The handle of an existing key value table. Appropriate
+      arguments will be described elsewhere.
+    \end{Parameter}
+  \end{ParameterSection}
+  
+  \begin{Discussion}
+    The complexity comes in setting up the key-value table to be
+    passed through. Effectively any arguments can be given that will
+    be interpreted by the EOS, but the following are expected (note
+    capitalization - it is always useful to set up the table using the
+    CASE INSENSITIVE flag):
+    \begin{itemize}
+    \item {\tt EOS Name}: This must correspond to the name that the
+      EOS thorn has registered.
+    \item {\tt Independent variable names}: This is a string (a
+      CCTK\_STRING) of whitespace separated names describing the
+      independent variables. Although there is no particular values
+      for these ``names'' required by this base thorns the following
+      conventions for variable names have been used in existing thorns
+      (name in parantheses is the variable name in {\sc whisky}):
+      \begin{itemize}
+      \item {\tt Rho}: Rest mass density ({\tt rho})
+      \item {\tt SpecificInternalEnergy}: Specific internal energy
+        ({\tt eps})
+      \item {\tt Pressure}: Pressure ({\tt press})
+      \item {\tt DPressureDRho}: Partial derivative of pressure with
+        respect to rest mass density, all else being fixed ({\tt
+          dpdrho})
+      \item {\tt DPressureDSpecificInternalEnergy}: Partial derivative
+        of pressure with respect to specific internal energy, all else
+        being fixed ({\tt dpdeps})
+      \item {\tt c\_s\^{}2}: Speed of sound squared ({\tt cs2}).
+      \end{itemize}
+    \item {\tt Dependent variable names}: A string describing the
+      dependent variables, following the same syntax as the {\tt
+        Independent variable names}
+    \item {\tt N independent variables}: The number of independent
+      variables
+    \item {\tt N dependent variables}: The number of dependent
+      variables
+    \item {\tt Independent GFs}: An array of integers containing the
+      indices of the grid functions corresponding to the independent
+      variables. E.g., if the first dependent variable name is {\tt
+        Rho} which is contained in the grid function {\tt whisky::rho}
+      then the first entry of this array is found from {\tt
+        CCTK\_VarIndex("whisky::rho")}.
+    \item {\tt Dependent GFs}: An array of integers containing the
+      indices of the dependent grid functions, following the syntax of
+      the {\tt Independent GFs}.
+    \end{itemize}
+  \end{Discussion}
+
+  \begin{SeeAlsoSection}
+    \begin{SeeAlso}{EOS\_SetGFs}
+      Sets the EOS.
+    \end{SeeAlso}
+  \end{SeeAlsoSection}
+\end{FunctionDescription}
+
+
+
+\begin{FunctionDescription}{EOS\_SetGFs}
+  \label{Whisky_Dev_EOSBase_General_EOS_SetGFs}  
+  
+  Actually sets the dependent GFs in an EOS call. The call must have
+  been previously set up using EOS\_SetupCall. Must be called from
+  routines scheduled in {\tt local} mode.
+
+  \begin{SynopsisSection}
+    \begin{Synopsis}{C}
+\begin{verbatim}
+CCTK_INT ierr = EOS_SetGFs(CCTK_POINTER_TO_CONST cGH, CCTK_INT call_handle)
+\end{verbatim}
+    \end{Synopsis}
+    \begin{Synopsis}{Fortran}
+\begin{verbatim}
+CCTK_INT ierr = EOS_SetGFs(CCTK_POINTER_TO_CONST cGH, CCTK_INT call_handle)
+\end{verbatim}
+    \end{Synopsis}
+  \end{SynopsisSection}
+
+  \begin{ResultSection}
+    \begin{ResultNote}
+      The {\tt call\_handle} should have been previously set up by
+      EOS\_SetupCall. Currently only successful returns (0) are
+      given.
+    \end{ResultNote}
+    \begin{Result}{\rm 0}
+      success.
+    \end{Result}
+  \end{ResultSection}
+
+  \begin{ParameterSection}
+    \begin{Parameter}{cGH}
+      The Cactus GH structure, and the reason why this must be called
+      in {\tt local} mode.
+    \end{Parameter}
+    \begin{Parameter}{call\_handle}
+      An EOS call previously set up by EOS\_SetupCall.
+    \end{Parameter}
+  \end{ParameterSection}
+
+  \begin{Discussion}
+    Once the EOS call has been setup this routine basically tells the
+    EOS function to apply the appropriate EOS calls at this point to
+    the appropriate arrays.
+  \end{Discussion}
+
+  \begin{SeeAlsoSection}
+    \begin{SeeAlso}{EOS\_SetupCall}
+      Setup the EOS call.
+    \end{SeeAlso}
+  \end{SeeAlsoSection}
+\end{FunctionDescription}
+
+\pagebreak
+\section{Registering an EOS}
+
+Before you can use an EOS one first has to be registered. The best way
+of learning how to do this is to look at the example thorns, such as
+the ``generalized'' polytropic EOS (thorn {\tt EOS\_GeneralPolytrope}) or
+ideal gas EOS (thorn {\tt EOS\_GeneralIdealFluid}). Here is just the
+essential description.
+
+The essential thing that is required is a function (probably in C,
+although in theory it's language independent) that sets arbitrary
+sized arrays\footnote{The arbitrariness applies to the different
+  calls, not different arrays: all arrays, whether for independent or
+  dependent variables are assumed to have the same size in any given
+  call.} of dependent variables from the independent variables. This
+function is registered using the aliased function {\tt
+  EOS\_RegisterCall}. This function, and the function pointer that
+must be called, are as follows.
+
+
+
+
+\begin{FunctionDescription}{EOS\_RegisterCall}
+  \label{Whisky_Dev_EOSBase_General_EOS_RegisterCall}  
+  
+  Register an EOS with the base thorn.
+
+  \begin{SynopsisSection}
+    \begin{Synopsis}{C}
+\begin{verbatim}
+CCTK_INT ierr = EOS_RegisterCall(CCTK_INT table_handle, \
+                                 CCTK_INT CCTK_FPOINTER EOS_fn(...))
+\end{verbatim}
+    \end{Synopsis}
+    \begin{Synopsis}{Fortran}
+\begin{verbatim}
+CCTK_INT ierr = EOS_RegisterCall(CCTK_INT table_handle, \
+                                 CCTK_INT CCTK_FPOINTER EOS_fn(...))
+\end{verbatim}
+    \end{Synopsis}
+  \end{SynopsisSection}
+
+  \begin{ResultSection}
+    \begin{ResultNote}
+      The function pointer {\tt EOS\_fn} is described below on
+      page~\pageref{Whiskty_Dev_EOSBase_General_EOS_fn}.  
+
+      Currently only successful returns (0) are given.
+    \end{ResultNote}
+    \begin{Result}{\rm 0}
+      success.
+    \end{Result}
+  \end{ResultSection}
+
+  \begin{ParameterSection}
+    \begin{Parameter}{table\_handle}
+      A key/value table containing any persistent information that the
+      EOS thorn may want to store. This is not used by the base thorn,
+      and is there for the convenience of the EOS thorn.
+    \end{Parameter}
+    \begin{Parameter}{EOS\_fn}
+      A function pointer for the EOS call itself, described below.
+    \end{Parameter}
+  \end{ParameterSection}
+
+  \begin{Discussion}
+    The table can be used to differentiate between different
+    calls. For example, if one thorn implements many different
+    EOSs and the number is not known at compile time (e.g., a table
+    interpolator thorn that provides multiple tables) then only one
+    registration need take place, and the key/value table can be used
+    store which (interpolation) table is being used in the particular
+    call. 
+  \end{Discussion}
+
+  \begin{SeeAlsoSection}
+    \begin{SeeAlso}{EOS\_fn}
+      The actual EOS function.
+    \end{SeeAlso}
+  \end{SeeAlsoSection}
+\end{FunctionDescription}
+
+
+\begin{FunctionDescription}{EOS\_fn}
+  \label{Whisky_Dev_EOSBase_General_EOS_fn}  
+  
+  The actual EOS function that must be provided.
+
+  \begin{SynopsisSection}
+    \begin{Synopsis}{C}
+\begin{verbatim}
+CCTK_INT ierr = EOS_fn(CCTK_INT param_table, \
+                       CCTK_INT n_elems, \
+                       CCTK_POINTER* indep_arrays, \
+                       CCTK_INT* which_dep_arrays_to_set, \
+                       CCTK_POINTER* dep_arrys)
+\end{verbatim}
+    \end{Synopsis}
+    \begin{Synopsis}{Fortran}
+\begin{verbatim}
+CCTK_INT ierr = EOS_fn(CCTK_INT param_table, \
+                       CCTK_INT n_elems, \
+                       CCTK_POINTER* indep_arrays, \
+                       CCTK_INT* which_dep_arrays_to_set, \
+                       CCTK_POINTER* dep_arrys)
+\end{verbatim}
+    \end{Synopsis}
+  \end{SynopsisSection}
+
+  \begin{ResultSection}
+    \begin{ResultNote}
+      Currently only successful returns (0) are given.
+    \end{ResultNote}
+    \begin{Result}{\rm 0}
+      success.
+    \end{Result}
+  \end{ResultSection}
+
+  \begin{ParameterSection}
+    \begin{Parameter}{param\_table}
+      A key/value table containing any persistent information that the
+      EOS thorn may want to store. This is not used by the base thorn,
+      and is there for the convenience of the EOS thorn.
+    \end{Parameter}
+    \begin{Parameter}{n\_elems}
+      The size of the arrays that are passed in.
+    \end{Parameter}
+    \begin{Parameter}{indep\_arrays}
+      The independent arrays (should essentially be cast to a {\tt
+        CCTK\_REAL**}).
+    \end{Parameter}
+    \begin{Parameter}{which\_dep\_arrays\_to\_set}
+      An array telling the EOS thorn which dependent arrays should be
+      set in this thorn. This is important because dependent arrays
+      that are not needed will NOT be passed in the call; see below.
+    \end{Parameter}
+    \begin{Parameter}{dep\_arrays}
+      The dependent arrays (should essentially be cast to a {\tt
+        CCTK\_REAL**}). Note that you should not assume that all these
+      pointers are non-null (hence the difficulty in using this with
+      Fortran). In general, if the calling thorn does NOT request that
+      a dependent variable be set then the equivalent pointer WILL be
+      null.
+    \end{Parameter}
+  \end{ParameterSection}
+
+  \begin{Discussion}
+    The table can be used to differentiate between different
+    calls. For example, if one thorn implements many different
+    EOSs and the number is not known at compile time (e.g., a table
+    interpolator thorn that provides multiple tables) then only one
+    registration need take place, and the key/value table can be used
+    store which (interpolation) table is being used in the particular
+    call. 
+  \end{Discussion}
+
+  \begin{SeeAlsoSection}
+    \begin{SeeAlso}{EOS\_RegisterCall}
+      Register the EOS function with the base thorn.
+    \end{SeeAlso}
+  \end{SeeAlsoSection}
+\end{FunctionDescription}
+
+
+
+\begin{thebibliography}{9}
+
+\end{thebibliography}
+
+% Do not delete next line
+% END CACTUS THORNGUIDE
+
+\end{document}

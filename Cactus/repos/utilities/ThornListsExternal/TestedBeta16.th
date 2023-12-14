@@ -1,0 +1,277 @@
+# $Header$
+
+!DESC "All Thorns for the AEI NumRel Group"
+
+# -----------------------------------------------------------
+
+# THE STANDARD CACTUS THORNS
+
+!REPOSITORY_TYPE pserver
+!REPOSITORY_LOCATION cvs.cactuscode.org
+!REPOSITORY_NAME /cactusdevcvs
+!REPOSITORY_USER cvs_anon
+
+CactusBase/Boundary
+CactusBase/CartGrid3D
+CactusBase/CoordBase
+CactusBase/IOASCII
+CactusBase/IOBasic
+CactusBase/IOUtil
+CactusBase/InitBase
+CactusBase/LocalInterp
+CactusBase/LocalReduce
+CactusBase/MoL
+CactusBase/SymBase
+CactusBase/Time
+
+CactusBench/BenchADM
+CactusBench/BenchIO
+
+CactusConnect/HTTPD
+CactusConnect/HTTPDExtra
+CactusConnect/Socket
+
+CactusEinstein/ADM
+CactusEinstein/ADMAnalysis
+CactusEinstein/ADMBase
+CactusEinstein/ADMConstraints
+CactusEinstein/ADMCoupling
+CactusEinstein/ADMMacros
+CactusEinstein/AHFinder
+CactusEinstein/CoordGauge
+CactusEinstein/EvolSimple
+CactusEinstein/Extract
+CactusEinstein/IDAnalyticBH
+CactusEinstein/IDAxiBrillBH
+CactusEinstein/IDBrillData
+CactusEinstein/IDLinearWaves
+CactusEinstein/IDSimple
+#CactusEinstein/Maximal
+CactusEinstein/PsiKadelia
+CactusEinstein/SpaceMask
+CactusEinstein/StaticConformal
+CactusEinstein/TimeGeodesic
+
+CactusElliptic/EllBase
+CactusElliptic/EllPETSc
+CactusElliptic/EllSOR
+
+CactusExamples/DemoInterp
+CactusExamples/FleshInfo
+CactusExamples/HelloWorld
+CactusExamples/IDWaveMoL
+CactusExamples/SampleBoundary
+CactusExamples/SampleIO
+CactusExamples/TimerInfo
+CactusExamples/WaveMoL
+CactusExamples/WaveToy1DF77
+CactusExamples/WaveToy2DF77
+
+CactusExternal/BLAS
+CactusExternal/FFTWlib
+CactusExternal/FlexIO
+CactusExternal/GSL
+CactusExternal/HDF5
+CactusExternal/LAPACK
+# Lorene may not be installed
+#CactusExternal/LORENE
+CactusExternal/PETSc
+CactusExternal/SDF
+CactusExternal/jpeg6b
+
+CactusIO/IOJpeg
+
+CactusPUGH/PUGH
+CactusPUGH/PUGHInterp
+CactusPUGH/PUGHReduce
+CactusPUGH/PUGHSlab
+
+CactusPUGHIO/IOFlexIO
+CactusPUGHIO/IOHDF5
+CactusPUGHIO/IOHDF5Util
+CactusPUGHIO/IOPanda
+# doesn't compile anymore with HDF5 1.8.x
+#CactusPUGHIO/IOStreamedHDF5
+CactusPUGHIO/IsoSurfacer
+
+CactusTest/TestAllTypes
+CactusTest/TestArrays
+CactusTest/TestComplex
+CactusTest/TestCoordinates
+CactusTest/TestFortranDependencies1
+CactusTest/TestFortranDependencies2
+CactusTest/TestFpointerNULL
+CactusTest/TestFreeF90
+CactusTest/TestGlobalReduce
+CactusTest/TestInclude1
+CactusTest/TestInclude2
+CactusTest/TestLocalReduce
+CactusTest/TestReduce
+CactusTest/TestSchedule
+CactusTest/TestStrings
+CactusTest/TestTable
+CactusTest/TestTimers
+CactusTest/TestTypes
+
+CactusUtils/NaNChecker
+CactusUtils/TimerReport
+
+CactusWave/IDScalarWave
+CactusWave/IDScalarWaveC
+CactusWave/IDScalarWaveCXX
+CactusWave/IDScalarWaveElliptic
+CactusWave/WaveToyC
+CactusWave/WaveToyF77
+CactusWave/WaveToyCXX
+CactusWave/WaveToyExtra
+CactusWave/WaveToyFreeF90
+CactusWave/WaveToyF90
+CactusWave/WaveBinarySource
+
+# -----------------------------------------------------------
+
+# CACTUS DEVELOPMENT THORNS
+
+BetaThorns/Cartoon2D
+
+# -----------------------------------------------------------
+
+# OTHER ARRANGEMENTS ON THE CACTUS SERVER
+
+!REPOSITORY_TYPE pserver
+!REPOSITORY_LOCATION cvs.cactuscode.org
+!REPOSITORY_NAME /arrangements
+!REPOSITORY_USER cvs_anon
+
+# Tuebingen
+TAT/CheckSync
+TAT/MegaFlop
+TAT/NaNCatcher
+TAT/Periodic
+TAT/Slab
+TAT/SlabTest
+TAT/TATCG
+TAT/TATJacobi
+TAT/TATPETSc
+TAT/TATelliptic
+TAT/TGRtensor
+
+# -----------------------------------------------------------
+
+# FROM THE AEI NUMREL GROUP REPOSITORY
+
+!REPOSITORY_TYPE svn:https://
+!REPOSITORY_LOCATION svn.aei.mpg.de
+!REPOSITORY_NAME T:/numrel/*/trunk
+!REPOSITORY_USER cvs_anon
+
+Excision/LegoExcision
+
+PerturbedBH/DistortedBHIVP
+PerturbedBH/IDAxiOddBrillBH
+PerturbedBH/RotatingDBHIVP
+
+AEIThorns/ADMCheckRHS
+AEIThorns/AEILocalInterp
+AEIThorns/AHFinderDirect
+AEIThorns/BAM_Elliptic
+AEIThorns/BAM_VecLap
+AEIThorns/BSSN_MoL
+AEIThorns/BoundaryExample
+AEIThorns/CalcK
+AEIThorns/Constants
+AEIThorns/Dissipation
+AEIThorns/EHFinder
+AEIThorns/Exact
+AEIThorns/FiniteDifferencing
+AEIThorns/Formaline
+AEIThorns/Fortran
+AEIThorns/GSLFortran
+AEIThorns/HyperWave
+AEIThorns/HyperWave0
+AEIThorns/IDConstraintViolate
+AEIThorns/IDFileADM
+AEIThorns/ManualTermination
+AEIThorns/Nice
+AEIThorns/NoExcision
+AEIThorns/Noise
+AEIThorns/Norms
+AEIThorns/ReflectionSymmetry
+AEIThorns/RotatingSymmetry180
+AEIThorns/RotatingSymmetry90
+AEIThorns/SphericalSurface
+AEIThorns/TensorTypes
+AEIThorns/TestInterpLocal_Large
+AEIThorns/TestInterpLocal_Small
+AEIThorns/TestInterpPUGH_Small
+AEIThorns/TmunuBase
+
+# -----------------------------------------------------------
+
+# FROM THE LSU NUMREL GROUP REPOSITORY
+
+!REPOSITORY_TYPE pserver
+!REPOSITORY_LOCATION cvs.cct.lsu.edu
+!REPOSITORY_NAME /numrel
+!REPOSITORY_USER cvs_anon
+
+LSUThorns/DGEMM
+LSUThorns/SpECReader
+LSUThorns/SummationByParts
+# requires AEIDevelopment/MultiPatch
+#LSUThorns/SummationByPartsTests
+
+# -----------------------------------------------------------
+
+# ASTROGRID THORNS
+
+!REPOSITORY_TYPE svn:https://
+!REPOSITORY_LOCATION svn.aei.mpg.de
+!REPOSITORY_NAME /eScience/AstroGrid/Cactus/Thorns
+!REPOSITORY_USER cvs_anon
+
+!REPOSITORY_MODULE Publish/trunk
+AstroGrid/Publish
+!REPOSITORY_MODULE HTTPS/trunk
+AstroGrid/HTTPS
+!REPOSITORY_MODULE Visualisation/trunk
+AstroGrid/Visualisation
+
+# -----------------------------------------------------------
+
+# TODO: Kranc
+# TODO: McLachlan
+
+# -----------------------------------------------------------
+
+# CARPET THORNS
+
+#The development version of Carpet is available via git:
+#
+#        cd Cactus
+#        git clone -o carpet git://carpetcode.dyndns.org/carpet.git
+#        cd arrangements
+#        ln -s ../carpet/Carpet* .
+#
+#(Don't miss the dot after the Carpet* in the last line.)
+
+!REPOSITORY_TYPE ignore
+Carpet/Carpet
+Carpet/CarpetEvolutionMask
+Carpet/CarpetIOASCII
+Carpet/CarpetIOBasic
+Carpet/CarpetIOHDF5
+Carpet/CarpetIOScalar
+Carpet/CarpetInterp
+Carpet/CarpetInterp2
+Carpet/CarpetLib
+Carpet/CarpetMask
+Carpet/CarpetReduce
+Carpet/CarpetRegrid
+Carpet/CarpetRegrid2
+Carpet/CarpetSlab
+Carpet/CarpetTest
+Carpet/CarpetTracker
+Carpet/LoopControl
+
+# DON'T add anything after this line.

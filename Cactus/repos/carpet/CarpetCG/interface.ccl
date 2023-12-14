@@ -1,0 +1,11 @@
+# Interface definition for thorn CarpetCG
+
+implements: CarpetCG
+inherits: TATelliptic
+
+USES INCLUDE HEADER: carpet.hh
+USES INCLUDE HEADER: TATelliptic.h
+
+real prsvars[cg_maxsolvevars] TYPE=GF Timelevels=1 tags='Prolongation="None"'
+
+real dirvars[cg_maxsolvevars] TYPE=GF Timelevels=1 tags='Prolongation="None"'

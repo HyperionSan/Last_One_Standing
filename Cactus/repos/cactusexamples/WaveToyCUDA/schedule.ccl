@@ -1,0 +1,27 @@
+# Schedule definitions for thorn WaveToyCUDA
+
+STORAGE: scalar[3]
+
+SCHEDULE WaveToyCUDA_Init AT initial
+{
+  LANG:   C
+  TAGS:   device=1
+  WRITES: WaveToyCUDA::scalar
+} "Initialise scalar wave"
+
+#SCHEDULE WaveToyCUDA_Evol AT evol
+#{
+#  LANG:   C
+#  TAGS:   device=1
+#  READS:  WaveToyCUDA::scalar
+#  WRITES: WaveToyCUDA::scalar
+#} "Evolve scalar wave"
+#
+#SCHEDULE WaveToyCUDA_Boundary AT evol AFTER WaveToyCUDA_Evol
+#{
+#  LANG:   C
+#  TAGS:   device=1
+#  READS:  WaveToyCUDA::scalar
+#  WRITES: WaveToyCUDA::scalar
+#  SYNC:   scalar
+#} "Boundary conditions for scalar wave"

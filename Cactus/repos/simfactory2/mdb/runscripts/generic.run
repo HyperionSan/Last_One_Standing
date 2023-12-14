@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# This runscript is used internally by simfactory as a template during the
+# sim setup and sim setup-silent commands
+# Edit at your own risk
+
+echo "Preparing:"
+set -x                          # Output commands
+set -e                          # Abort on errors
+
+cd @RUNDIR@-active
+
+echo "Checking:"
+pwd
+hostname
+date
+
+echo "Environment:"
+export CACTUS_NUM_PROCS=@NUM_PROCS@
+export CACTUS_NUM_THREADS=@NUM_THREADS@
+export GMON_OUT_PREFIX=gmon.out
+export OMP_NUM_THREADS=@NUM_THREADS@
+env | sort > SIMFACTORY/ENVIRONMENT
+
+echo "Starting:"
+export CACTUS_STARTTIME=$(date +%s)
+
+if [ ${CACTUS_NUM_PROCS} = 1 ]; then
+    if [ @RUNDEBUG@ -eq 0 ]; then
+   	  @EXECUTABLE@ -L 3 @PARFILE@
+    else
+   	  gdb --args @EXECUTABLE@ -L 3 @PARFILE@
+    fi
+else
+	mpirun -np @NUM_PROCS@ @EXECUTABLE@ -L 3 @PARFILE@
+fi
+
+echo "Stopping:"
+date
+echo "Done."

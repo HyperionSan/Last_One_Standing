@@ -1,0 +1,61 @@
+# Parameter definitions for thorn KerrQuasiIsotropic
+#===================================================
+
+#=== pars from/for ADMBase ==================
+SHARES: ADMBase
+#---------------
+
+EXTENDS KEYWORD initial_data 
+{
+  "KQI_ana"::"analytic KQI initial data"
+} 
+
+EXTENDS KEYWORD initial_lapse
+{
+  "KQI_ana" ::"lapse in KQI initial data, continous extension"
+  "KQI_prec"::"use precollapsed lapse"
+  "KQI_abs" ::"absolute value of KQI lapse; NOTE: discouraged. Better to use KQI_ana to reproduce QNMs"
+}
+
+EXTENDS KEYWORD initial_shift
+{
+  "KQI_ana"::"shift in KQI initial data"
+}
+
+
+RESTRICTED:
+
+#============================================
+#=== par for scheduling of calc =============
+#============================================
+BOOLEAN schedule_in_ADMBase_InitialData "Schedule in (instead of after) ADMBase_InitialData"
+{
+} "yes"
+
+#============================================
+#=== pars for black holes ===================
+#============================================
+CCTK_REAL m_plus "mass of the m+ puncture" 
+{
+  0.0:* :: "any positive value"
+} 1.0
+
+CCTK_REAL spin_plus "spin of the Kerr BH with z being the rotation axis"
+{
+  0:1  :: "any value between 0 and 1"
+} 0.0
+
+CCTK_REAL pos_plus[3] "position of the m+ puncture"
+{
+  *:* :: "any value possible; for zero spin set pos_plus[0]=0.0001"
+} 0.0
+
+#============================================
+#=== auxiliary pars for calc ================
+#============================================
+
+CCTK_REAL eps_r "floor value for rr"
+{
+  0:*  :: "any small positive value"
+} 1.0d-12
+

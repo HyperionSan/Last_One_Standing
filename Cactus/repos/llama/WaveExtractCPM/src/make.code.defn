@@ -1,0 +1,18 @@
+# Main make.code.defn file for thorn WaveExtractCPM
+ 
+SRCS = AdjustDetector.c                \
+       IO.c                            \
+       IOTable.cc                      \
+       SteerableTimeForOutput.c        \
+       ParamCheck.c                    \
+       ResetCurrDet.c                  \
+       WavExtrCPMConstants.F90         \
+       Init.F90                        \
+       MoncriefQ.F90                   \
+       ProjectSphere.cc                \
+       ProjectSphereCactusInterp.F90   \
+       SchwarzschildMassRadius.F90     \
+       SetupDetectors.F90              \
+       SetupSphere.F90                 \
+       SubtractSphericalMetric.F90     \
+       SphericalSurface.F90

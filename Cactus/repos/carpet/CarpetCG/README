@@ -1,0 +1,12 @@
+Cactus Code Thorn CarpetCG
+Thorn Author(s)     : Ian Hawke <hawke@aei.mpg.de>
+                    : Erik Schnetter <eschnett@aei.mpg.de>
+Thorn Maintainer(s) : Ian Hawke <hawke@aei.mpg.de>
+                    : Erik Schnetter <eschnett@aei.mpg.de>
+--------------------------------------------------------------------------
+
+Purpose of the thorn:
+
+A conjugate gradient elliptic solver for Carpet using the TAT
+interface. Essentially a straight modification of TATCG using
+TATJacobi as a template.

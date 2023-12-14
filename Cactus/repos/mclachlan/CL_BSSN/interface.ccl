@@ -1,0 +1,366 @@
+# File produced by Kranc
+
+implements: CL_BSSN
+
+inherits:   ADMBase Boundary GenericFD Grid TmunuBase
+
+
+
+USES INCLUDE: loopcontrol.h
+USES INCLUDE: Symmetry.h
+USES INCLUDE: vectors.h
+USES INCLUDE: Boundary.h
+
+CCTK_INT FUNCTION MoLRegisterEvolved(CCTK_INT IN EvolvedIndex, CCTK_INT IN RHSIndex)
+USES FUNCTION MoLRegisterEvolved
+
+SUBROUTINE Diff_coeff(CCTK_POINTER_TO_CONST IN cctkGH, CCTK_INT IN dir, CCTK_INT IN nsize, CCTK_INT OUT ARRAY imin, CCTK_INT OUT ARRAY imax, CCTK_REAL OUT ARRAY q, CCTK_INT IN table_handle)
+USES FUNCTION Diff_coeff
+
+CCTK_INT FUNCTION MultiPatch_GetMap(CCTK_POINTER_TO_CONST IN cctkGH)
+USES FUNCTION MultiPatch_GetMap
+
+CCTK_INT FUNCTION MultiPatch_GetBbox(CCTK_POINTER_TO_CONST IN cctkGH, CCTK_INT IN size, CCTK_INT OUT ARRAY bbox)
+USES FUNCTION MultiPatch_GetBbox
+
+CCTK_INT FUNCTION GetBoundarySpecification(CCTK_INT IN size, CCTK_INT OUT ARRAY nboundaryzones, CCTK_INT OUT ARRAY is_internal, CCTK_INT OUT ARRAY is_staggered, CCTK_INT OUT ARRAY shiftout)
+USES FUNCTION GetBoundarySpecification
+
+CCTK_INT FUNCTION MultiPatch_GetBoundarySpecification(CCTK_INT IN map, CCTK_INT IN size, CCTK_INT OUT ARRAY nboundaryzones, CCTK_INT OUT ARRAY is_internal, CCTK_INT OUT ARRAY is_staggered, CCTK_INT OUT ARRAY shiftout)
+USES FUNCTION MultiPatch_GetBoundarySpecification
+
+CCTK_INT FUNCTION SymmetryTableHandleForGrid(CCTK_POINTER_TO_CONST IN cctkGH)
+USES FUNCTION SymmetryTableHandleForGrid
+
+CCTK_INT FUNCTION Boundary_SelectGroupForBC(CCTK_POINTER_TO_CONST IN GH, CCTK_INT IN faces, CCTK_INT IN boundary_width, CCTK_INT IN table_handle, CCTK_STRING IN group_name, CCTK_STRING IN bc_name)
+USES FUNCTION Boundary_SelectGroupForBC
+
+CCTK_INT FUNCTION Driver_SelectGroupForBC(CCTK_POINTER_TO_CONST IN GH, CCTK_INT IN faces, CCTK_INT IN boundary_width, CCTK_INT IN table_handle, CCTK_STRING IN group_name, CCTK_STRING IN bc_name)
+USES FUNCTION Driver_SelectGroupForBC
+
+CCTK_INT FUNCTION Boundary_SelectVarForBC(CCTK_POINTER_TO_CONST IN GH, CCTK_INT IN faces, CCTK_INT IN boundary_width, CCTK_INT IN table_handle, CCTK_STRING IN var_name, CCTK_STRING IN bc_name)
+USES FUNCTION Boundary_SelectVarForBC
+
+CCTK_INT FUNCTION Driver_SelectVarForBC(CCTK_POINTER_TO_CONST IN GH, CCTK_INT IN faces, CCTK_INT IN boundary_width, CCTK_INT IN table_handle, CCTK_STRING IN var_name, CCTK_STRING IN bc_name)
+USES FUNCTION Driver_SelectVarForBC
+
+public:
+CCTK_REAL CL_log_confac type=GF timelevels=3 tags='tensortypealias="Scalar" tensorweight=0.16666666666666666667'
+{
+  phi
+} "CL_log_confac"
+
+public:
+CCTK_REAL CL_dlog_confac type=GF timelevels=3 tags='tensortypealias="D" tensorweight=0'
+{
+  dphi1,
+  dphi2,
+  dphi3
+} "CL_dlog_confac"
+
+public:
+CCTK_REAL CL_metric type=GF timelevels=3 tags='tensortypealias="DD_sym" tensorweight=-0.66666666666666666667'
+{
+  gt11,
+  gt12,
+  gt13,
+  gt22,
+  gt23,
+  gt33
+} "CL_metric"
+
+public:
+CCTK_REAL CL_dmetric type=GF timelevels=3 tags='tensortypealias="DDD_sym" tensorweight=0'
+{
+  dgt111,
+  dgt112,
+  dgt113,
+  dgt122,
+  dgt123,
+  dgt133,
+  dgt211,
+  dgt212,
+  dgt213,
+  dgt222,
+  dgt223,
+  dgt233,
+  dgt311,
+  dgt312,
+  dgt313,
+  dgt322,
+  dgt323,
+  dgt333
+} "CL_dmetric"
+
+public:
+CCTK_REAL CL_Gamma type=GF timelevels=3 tags='tensortypealias="U" tensorweight=0.66666666666666666667'
+{
+  Xt1,
+  Xt2,
+  Xt3
+} "CL_Gamma"
+
+public:
+CCTK_REAL CL_trace_curv type=GF timelevels=3 tags='tensortypealias="Scalar" tensorweight=0'
+{
+  trK
+} "CL_trace_curv"
+
+public:
+CCTK_REAL CL_curv type=GF timelevels=3 tags='tensortypealias="DD_sym" tensorweight=-0.66666666666666666667'
+{
+  At11,
+  At12,
+  At13,
+  At22,
+  At23,
+  At33
+} "CL_curv"
+
+public:
+CCTK_REAL CL_lapse type=GF timelevels=3 tags='tensortypealias="Scalar" tensorweight=0'
+{
+  alpha
+} "CL_lapse"
+
+public:
+CCTK_REAL CL_dlapse type=GF timelevels=3 tags='tensortypealias="D" tensorweight=0'
+{
+  dalpha1,
+  dalpha2,
+  dalpha3
+} "CL_dlapse"
+
+public:
+CCTK_REAL CL_shift type=GF timelevels=3 tags='tensortypealias="U" tensorweight=0'
+{
+  beta1,
+  beta2,
+  beta3
+} "CL_shift"
+
+public:
+CCTK_REAL CL_dshift type=GF timelevels=3 tags='tensortypealias="DU" tensorweight=0'
+{
+  dbeta11,
+  dbeta12,
+  dbeta13,
+  dbeta21,
+  dbeta22,
+  dbeta23,
+  dbeta31,
+  dbeta32,
+  dbeta33
+} "CL_dshift"
+
+public:
+CCTK_REAL CL_dtshift type=GF timelevels=3 tags='tensortypealias="U" tensorweight=0'
+{
+  B1,
+  B2,
+  B3
+} "CL_dtshift"
+
+public:
+CCTK_REAL CL_Ham type=GF timelevels=1 tags='tensortypealias="Scalar" tensorweight=0'
+{
+  H
+} "CL_Ham"
+
+public:
+CCTK_REAL CL_mom type=GF timelevels=1 tags='tensortypealias="D" tensorweight=0'
+{
+  M1,
+  M2,
+  M3
+} "CL_mom"
+
+public:
+CCTK_REAL CL_cons_detg type=GF timelevels=1 tags='tensortypealias="Scalar" tensorweight=2'
+{
+  cS
+} "CL_cons_detg"
+
+public:
+CCTK_REAL CL_cons_Gamma type=GF timelevels=1 tags='tensortypealias="U" tensorweight=0.66666666666666666667'
+{
+  cXt1,
+  cXt2,
+  cXt3
+} "CL_cons_Gamma"
+
+public:
+CCTK_REAL CL_cons_traceA type=GF timelevels=1 tags='tensortypealias="Scalar" tensorweight=0'
+{
+  cA
+} "CL_cons_traceA"
+
+public:
+CCTK_REAL CL_cons_dlapse type=GF timelevels=1 tags='tensortypealias="D" tensorweight=0'
+{
+  cdalpha1,
+  cdalpha2,
+  cdalpha3
+} "CL_cons_dlapse"
+
+public:
+CCTK_REAL CL_cons_dshift type=GF timelevels=1 tags='tensortypealias="DU" tensorweight=0'
+{
+  cdbeta11,
+  cdbeta12,
+  cdbeta13,
+  cdbeta21,
+  cdbeta22,
+  cdbeta23,
+  cdbeta31,
+  cdbeta32,
+  cdbeta33
+} "CL_cons_dshift"
+
+public:
+CCTK_REAL CL_cons_dlog_confac type=GF timelevels=1 tags='tensortypealias="D" tensorweight=0'
+{
+  cdphi1,
+  cdphi2,
+  cdphi3
+} "CL_cons_dlog_confac"
+
+public:
+CCTK_REAL CL_cons_dmetric type=GF timelevels=1 tags='tensortypealias="DDD_sym" tensorweight=0'
+{
+  cdgt111,
+  cdgt112,
+  cdgt113,
+  cdgt122,
+  cdgt123,
+  cdgt133,
+  cdgt211,
+  cdgt212,
+  cdgt213,
+  cdgt222,
+  cdgt223,
+  cdgt233,
+  cdgt311,
+  cdgt312,
+  cdgt313,
+  cdgt322,
+  cdgt323,
+  cdgt333
+} "CL_cons_dmetric"
+
+public:
+CCTK_REAL CL_curvrhs type=GF timelevels=3 tags='tensortypealias="DD_sym" tensorweight=-0.66666666666666666667 Prolongation="None"'
+{
+  At11rhs,
+  At12rhs,
+  At13rhs,
+  At22rhs,
+  At23rhs,
+  At33rhs
+} "CL_curvrhs"
+
+public:
+CCTK_REAL CL_dlapserhs type=GF timelevels=3 tags='tensortypealias="D" tensorweight=0 Prolongation="None"'
+{
+  dalpha1rhs,
+  dalpha2rhs,
+  dalpha3rhs
+} "CL_dlapserhs"
+
+public:
+CCTK_REAL CL_dlog_confacrhs type=GF timelevels=3 tags='tensortypealias="D" tensorweight=0 Prolongation="None"'
+{
+  dphi1rhs,
+  dphi2rhs,
+  dphi3rhs
+} "CL_dlog_confacrhs"
+
+public:
+CCTK_REAL CL_dmetricrhs type=GF timelevels=3 tags='tensortypealias="DDD_sym" tensorweight=0 Prolongation="None"'
+{
+  dgt111rhs,
+  dgt112rhs,
+  dgt113rhs,
+  dgt122rhs,
+  dgt123rhs,
+  dgt133rhs,
+  dgt211rhs,
+  dgt212rhs,
+  dgt213rhs,
+  dgt222rhs,
+  dgt223rhs,
+  dgt233rhs,
+  dgt311rhs,
+  dgt312rhs,
+  dgt313rhs,
+  dgt322rhs,
+  dgt323rhs,
+  dgt333rhs
+} "CL_dmetricrhs"
+
+public:
+CCTK_REAL CL_dshiftrhs type=GF timelevels=3 tags='tensortypealias="DU" tensorweight=0 Prolongation="None"'
+{
+  dbeta11rhs,
+  dbeta12rhs,
+  dbeta13rhs,
+  dbeta21rhs,
+  dbeta22rhs,
+  dbeta23rhs,
+  dbeta31rhs,
+  dbeta32rhs,
+  dbeta33rhs
+} "CL_dshiftrhs"
+
+public:
+CCTK_REAL CL_dtshiftrhs type=GF timelevels=3 tags='tensortypealias="U" tensorweight=0 Prolongation="None"'
+{
+  B1rhs,
+  B2rhs,
+  B3rhs
+} "CL_dtshiftrhs"
+
+public:
+CCTK_REAL CL_Gammarhs type=GF timelevels=3 tags='tensortypealias="U" tensorweight=0.66666666666666666667 Prolongation="None"'
+{
+  Xt1rhs,
+  Xt2rhs,
+  Xt3rhs
+} "CL_Gammarhs"
+
+public:
+CCTK_REAL CL_lapserhs type=GF timelevels=3 tags='tensortypealias="Scalar" tensorweight=0 Prolongation="None"'
+{
+  alpharhs
+} "CL_lapserhs"
+
+public:
+CCTK_REAL CL_log_confacrhs type=GF timelevels=3 tags='tensortypealias="Scalar" tensorweight=0.16666666666666666667 Prolongation="None"'
+{
+  phirhs
+} "CL_log_confacrhs"
+
+public:
+CCTK_REAL CL_metricrhs type=GF timelevels=3 tags='tensortypealias="DD_sym" tensorweight=-0.66666666666666666667 Prolongation="None"'
+{
+  gt11rhs,
+  gt12rhs,
+  gt13rhs,
+  gt22rhs,
+  gt23rhs,
+  gt33rhs
+} "CL_metricrhs"
+
+public:
+CCTK_REAL CL_shiftrhs type=GF timelevels=3 tags='tensortypealias="U" tensorweight=0 Prolongation="None"'
+{
+  beta1rhs,
+  beta2rhs,
+  beta3rhs
+} "CL_shiftrhs"
+
+public:
+CCTK_REAL CL_trace_curvrhs type=GF timelevels=3 tags='tensortypealias="Scalar" tensorweight=0 Prolongation="None"'
+{
+  trKrhs
+} "CL_trace_curvrhs"

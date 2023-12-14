@@ -1,0 +1,16 @@
+
+!DESC "Standard Benchmark for Einstein Equations"
+
+!REPOSITORY_TYPE = pserver
+!REPOSITORY_LOCATION = cvs.cactuscode.org
+                
+CactusBase/Boundary          
+CactusBase/CartGrid3D        
+CactusBase/IOUtil            
+CactusBase/IOBasic           
+CactusBase/Time              
+CactusPUGHIO/IOASCII         
+CactusPUGH/PUGH              
+CactusPUGHIO/IOHDF5          
+CactusWave/IDScalarWave      
+CactusWave/WaveToyC          

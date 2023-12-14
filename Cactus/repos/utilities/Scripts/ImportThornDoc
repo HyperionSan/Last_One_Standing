@@ -1,0 +1,17 @@
+#!/bin/bash
+
+set -e
+set -u
+
+if [ $# -ne 3 ]; then
+    echo "Usage: $0 <cactus dir> <thornlist> <webthorndoc>" >&2
+    exit 1
+fi  
+
+cactus="$1"
+thornlist="$2"
+webthorndoc="$3"
+
+for ta in $(grep -v '^[#!]' $thornlist | sed 's/#.*//' | sort -u); do mkdir -p $webthorndoc/${ta}; rsync -av --include="*/" --include="*.html" --include "*.png" --include="*.css" --exclude="*" $cactus/doc/HTML/ThornDoc/$ta/ $webthorndoc/$ta/; done
+
+for a in $(grep -v '^[#!]' $thornlist|sed 's/#.*//' | sed 's/\/.*//'|sort -u); do if [ -r $cactus/doc/HTML/ArrangementDoc/$a ]; then rsync -av --include="*/" --include="*.html" --include "*.png" --include="*.css" --exclude="*" $cactus/doc/HTML/ArrangementDoc/$a/ $webthorndoc/$a/; fi; done

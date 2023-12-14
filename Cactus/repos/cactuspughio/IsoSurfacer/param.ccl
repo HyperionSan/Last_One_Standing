@@ -1,0 +1,80 @@
+# Parameter definitions for thorn IsoSurfacer
+# $Header$
+
+private:
+
+STRING out_dir "Output directory for IsoSurfacer files, overrides IO::out_dir"
+{
+  ".+" :: "A valid directory name"
+  "^$" :: "An empty string to choose the default from IO::out_dir"
+} ""
+
+STRING out_vars "Variable to output isosurfaces for" # STEERABLE = ALWAYS
+{
+  ".+" :: "Fully qualified variable name"
+  "^$" :: "An empty string to output nothing"
+} ""
+
+INT out_every "How often to output isosurfaces, overrides IO::out_every" # STEERABLE = ALWAYS
+{
+   1:* :: "Every so many iterations"
+   0:  :: "Disable IsoSurfacer output"
+  -1:  :: "Default to IO::out_every"
+} -1
+
+INT out_start "First iteration to start drawing isosurfaces" # STEERABLE = ALWAYS
+{
+  1: :: "Some positive integer"
+} 1
+
+STRING out_format "What format to output isosufaces" # STEERABLE = ALWAYS
+{
+  .* :: "Comma separated list.  Can be UCD, VRML, ASCII, SOCK or None"
+} "None"
+
+REAL isovalue "Isosurface value" STEERABLE = ALWAYS
+{
+ : :: "Any floating point value"
+} 1.0
+
+INT dataport "dataport for socket connection (output port)"
+{
+  1:65535 :: "Some positive integer"
+} 7051
+
+INT controlport "controlport for socket connection (input port)"
+{
+  1:65535 :: "some positive integer"
+} 7050
+
+STRING format_str "If the precision specified in the default format string is less than what you need, then insert your own format for floating point numbers here"
+{
+  .* :: "A regex which matches everything"
+} "%3.3f"
+
+BOOLEAN compute_normals "Compute Vertex Normals." # STEERABLE = ALWAYS
+{
+} "no"
+
+BOOLEAN send_normals "Send Vertex Normals." # STEERABLE = ALWAYS
+{
+} "no"
+
+BOOLEAN allow_empty_sends "Allow the Isosurfacer to send zero-length vertex lists to the client application. Ordinarily these zero-length sends are supressed." # STEERABLE = ALWAYS
+{
+} "no"
+
+STRING isosurfacer " What to isosurface and how. Format:{(functionName) (isolevel1, isolevel2, ...) (format1, format2, ...) (itiso, resolution, firstIteration, uniqverts)} {} ...:: only for backward compability with old isosurfacer"
+{
+ .* :: "compatability with original isosurfacer"
+} ""
+
+
+#############################################################################
+### import IOUtil parameters
+#############################################################################
+shares: IO
+
+USES STRING out_dir AS io_out_dir
+USES INT out_every AS io_out_every
+USES KEYWORD verbose 

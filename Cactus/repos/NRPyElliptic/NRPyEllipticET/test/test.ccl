@@ -1,0 +1,5 @@
+TEST bbh_conformally_flat
+{
+  ABSTOL 3e-5
+  RELTOL 5e-3
+}

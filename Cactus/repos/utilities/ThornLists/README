@@ -1,0 +1,12 @@
+$Header:
+
+This directory contains several thorn lists.  These lists have the
+following contents:
+
+
+These thornlists build on their own:
+
+Cactus_4.2.0.th : List of thorns within the 4.2.0 release
+Cactus_4.3.0.th : List of thorns within the 4.3.0 release
+Cactus_devel.th : List of thorns within the development version
+

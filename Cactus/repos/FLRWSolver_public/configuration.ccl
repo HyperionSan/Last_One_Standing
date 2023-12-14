@@ -1,0 +1,4 @@
+# Configuration definition for thorn FLRWSolver
+
+REQUIRES FFTW3 SpaceMask
+

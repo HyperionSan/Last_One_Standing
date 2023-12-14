@@ -1,0 +1,21 @@
+#! /bin/bash
+#SBATCH -A @ALLOCATION@
+#SBATCH -p @QUEUE@
+#SBATCH -t @WALLTIME@
+#SBATCH --mem 120000
+#SBATCH --partition skl_usr_prod
+#SBATCH --nodes @NODES@
+#SBATCH --ntasks-per-node @(@NUM_PROCS@/@NODES@)@
+#SBATCH --cpus-per-task @NUM_THREADS@
+#SBATCH @("@CHAINED_JOB_ID@" != "" ? "-d afterany:@CHAINED_JOB_ID@" : "")@
+#SBATCH -J @SHORT_SIMULATION_NAME@
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=@EMAIL@
+#SBATCH -o @RUNDIR@/@SIMULATION_NAME@.out
+#SBATCH -e @RUNDIR@/@SIMULATION_NAME@.err
+
+sleep 10
+
+cd @SOURCEDIR@
+@SIMFACTORY@ run @SIMULATION_NAME@ --basedir=@BASEDIR@ --machine=@MACHINE@ --restart-id=@RESTART_ID@ @FROM_RESTART_COMMAND@
+

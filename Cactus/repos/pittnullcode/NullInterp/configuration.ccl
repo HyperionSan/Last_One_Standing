@@ -1,0 +1,9 @@
+# Configuration definition for thorn NullInterp 
+# $Header$
+
+REQUIRES Fortran NullGrid
+PROVIDES NullInterp
+{
+ LANG
+}
+

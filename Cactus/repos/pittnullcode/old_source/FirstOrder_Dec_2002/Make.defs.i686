@@ -1,0 +1,26 @@
+#! /usr/sbin/smake
+#
+FC      = frt
+F90     = frt
+CC      = gcc
+LD      = $(F90)
+MOD     = mod
+SWP     =
+RM      = /bin/rm -f
+MP      =
+ABI     =
+ISA     =
+ARCH    = $(MP) $(ABI) $(ISA)
+OLEVEL  = -O3
+FOPTS   = -Fixed
+F90OPTS = -Am -M. -Free -static-flib -K fast,eval,preex # -H aesu
+COPTS   =
+F90FLAGS= $(ARCH) $(OLEVEL) $(F90OPTS)
+FFLAGS  = $(ARCH) $(OLEVEL) $(FOPTS)
+CFLAGS  = $(ARCH) $(OLEVEL) $(COPTS)
+LIBPATH =  -L/home/raven2/yosef/lib/ -L/usr/lib/gcc-lib/i386-redhat-linux/2.96
+LIBS    = -lhdfio -lhlio -lieeeio -lgcc
+LDFLAGS =  -static-flib $(ARCH) $(OLEVEL)
+LIBFLAGS = $(LIBPATH) $(LIBS)
+PROF    =
+

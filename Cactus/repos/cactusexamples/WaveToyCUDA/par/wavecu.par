@@ -1,0 +1,55 @@
+ActiveThorns = "
+   #Accelerator
+   Carpet
+   CarpetIOASCII
+   CarpetIOBasic
+   CarpetLib
+   CarpetReduce
+   CartGrid3D
+   CoordBase
+   CycleClock
+   Formaline
+   GSL
+   IOUtil
+   InitBase
+   LoopControl
+   SymBase
+   Time
+   Vectors
+   WaveToyCUDA
+"
+
+Cactus::cctk_itlast = 0 # 200
+
+Carpet::domain_from_coordbase   = yes
+Carpet::prolongation_order_time = 2
+
+CoordBase::domainsize = "minmax"
+CoordBase::xmin       = -0.5
+CoordBase::ymin       = -0.5
+CoordBase::zmin       = -0.5
+CoordBase::xmax       = +0.5
+CoordBase::ymax       = +0.5
+CoordBase::zmax       = +0.5
+CoordBase::dx         =  0.01
+CoordBase::dy         =  0.01
+CoordBase::dz         =  0.01
+CartGrid3D::type      = "coordbase"
+Time::dtfac           = 0.5
+
+#Accelerator::verbose     = no
+#Accelerator::veryverbose = no
+
+InitBase::initial_data_setup_method = "init_all_levels"
+
+WaveToyCUDA::verbose    = no
+WaveToyCUDA::wavelength = 2.0
+
+IO::out_dir                    = $parfile
+IOBasic::outInfo_every         = 20
+IOBasic::outInfo_vars          = "WaveToyCUDA::scalar"
+IOASCII::output_all_timelevels = no
+IOASCII::out1D_every           = 20
+IOASCII::out1D_vars            = "WaveToyCUDA::scalar"
+IOASCII::out3D_every           = 0
+IOASCII::out3D_vars            = "WaveToyCUDA::scalar"

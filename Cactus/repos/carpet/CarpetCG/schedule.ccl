@@ -1,0 +1,9 @@
+# Schedule definitions for thorn CarpetCG
+
+STORAGE: prsvars
+STORAGE: dirvars
+
+SCHEDULE CarpetCG_register AT startup
+{
+  LANG: C
+} "Register the elliptic solver"

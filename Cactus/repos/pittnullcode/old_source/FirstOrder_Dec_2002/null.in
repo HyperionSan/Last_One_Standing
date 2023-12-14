@@ -1,0 +1,26 @@
+ &null_input
+ nn    = 77
+ nx    = 181
+ nt    = 700
+ iot0  = 1
+ iot2  = 1000
+ iot3  = 5000
+ rwt   = 2.0d0
+ cfl   = 0.5d0
+ disip = 2.8d0
+ time  = -2.02d0
+ ID_CASE = 2
+ R_left = 4.0
+ R_right = 50.0
+ ID_AMP = 1.0e-4
+ boundary_output = F
+ horizon_output = F
+ it_cfl  = 10
+ dt_fix = .93333333333333333e-3
+ cfl_compute = F
+ circ_rad    = .5d0
+ qsize = 1.2d0
+ do_checkpoint = F
+ it_checkpoint = 4
+ chkrcvr = F
+/

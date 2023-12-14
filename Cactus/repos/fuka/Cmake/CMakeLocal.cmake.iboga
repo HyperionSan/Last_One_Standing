@@ -1,0 +1,3 @@
+set(GSL_LIBRARIES "$ENV{GSL_ROOT}/lib/libgsl.so")
+set(FFTW_LIBRARIES "$ENV{FFTW_ROOT}/lib/libfftw3.so")
+set(SCALAPACK_LIBRARIES "-L$ENV{INTEL_MKL_ROOT}/linux/mkl/lib/ -Wl,--no-as-needed -lmkl_scalapack_lp64 -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lmkl_blacs_intelmpi_lp64 -lpthread -lm -ldl")

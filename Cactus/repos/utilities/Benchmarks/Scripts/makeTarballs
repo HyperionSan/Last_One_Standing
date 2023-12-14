@@ -1,0 +1,34 @@
+#!/bin/bash
+
+benchmarks=$(cat <<EOF
+BenchIO_FlexIO
+BenchIO_HDF5
+Bench_BSSN_Carpet
+Bench_BSSN_PUGH
+Bench_Whisky_Carpet
+EOF
+)
+
+for benchmark in $benchmarks
+do
+    echo "Creating tarball for $benchmark..."
+
+    thorns=$(cat BENCHMARKS/$benchmark.thornlist | grep -v '^$' | grep -v '^!')
+
+    pushd .. > /dev/null
+
+    tar czf $benchmark.tar.gz \
+        Cactus/BENCHMARKS/$benchmark*.par \
+        Cactus/BENCHMARKS/$benchmark.thornlist \
+        Cactus/CONTRIBUTORS \
+        Cactus/COPYRIGHT \
+        Cactus/CVS \
+        Cactus/Makefile \
+        $(for thorn in $thorns; do echo Cactus/arrangements/$thorn; done) \
+        Cactus/doc \
+        Cactus/lib \
+        Cactus/src
+
+    popd > /dev/null
+
+done

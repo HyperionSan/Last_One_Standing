@@ -1,0 +1,2 @@
+#!/bin/bash
+cat volume_integration/volume_integrals.txt |grep -v \#|awk '{print $1,$2/$5,$3/$5," | ",$6/$9,$7/$9," | ",$11/$14,$12/$14," | ",$15/$18,$16/$18}' > volume_integration/tracks.txt

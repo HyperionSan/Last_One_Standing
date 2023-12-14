@@ -1,0 +1,312 @@
+/*
+ * setup_areal_sphere.cc
+ *
+ * These routines determine a sphere which satisfies the property
+ *
+ *   r(mu,nu) = R*(unit sphere metric)                                      (*)
+ *
+ * for a constant R, where (mu,nu) are local coordinates on the sphere,
+ * eg. spherical polar (mu,nu)=(theta,phi).
+ *
+ * The coordinate transformation is of the form
+ *
+ *   r^4  =  (det unit sphere) R^4 / g(r, r_nu, r_mu, mu, nu, g_ab)        (**)
+ *
+ * where g() is a known function (see the function calc_R(), below)
+ * of the 3-metric of the slice, g_ab, the radius r, and its derivatives:
+ *   r_mu := dr/dmu,     r_nu := dr/dnu
+ *
+ * Since g() depends on r, the evaluation of r(R) is not explicit. The
+ * routines below iterate over (**), calculating a new r_i given the
+ * user specified constant radius R, and an initial guess r_0.
+ *
+ * Contents:
+ *   calc_constant_r() iterates over calls to recompute (**) until convergence.
+ *   calc_R()          computes (**), given a current guess for r(mu,nu).
+ *   get_metric()      determines the underlying spacetime metric on the sphere
+ *
+ * Utility functions:
+ *   diff_theta(), diff_phi() compute 1st derivatives in the angular coords.
+ *   norm_inf()        computes the infinity norm of a quantity over the sphere
+ *
+ */
+
+#include <iostream>
+#include <cmath>
+
+// User parameters (should go into param.ccl)
+
+#define DESIRED_RADIUS                  20.0
+
+#define NTHETA                          100
+#define NPHI                            100
+
+#define TOLERANCE                       1e-6
+#define MAX_IT                          10
+
+// Parameters for setting up a distorted spacetime for testing.
+
+#define TEST_PARM_A                     0.01
+#define TEST_PARM_B                     0.005
+#define TEST_PARM_C                     0.01
+
+// Constants
+
+#define PI                              4.0*atan(1.0)
+
+using namespace std;
+
+/****************************************************************************
+ *  UTILITY FUNCTIONS.
+ ****************************************************************************/
+
+/*
+ *  Infinity norm over the slice.
+ */
+double
+norm_inf(double const * const f, int const ni, int const nj)
+{
+  double norm = f[0];
+  for (int idx=0; idx<ni*nj; ++idx)
+    if (fabs(f[idx]) > norm)
+      norm = fabs(f[idx]);
+  return norm;
+}
+
+/*
+ * Derivative in the theta direction (2nd order).
+ */
+double
+diff_theta(double const * const r, int const i, int const j,
+           double const dtheta, int const ntheta, int const nphi)
+{
+  if (i==0)
+    {
+      if (j >= nphi/2)
+        return (r[nphi+j] - r[j-nphi/2])/(2.0*dtheta);
+      else
+        return (r[nphi+j] - r[j+nphi/2])/(2.0*dtheta);
+    }
+  else if (i==ntheta-1)
+    {
+      if (j >= nphi/2)
+        return (r[i*nphi+j-nphi/2] - r[(i-1)*nphi+j])/(2.0*dtheta);
+      else
+        return (r[i*nphi+j+nphi/2] - r[(i-1)*nphi+j])/(2.0*dtheta);
+    }
+  return (r[(i+1)*nphi+j] - r[(i-1)*nphi+j])/(2.0*dtheta);
+}
+
+
+/*
+ * Derivative in the phi direction (2nd order).
+ */
+double
+diff_phi(double const * const r, int const i, int const j, double const dphi,
+         int const ntheta, int const nphi)
+{
+  if (j==0)
+    return (r[i*nphi+1] - r[i*nphi+nphi-1])/dphi;
+  else if (j==nphi-1)
+    return (r[i*nphi] - r[i*nphi+nphi-2])/dphi;
+
+  return (r[i*nphi+(j+1)] - r[i*nphi+(j-1)])/(2.0*dphi);
+}
+
+/****************************************************************************
+ *  SOLVER.
+ ****************************************************************************/
+
+/*
+ *  Get the metric at a point on the sphere.
+ *
+ *  The metric components should be given in cartesian components to
+ *  fill the g_cart[] array. This is transformed to spherical polar
+ *  coordinates g_sph[] using the jacobian J[].
+ *
+ *  In practice, the jacobian J[] will also need to recognise the possibility
+ *  of alternate patch systems that are in use, eg. thornburg04 style 6-patch
+ *  systems.
+ *
+ *  The metric components should be obtained by interpolation from the
+ *  numerically generated spacetime.
+ *
+ *  For test purposes, the spherical metric is distorted to something
+ *  non-trivial, but this should not be present in the final version of
+ *  the code.
+ */
+int
+get_metric(double g_sph[4][4], double const r, double const theta,
+           double const phi)
+{
+  double const J[4][4] = {
+    { 1,                   0,                     0,                      0 },
+    { 0, sin(theta)*cos(phi), r*cos(theta)*cos(phi), -r*sin(theta)*sin(phi) },
+    { 0, sin(theta)*sin(phi), r*cos(theta)*sin(phi),  r*sin(theta)*cos(phi) },
+    { 0,          cos(theta),         -r*sin(theta),                      0 }
+  };
+
+  double const g_cart[4][4] = { {-1, 0, 0, 0 },
+                                { 0, 1, 0, 0 },
+                                { 0, 0, 1, 0 },
+                                { 0, 0, 0, 1 } };
+  for (int a=0; a<4; ++a)
+    for (int b=0; b<4; ++b)
+      {
+        g_sph[a][b] = 0.0;
+        for (int ix=1; ix<4; ++ix)
+          for (int jx=1; jx<4; ++jx)
+            g_sph[a][b] += g_cart[ix][jx]*J[ix][a]*J[jx][b];
+      }
+
+  /*
+   *  The remainder of this routine implements a distortion in order
+   *  to test that the method converges for non-trivial data.
+   */
+  double const Jp[4][4] = {
+    { 1, 0, 0, 0 },
+    { 0, cos(phi)*sin(theta)*TEST_PARM_C + 2*r*TEST_PARM_B 
+      + cos(theta)*TEST_PARM_A + 1,
+      r*(cos(phi)*cos(theta)*TEST_PARM_C - sin(theta)*TEST_PARM_A),
+      -sin(phi)*r*sin(theta)*TEST_PARM_C},
+    { 0, 0, 1, 0},
+    { 0, 0, 0, 1}
+  };
+  
+  double g_distort[4][4];
+  for (int a=0; a<4; ++a)
+    for (int b=0; b<4; ++b)
+      {
+        g_distort[a][b] = 0.0;
+        for (int ix=1; ix<4; ++ix)
+          for (int jx=1; jx<4; ++jx)
+            g_distort[a][b] += g_sph[ix][jx]*Jp[ix][a]*Jp[jx][b];
+      }
+
+  for (int a=1; a<4; ++a)
+    for (int b=1; b<4; ++b)
+      g_sph[a][b] = g_distort[a][b];
+
+  return 0;
+}
+
+/*
+ *  Calculate the updated radius, R, at a point given an initial guess
+ *  for the radius, r, and the metric on the sphere. See Nigel's notes
+ *  for details on the computation.
+ */
+double
+calc_R(double * r, double const * const theta, double const * const phi,
+       int const ntheta, int const nphi, double const dtheta,
+       double const dphi, int const i, int const j)
+{
+  double const rp = r[i*nphi+j];
+  double const tp = theta[i];
+  double const pp = phi[j];
+  
+  double g_sph[4][4];
+  int ierr = get_metric(g_sph, rp, tp, pp);
+  if (ierr)
+    exit(-1);
+
+  double const grr = g_sph[1][1];
+  double const hr2 = g_sph[1][2] / rp;
+  double const hr3 = g_sph[1][3] / rp;
+  double const h22 = g_sph[2][2] / (rp*rp);
+  double const h23 = g_sph[2][3] / (rp*rp);
+  double const h33 = g_sph[3][3] / (rp*rp);
+  
+  double const log_r_theta = diff_theta(r, i, j, dtheta, ntheta, nphi) / rp;
+  double const log_r_phi = diff_phi(r, i, j, dphi, ntheta, nphi) / rp;
+
+  double const cg = sin(tp)*sin(tp) /
+    (h22*h33 - h23 * h23
+     + 2.0 * log_r_theta * hr2 * log_r_phi * hr3
+     + 2.0 * log_r_theta * hr2 * h33
+     + h22 * log_r_phi * log_r_phi * grr
+     + log_r_theta * log_r_theta * grr * h33
+     - 2.0 * log_r_theta * log_r_phi * grr * h23
+     - log_r_phi * log_r_phi * hr2 * hr2
+     + 2.0 * h22 * log_r_phi * hr3
+     - log_r_theta * log_r_theta * hr3 * hr3
+     - 2.0 * log_r_theta * hr3 * h23
+     - 2.0 * log_r_phi * hr2 * h23);
+
+  return  DESIRED_RADIUS * pow(cg, 0.25);
+}
+
+/*
+ *  Iterate the radius computation until a specified tolerance is
+ *  reached.
+ */
+int
+calc_constant_r(double* r, int const ntheta, int const nphi, 
+                double const dtheta, double const dphi,
+                double const * const theta, double const * const phi)
+{
+  printf("Iterating...\n");
+
+  int it = 0;
+  double res_Linf = 2.0*TOLERANCE;
+  while ((res_Linf > TOLERANCE) && (it < MAX_IT))
+    {
+      double R[NTHETA*NPHI];
+      double res[NTHETA*NPHI];
+      for (int i=0; i<ntheta; ++i)
+        for (int j=0; j<nphi; ++j)
+          {
+            int const idx = i*nphi + j;
+            R[idx] = calc_R(r, theta, phi, ntheta, nphi, dtheta, dphi, i, j);
+            res[idx] = fabs(R[idx] - r[idx]);
+          }
+      res_Linf = norm_inf(res, ntheta, nphi);
+      for (int idx=0; idx<ntheta*nphi; ++idx)
+        r[idx] = R[idx];
+      ++it;
+
+      printf("%d %f\n", (int) it, (float) res_Linf);
+    }
+  printf("Done.\n");
+
+  return 0;
+}
+
+
+/****************************************************************************
+ *  MAIN ROUTINE.
+ ****************************************************************************
+ *
+ *  Sets up some arrays containing the spherical-polar coordinate grids;
+ *  Initialises the radius of the sphere to a constant-value guess;
+ *  Calls the calc_constant_r() routine to solve for spheres of constant
+ *  areal radius.
+ */
+int
+main(int argc, char* argv[])
+{
+  int const ntheta = NTHETA;
+  int const nphi = NPHI;
+  double const dtheta = PI / ntheta;
+  double const dphi = 2*PI / nphi;
+  double const R0 = DESIRED_RADIUS;
+
+  double theta[NTHETA];
+  theta[0] = 0.5*dtheta;
+  for (int i=1; i<ntheta; ++i)
+    theta[i] = theta[i-1] + dtheta;
+
+  double phi[NPHI];
+  phi[0] = 0.0;
+  for (int j=1; j<nphi; ++j)
+    phi[j] = phi[j-1] + dphi;
+
+  // Initial guess is a sphere of constant coordinate radius.
+  double r[NTHETA*NPHI];
+  for (int idx=0; idx<ntheta*nphi; ++idx)
+    r[idx] = R0;
+
+  // Update r[] to be a sphere of the form R*(unit-sphere) for constant R.
+  int const err = calc_constant_r(r, ntheta, nphi, dtheta, dphi, theta, phi);
+
+  return err;
+}

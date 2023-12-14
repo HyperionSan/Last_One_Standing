@@ -1,0 +1,17 @@
+# Schedule definitions for thorn IsoSurfacer
+# $Header$
+
+schedule IsoSurfacer_Startup at STARTUP
+{
+  LANG:C
+} "Startup routine"
+
+schedule IsoSurfacer_Worker at POSTSTEP
+{
+  LANG:C
+} "Polling routine"
+
+schedule Iso_ShutdownServer at TERMINATE
+{
+  LANG:C
+} "Termination routine"

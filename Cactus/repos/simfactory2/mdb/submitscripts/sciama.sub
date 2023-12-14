@@ -1,0 +1,11 @@
+#! /bin/bash
+#SBATCH --partition @QUEUE@
+#SBATCH --time=@WALLTIME@
+#SBATCH --nodes=@NODES@
+#SBATCH --tasks-per-node=@PPN@
+#SBATCH --export=ALL
+#SBATCH --jobname=@SHORT_SIMULATION_NAME@
+#SBATCH --out @SIMULATION_NAME@.out
+#SBATCH --error @SIMULATION_NAME@.err
+cd @SOURCEDIR@
+@SIMFACTORY@ run @SIMULATION_NAME@ --basedir=@BASEDIR@ --machine=@MACHINE@ --restart-id=@RESTART_ID@ @FROM_RESTART_COMMAND@

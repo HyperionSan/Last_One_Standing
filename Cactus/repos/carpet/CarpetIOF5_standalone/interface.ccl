@@ -1,0 +1,50 @@
+# Interface definition for thorn CarpetIOF5
+
+IMPLEMENTS: IOF5
+
+USES INCLUDE: bbox.hh defs.hh dh.hh vect.hh
+USES INCLUDE: carpet.hh modes.hh
+
+
+
+CCTK_INT next_output_iteration TYPE=scalar
+CCTK_REAL next_output_time TYPE=scalar
+CCTK_INT this_iteration TYPE=scalar
+
+
+
+CCTK_INT FUNCTION Coord_GroupSystem \
+  (CCTK_POINTER_TO_CONST IN cctkGH, \
+   CCTK_STRING IN groupname)
+REQUIRES FUNCTION Coord_GroupSystem
+
+# Check whether existing output files should be truncated or not
+CCTK_INT FUNCTION IO_TruncateOutputFiles \
+  (CCTK_POINTER_TO_CONST IN cctkGH)
+REQUIRES FUNCTION IO_TruncateOutputFiles
+
+
+
+# Return a pointer to an unmodifiable C string
+# which contains a unique ID for this configuration
+CCTK_POINTER_TO_CONST \
+FUNCTION UniqueConfigID (CCTK_POINTER_TO_CONST IN cctkGH)
+USES FUNCTION UniqueConfigID
+
+# Return a pointer to an unmodifiable C string
+# which contains a unique ID for this build
+CCTK_POINTER_TO_CONST \
+FUNCTION UniqueBuildID (CCTK_POINTER_TO_CONST IN cctkGH)
+USES FUNCTION UniqueBuildID
+
+# Return a pointer to an unmodifiable C string
+# which contains a unique ID for this simulation
+CCTK_POINTER_TO_CONST \
+FUNCTION UniqueSimulationID (CCTK_POINTER_TO_CONST IN cctkGH)
+USES FUNCTION UniqueSimulationID
+
+# Return a pointer to an unmodifiable C string
+# which contains a unique ID for this run
+CCTK_POINTER_TO_CONST \
+FUNCTION UniqueRunID (CCTK_POINTER_TO_CONST IN cctkGH)
+USES FUNCTION UniqueRunID

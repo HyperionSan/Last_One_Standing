@@ -1,0 +1,3 @@
+To use these files, copy them into
+$HOME/.vim/after/syntax
+Help on this is available from within vim via ":he mysyntaxfile-add".

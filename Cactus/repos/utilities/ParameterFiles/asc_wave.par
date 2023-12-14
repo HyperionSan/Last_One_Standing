@@ -1,0 +1,68 @@
+# perpetual_wavetoy.par - Perpetual wavetoy example with lots of output enabled 
+# $Id$
+#
+# /*@@
+#   @file      perpetual_wavetoy.par
+#   @date      Fri 9 Nov 2001
+#   @author    Thomas Radke
+#   @desc
+#              (Almost) perpetual wavetoy example with lots of output enabled
+#              for remote visualization demos
+#   @enddesc
+# @@*/
+
+ActiveThorns = "PortalAnnounce Boundary IDScalarWaveC Time WaveToyC PUGH PUGHSlab PUGHReduce CartGrid3D IOUtil IOBasic IOASCII IOHDF5Util IOHDF5 IOStreamedHDF5 Socket HTTPD HTTPDExtra IOJpeg jpeg6b IsoSurfacer"
+
+PortalAnnounce::portal_host = "athena.ncsa.uiuc.edu"
+PortalAnnounce::portal_port = 9296
+PortalAnnounce::portal_announce = "yes"
+ 
+Time::dtfac = 0.5
+
+IDScalarWave::initial_data = "gaussian"
+IDScalarWave::radius       = 0
+IDScalarWave::amplitude    = 1.0
+
+Driver::global_nsize = 30
+
+cactus::cctk_itlast = 10000
+
+IO::out_downsample_x  = 5
+IO::out_downsample_y  = 5
+IO::out_downsample_z  = 5
+IO::out_single_precision        = "yes"
+IO::out_unchunked     = "yes"
+IO::out_mode          = "onefile"
+IO::new_filename_scheme = 1
+
+IOHDF5::outHDF5_every = 200
+IOHDF5::out_vars      = "wavetoy::phi "
+
+IOStreamedHDF5::outHDF5_every = 20
+IOStreamedHDF5::out_vars      = "wavetoy::phi "
+
+IOBasic::outInfo_every = 20
+IOBasic::outInfo_vars  = "wavetoy::phi"
+
+IOBasic::outScalar_every = 50
+IOBasic::outScalar_vars  = "wavetoy::phi"
+IOBasic::out_format  = ".2g"
+
+IOJpeg::out_every = 100
+IOJpeg::out_vars  = "wavetoy::phi"
+IOJpeg::mode        = "remove"
+
+IOASCII::out1D_vars  = "wavetoy::phi"
+IOASCII::out1D_every = 50
+IOASCII::out1D_style = "gnuplot"
+
+IOASCII::out2D_vars  = "wavetoy::phi"
+IOASCII::out2D_every = 10
+IOASCII::out_format  = ".3g"
+
+IsoSurfacer::out_format = "SOCK"
+IsoSurfacer::out_vars    = "WAVETOY::phi"
+IsoSurfacer::isovalue      = 0.35
+
+HTTPD::use_pthreads       = "yes"
+HTTPD::port = "7123"

@@ -1,0 +1,153 @@
+project = Cactus
+component = EinsteinToolkit
+component_version = 1.0.0
+description = Check out, build, and test the Einstein Toolkit
+
+run_type = build
+
+
+
+inputs = utilities.svn, einsteintoolkit-thornlists.svn
+
+pre_all          = Utilities/trunk/NMI/fetch.sh
+pre_all_args     = 
+
+remote_task      = Utilities/trunk/NMI/remote.sh
+remote_task_args = 
+
+remote_post      = Utilities/trunk/NMI/results.sh
+remote_post_args = 
+
+post_all         = Utilities/trunk/NMI/doc.sh
+post_all_args    = 
+
+
+
+## Schedule a test every day at midnight
+cron_hour   = 0
+cron_minute = 0
+
+## Notify the Einstein Toolkit maintainers of the results
+#notify = maintainers@einsteintoolkit.org
+# Notify someone
+notify = schnetter@cct.lsu.edu
+
+
+
+# List of platforms to test
+
+platforms = ps3_ydl_5.0, unmanaged-x86_rhap_5, x86_64_deb_5.0, x86_64_macos_10.6
+
+# Allow running on unmanaged platforms
+++unmanaged = true
+
+# Working platforms (with some date when they were working):
+#    ps3_ydl_5.0            (worked on 2010-03-31)
+#    unmanaged-x86_rhap_5   (worked on 2010-03-31)
+#    x86_64_deb_5.0         (worked on 2010-03-31)
+#    x86_64_macos_10.6      (worked on 2010-03-31)
+
+# Platforms of unknown status:
+#    (currently none)
+
+# Note that many of the unsupported or failing platforms are not
+# interesting for us.
+
+# Platforms where building currently fails, but which could probably
+# made to work if we made the effort:
+#    ia64_rhas_3                (linker error due to multiply defined libc symbols)
+#    ia64_sles_9                (configuration problem with C++ compiler)
+#    ppc64_sles_9               (no Fortran 90 compiler found)
+#    ppc_aix_5.2                (weird C compiler error; no Fortran compiler)
+#    ppc_aix_5.2-pl5            (weird C compiler error; no Fortran 90 licence)
+#    ppc_aix_5.3                (weird C compiler error; no Fortran compiler)
+#    x86_64_deb_4.0             (Fortran underscore problem)
+#    x86_64_fc_5                (linker error due to multiply defined libc symbols)
+#    x86_64_fedora_11           (signal 9 while building HDF5)
+#    x86_64_fedora_8            (linker error with C++ STL symbols)
+#    x86_64_fedora_9            (Fortran underscore problem)
+#    x86_64_macos_10.5          (no Fortran compiler found)
+#    x86_64_rhap_5              (linker error due to multiply defined libc symbols)
+#    x86_64_rhap_5.2            (linker error due to multiply defined libc symbols)
+#    x86_64_rhap_5.3-updated    (linker error due to multiply defined libc symbols)
+#    x86_64_rhas_3              (linker error due to multiply defined libc symbols)
+#    x86_64_rhas_4              (linker error due to multiply defined libc symbols)
+#    x86_64_sles_9              (no Fortran 90 compiler found)
+#    x86_deb_4.0                (Fortran underscore problem)
+#    x86_deb_5.0                (???)
+#    x86_fc_5                   (???)
+#    x86_macos_10.4             (no Fortran compiler found)
+#    x86_rhap_5                 (linker error due to multiply defined libc symbols)
+#    x86_rhas_3                 (Fortran underscore problem)
+#    x86_rhas_4                 (no Fortran 90 compiler found)
+#    x86_sles_9                 (no Fortran 90 compiler found)
+#    x86_sl_4.4                 (no Fortran 90 compiler found)
+#    x86_suse_10.2              (no Fortran compiler found)
+
+# Unsupported platforms due to missing dependencies:
+#    hppa_hpux_11               (no modern C compiler)
+#    ia64_rhas_4                (no Fortran compiler)
+#    ppc_macos_10.4             (no Fortran compiler)
+#    ps3_fedora_9               (no Fortran compiler)
+#    x86_64_ubuntu_8.04.3       (no make)
+#    x86_64_winnt_5.1           (no make)
+#    x86_ubuntu_5.10            (no make)
+#    x86_winnt_5.1              (no make)
+#    x86_winnt_6.0              (no make)
+#    sun4u_sol_5.10             (no modern C compiler)
+#    sun4u_sol_5.8              (no modern C compiler)
+#    sun4u_sol_5.9              (no modern C compiler)
+
+
+
+# Prerequisites
+
+# Global prerequisites
+prereqs = make-3.80, openmpi-1.3, tar-1.14
+
+# Per-platform prerequisites
+prereqs_ia64_rhas_3             = gcc-4.4.3
+prereqs_ia64_sles_9             = gcc-4.2.4
+prereqs_ppc64_sles_9            = gcc-4.2.4
+prereqs_ppc_aix_5.2             = vacpp-6, vac-6
+prereqs_ppc_aix_5.2-pl5         = vacpp-6, vac-6
+prereqs_ppc_aix_5.3             = vacpp-6, vac-6
+prereqs_ps3_ydl_5.0             =
+prereqs_unmanaged-x86_rhap_5    =
+prereqs_x86_64_deb_4.0          = gcc-4.2.4
+prereqs_x86_64_deb_5.0          = gcc-4.3.2
+prereqs_x86_64_fc_5             = gcc-4.3.2
+prereqs_x86_64_fedora_11        = 
+prereqs_x86_64_fedora_8         = gcc-4.3.2
+prereqs_x86_64_fedora_9         = 
+prereqs_x86_64_macos_10.5       = gcc-4.3.2
+prereqs_x86_64_macos_10.6       = gcc-4.4.3
+prereqs_x86_64_rhap_5           = gcc-4.3.2
+prereqs_x86_64_rhap_5.2         = gcc-4.4.3
+prereqs_x86_64_rhap_5.3-updated = gcc-4.4.3
+prereqs_x86_64_rhas_3           = gcc-4.4.3
+prereqs_x86_64_rhas_4           = gcc-4.3.2
+prereqs_x86_64_sles_9           = 
+prereqs_x86_deb_4.0             = 
+prereqs_x86_deb_5.0             = gcc-4.2.4
+prereqs_x86_fc_5                = gcc-4.2.4
+prereqs_x86_macos_10.4          = gcc-4.3.2
+prereqs_x86_rhap_5              = gcc-4.4.3
+prereqs_x86_rhas_3              = gcc-4.3.2
+prereqs_x86_rhas_4              = gcc-4.3.2
+prereqs_x86_sl_4.4              = gcc-4.2.4
+prereqs_x86_sles_9              = gcc-4.2.4
+prereqs_x86_suse_10.2           = gcc-4.3.2
+
+
+
+################################################################################
+
+# Some notes to myself:
+
+# Required: cvs, svn, git, hg; perl, GNU make, latex
+# Probably: MPI
+# Maybe: FFTW, PETSc
+# Wishful thinking: PAPI, TAU
+
+# Missing: hg, latex

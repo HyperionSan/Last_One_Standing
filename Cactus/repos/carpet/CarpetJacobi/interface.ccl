@@ -1,0 +1,8 @@
+# Interface definition for thorn CarpetJacobi
+
+IMPLEMENTS: CarpetJacobi
+
+INHERITS: TATelliptic
+
+USES INCLUDE HEADER: carpet.hh
+USES INCLUDE HEADER: TATelliptic.h

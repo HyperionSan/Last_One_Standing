@@ -1,0 +1,50 @@
+Each benchmark acts on a certain number of points for a certain number
+of iterations.  Let me call the work that is necessary for one point
+and one iteration an "event", borrowing this terminology from
+relativity.  The number of events for each benchmarks is then:
+
+
+
+Benchmark			iters	points		RHS	total events
+================================================================================
+Bench_BSSN_PUGH_80l		 80	  80^3		3	122,880,000
+Bench_BSSN_PUGH_100l		 40	 100^3		3	120,000,000
+Bench_BSSN_Carpet_1lev_60l	160	  60^3		3	103,680,000
+Bench_BSSN_Carpet_1lev_75l	 80	  75^3		3	101,250,000
+Bench_BSSN_Carpet_3lev_32l	 84+9	  32^3		3	  9,142,272
+Bench_BSSN_Carpet_3lev_42l	 42+9	  42^3		3	 11,335,464
+Bench_Whisky_Carpet_36l		224+9	  36^3		3	 32,612,544
+Bench_Whisky_Carpet_48l		112+9	  48^3		3	 40,144,896
+
+Bench_BSSN_Carpet_3lev_32l	 84+9	( 32+8)^3	3	 17,856,000
+Bench_BSSN_Carpet_3lev_42l	 42+9	( 42+8)^3	3	 19,125,000
+Bench_Whisky_Carpet_36l		224+9	( 36+8)^3	3	 59,543,616
+Bench_Whisky_Carpet_48l		112+9	( 48+8)^3	3	 63,748,608
+
+The column "RHS" counts the number of right hand side evaluations per
+time integrator iteration.  Also, note that the mesh refinement
+benchmarks iterate over the fine levels more often than over the
+coarser levels; we count each level as one iteration.
+
+The "+9" in the iteration column is a number of additional iterations
+to create second order accurate initial data.  The "+8" in the points
+column is a number of additional grid points which are placed on
+refinement boundaries (but not on the coarsest grid [TODO: Correct the
+total events column for that]).
+
+The number of points was chosen so that the benchmarks occupy
+approximately 400 MB and 800 MB per CPU, respectively.  The number of
+iterations was chosen so that the benchmarks finish in about 15
+minutes (on a fast CPU in 2005).
+
+The BSSN benchmarks all solve the same set of equations, namely the
+Einstein equations in the BSSN formulation.  The Whisky benchmarks
+solve in addition the relativistic hydrodynamics equations; the Whisky
+benchmarks also use 3 refinement levels.
+
+
+
+The table above counts only operations towards solving the physical
+problem.  In addition, there are operations to manage the
+inter-processor boundaries, and to manage the mesh refinement
+boundaries.  Especially the latter can be very expensive.

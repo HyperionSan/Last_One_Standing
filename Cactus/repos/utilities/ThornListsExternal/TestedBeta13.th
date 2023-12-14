@@ -1,0 +1,233 @@
+# $Id$
+
+!DESC "All Thorns for the AEI NumRel Group"
+
+# -----------------------------------------------------------
+
+# THE STANDARD CACTUS THORNS
+
+!REPOSITORY_TYPE pserver
+!REPOSITORY_LOCATION cvs.cactuscode.org
+!REPOSITORY_NAME /cactusdevcvs
+!REPOSITORY_USER cvs_anon
+
+CactusBase/Boundary                
+CactusBase/CartGrid3D              
+CactusBase/CoordBase              
+CactusBase/IOASCII
+CactusBase/IOBasic                 
+CactusBase/IOUtil        
+CactusBase/LocalInterp          
+CactusBase/Time  
+CactusBase/SymBase
+
+CactusBench/BenchADM
+CactusBench/BenchIO
+       
+CactusConnect/HTTPD
+CactusConnect/HTTPDExtra
+CactusConnect/Socket
+
+CactusEinstein/ADM                 
+CactusEinstein/ADMAnalysis
+CactusEinstein/ADMBase
+CactusEinstein/ADMConstraints      
+CactusEinstein/ADMCoupling
+CactusEinstein/ADMMacros
+CactusEinstein/AHFinder 
+CactusEinstein/CoordGauge           
+CactusEinstein/Extract             
+CactusEinstein/EvolSimple
+CactusEinstein/IDAnalyticBH        
+CactusEinstein/IDAxiBrillBH        
+CactusEinstein/IDBrillData         
+CactusEinstein/IDLinearWaves       
+CactusEinstein/IDSimple
+CactusEinstein/Maximal
+CactusEinstein/PsiKadelia          
+CactusEinstein/SpaceMask
+CactusEinstein/StaticConformal
+CactusEinstein/TimeGeodesic        
+   
+CactusElliptic/EllBase  
+CactusElliptic/EllPETSc           
+CactusElliptic/EllSOR              
+            
+CactusExamples/DemoInterp
+CactusExamples/FleshInfo
+CactusExamples/HelloWorld
+CactusExamples/SampleIO
+CactusExamples/TimerInfo
+CactusExamples/WaveToy1DF77
+CactusExamples/WaveToy2DF77
+
+CactusExternal/FlexIO
+CactusExternal/jpeg6b
+
+CactusIO/IOJpeg
+
+CactusPUGH/PUGH                    
+CactusPUGH/PUGHInterp                  
+CactusPUGH/PUGHReduce
+CactusPUGH/PUGHSlab
+
+CactusPUGHIO/IOFlexIO              
+CactusPUGHIO/IOHDF5
+CactusPUGHIO/IsoSurfacer
+CactusPUGHIO/IOHDF5Util
+CactusPUGHIO/IOPanda
+CactusPUGHIO/IOStreamedHDF5
+
+CactusTest/TestArrays
+CactusTest/TestComplex
+CactusTest/TestCoordinates
+CactusTest/TestFpointerNULL
+CactusTest/TestFreeF90
+CactusTest/TestInclude1
+CactusTest/TestInclude2
+CactusTest/TestReduce
+CactusTest/TestStrings
+CactusTest/TestTimers
+#CactusTest/TestTypes
+
+CactusUtils/NaNChecker
+CactusUtils/TimerReport
+
+CactusWave/IDScalarWave    
+CactusWave/IDScalarWaveC   
+CactusWave/IDScalarWaveCXX 
+CactusWave/IDScalarWaveElliptic
+CactusWave/WaveBinarySource
+CactusWave/WaveToyC        
+CactusWave/WaveToyCXX      
+CactusWave/WaveToyExtra
+CactusWave/WaveToyF77      
+CactusWave/WaveToyF90  
+CactusWave/WaveToyFreeF90  
+
+# -----------------------------------------------------------
+
+# CACTUS DEVELOPMENT THORNS
+
+#AlphaThorns/Beacon
+#AlphaThorns/Cart3d
+#AlphaThorns/Cart3dTest
+#AlphaThorns/FileAdvertiser
+#AlphaThorns/Gnuplot
+#AlphaThorns/GradsResource
+#AlphaThorns/IOBlockIO
+#AlphaThorns/IOCallBack	   
+#AlphaThorns/MDS	   
+#AlphaThorns/MaxwellFTDT
+#AlphaThorns/MaxwellTime
+AlphaThorns/MoL
+#AlphaThorns/Notify	   
+#AlphaThorns/ParaRand	   
+#AlphaThorns/QFT	   
+#AlphaThorns/Renderer	   
+#AlphaThorns/Rose	
+#AlphaThorns/ShmServ   
+#AlphaThorns/SimpleWorm	   
+#AlphaThorns/Spawner
+#AlphaThorns/TCPXX
+#AlphaThorns/TestFunctions1A	   
+#AlphaThorns/TestFunctions1B	   
+#AlphaThorns/TestFunctions2
+
+BetaThorns/Cartoon2D
+#BetaThorns/IOASCIIStream
+
+# -----------------------------------------------------------
+
+# THE PRIVATE ARRANGEMENTS ON THE CACTUS SERVER
+
+!REPOSITORY_TYPE pserver
+!REPOSITORY_LOCATION cvs.cactuscode.org
+!REPOSITORY_NAME /arrangements
+!REPOSITORY_USER cvs_anon
+
+# Tuebingen
+#TAT/AdvectionToy
+TAT/always
+#TAT/Cart3d
+#TAT/Cart3dIDScalarWave
+#TAT/Cart3dTest
+#TAT/Card3dWaveToyC
+#TAT/CheckSync
+#TAT/CheckTimestepSize
+#TAT/FFTW
+#TAT/IDSWTE
+#TAT/IDScalarWavePETSc
+#TAT/IDScalarWaveStaggered
+#TAT/IDSWTE
+#TAT/IDSWTEF
+TAT/IDSWTEsimple
+#TAT/MegaFlop
+TAT/NaNCatcher
+#TAT/Pad
+#TAT/PadHydro
+#TAT/Periodic
+#TAT/Slab
+#TAT/SlabTest
+#TAT/TATCG
+TAT/TATelliptic
+#TAT/TATFourier
+#TAT/TATJacobi
+#TAT/TATMG
+TAT/TATPETSc
+#TAT/TGRapparentHorizon2D
+#TAT/TGRisolatedHorizon2D
+#TAT/TGRPETSc
+TAT/TGRtensor
+#TAT/WaveToyFourierHelper
+#TAT/WaveToyStaggered
+
+# -----------------------------------------------------------
+
+# FROM THE NUMREL GROUP REPOSITORY
+
+!REPOSITORY_TYPE pserver
+!REPOSITORY_LOCATION cvs.aei.mpg.de
+!REPOSITORY_NAME /numrelcvs
+!REPOSITORY_USER cvs_anon
+
+Excision/LegoExcision
+
+PerturbedBH/DistortedBHIVP
+PerturbedBH/IDAxiOddBrillBH
+PerturbedBH/RotatingDBHIVP
+
+#AEIThorns/ADM_BSSN
+AEIThorns/AEILocalInterp
+AEIThorns/AHFinderDirect
+AEIThorns/BAM_Elliptic
+AEIThorns/BAM_VecLap
+AEIThorns/BSSN_MoL
+AEIThorns/Dissipation
+AEIThorns/EHFinder
+AEIThorns/IOAHFinderHDF5
+AEIThorns/Exact
+AEIThorns/Nice
+AEIThorns/Noise
+AEIThorns/SphericalSurface
+AEIThorns/TestInterpBase
+AEIThorns/TestInterpLocal_Large
+AEIThorns/TestInterpLocal_Small
+AEIThorns/TestInterpPUGH_Small
+
+AEIDevelopment/AHFSetDCCentroid
+#AEIDevelopment/Announce
+AEIDevelopment/BAM_IniDat
+#AEIDevelopment/BosonStar
+AEIDevelopment/Constants
+AEIDevelopment/DriftCorrect
+#AEIDevelopment/Embedding
+AEIDevelopment/FishEye
+AEIDevelopment/IDPuncture
+AEIDevelopment/IsolatedHorizon
+#AEIDevelopment/MaskIso
+#AEIDevelopment/MeudonData
+#AEIDevelopment/Sendmail
+#AEIDevelopment/Unfish
+#AEIDevelopment/WaveExact
+AEIDevelopment/Wave_Extract

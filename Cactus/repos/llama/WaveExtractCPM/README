@@ -1,0 +1,29 @@
+Cactus Code Thorn WaveExtract
+
+Thorn Author(s) : Albert Einstein Institute (Gabrielle Allen, Thomas
+                  Radke, Erik Schnetter), Christian Reisswig, Seth
+                  Hopper
+Thorn Maintainer(s) : Seth Hopper
+--------------------------------------------------------------------------
+
+Purpose of the thorn:
+
+Gravitational wave extraction using gauge-invariant perturbations of
+Schwarzschild with the Zerilli-Moncrief and Cunningham-Price-Moncrief
+formalisms.
+
+History:
+
+The thorn was originally Extract (found in EinsteinAnalysis), which
+used the Zerilli-Moncrief and Regge-Wheeler variables.  Many features
+were added to Extract, and it was cut down to form WaveExtract
+(AEIDevelopment).  WaveExtract was then modified to work with
+ADMDerivatives (and hence Llama), to implement OpenMP paralellisation,
+and support for some old features such as corotating coordinates was
+removed.  WaveExtractL was then modified to replace the RW variable
+with the CPM variable, which does not need time integration to get the
+GW strain for the odd-parity modes.
+
+IMPORTANT: The old version in AEIDevelopment/WaveExtract is NOT
+           working with general coordinates (especially radial
+           stretching)!!  Use this thorn instead!

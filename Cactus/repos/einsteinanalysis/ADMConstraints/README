@@ -1,0 +1,24 @@
+Cactus Code Thorn ADMConstraints
+Author(s)    : Gabrielle Allen
+               Mark Miller
+Maintainer(s): Cactus team
+Licence      : LGPL
+--------------------------------------------------------------------------
+
+1. Purpose
+
+This analysis thorn calculates the violation in the ADM constraints using 
+the standard Einstein variables. 
+
+2. Includes
+
+ADMConstraints is symmetry boundaries, conformal factor and matter
+aware. Matter is included with the CalcTmunu mechanism.
+
+3. Output
+
+Hamiltonian constraint: ham, hamnormalized
+Momentum constraints: momx, momy, momz
+
+4. All variables are synchronized on output of the analysis routines
+   before output.

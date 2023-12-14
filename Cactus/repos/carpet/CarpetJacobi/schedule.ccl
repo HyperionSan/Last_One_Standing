@@ -1,0 +1,6 @@
+# Schedule definitions for thorn CarpetJacobi
+
+SCHEDULE CarpetJacobi_register AT startup
+{
+  LANG: C
+} "Register the elliptic solver"

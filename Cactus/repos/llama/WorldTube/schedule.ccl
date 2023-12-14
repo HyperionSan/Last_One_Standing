@@ -1,0 +1,45 @@
+# Schedule definitions for thorn WorldTube
+# $Header:$
+
+
+STORAGE: extracted_vars
+
+
+SCHEDULE WorldTube_ParamCheck AT PARAMCHECK
+{
+  LANG: C
+  OPTIONS: GLOBAL
+} "Check parameters"
+
+
+SCHEDULE WorldTube_RegisterSlices AT CCTK_INITIAL AFTER SphericalSlice_HasBeenSet
+{
+  LANG: C
+  OPTIONS: GLOBAL
+} "Register variables for extraction"
+
+
+SCHEDULE WorldTube_RegisterSlices AT CCTK_POST_RECOVER_VARIABLES AFTER SphericalSlice_HasBeenSet
+{
+  LANG: C
+  OPTIONS: GLOBAL
+} "Register variables for extraction"
+
+
+
+SCHEDULE WorldTube_ArealSphere AT CCTK_POSTSTEP AFTER SphericalSlice_HasBeenSet
+{
+  LANG: C
+  OPTIONS: GLOBAL
+} "Calculate surfaces of constant areal radius if selected"
+
+
+
+SCHEDULE WorldTube_Decompose AT CCTK_ANALYSIS
+{
+  LANG: C
+  OPTIONS: GLOBAL
+  TRIGGERS: extracted_vars
+} "Contract sliced variables with sYlm's"
+
+

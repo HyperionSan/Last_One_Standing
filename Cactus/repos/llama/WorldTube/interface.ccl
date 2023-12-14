@@ -1,0 +1,64 @@
+# Interface definition for thorn WorldTube
+# $Header:$
+
+implements: WorldTube
+inherits: SphericalSlice ADMBase
+
+uses include: spherical_slices.hh
+
+
+
+# Register a Cactus variable for being sliced and return registration number
+CCTK_INT FUNCTION \
+    SphericalSlice_RegisterVariable \
+         (CCTK_POINTER_TO_CONST IN varname, \
+          CCTK_INT IN sn, \
+          CCTK_INT IN timelevels, \
+          CCTK_POINTER_TO_CONST IN distrib_method)
+REQUIRES FUNCTION SphericalSlice_RegisterVariable
+
+
+# Return an array of all values of scalar product with all spin-weighted spherical harmonics sYlm up to lmax
+CCTK_INT FUNCTION \
+    SphericalSlice_ContractVariableWithAllsYlm \
+         (CCTK_INT IN varno, \
+          CCTK_INT IN timelevel, \
+          CCTK_INT IN s, \
+          CCTK_INT IN lmin, \
+          CCTK_INT IN lmax, \
+          CCTK_COMPLEX OUT ARRAY coeffs)
+REQUIRES FUNCTION SphericalSlice_ContractVariableWithAllsYlm \
+
+
+# Synchronzie slice, i.e. interpolate a whole set of variables on the same slice
+CCTK_INT FUNCTION \
+    SphericalSlice_CollectiveSyncVariables \
+         (CCTK_POINTER_TO_CONST IN cctkGH_, \
+	  CCTK_POINTER_TO_CONST IN varno, \
+	  CCTK_INT IN number_of_vars)
+REQUIRES FUNCTION SphericalSlice_CollectiveSyncVariables \
+
+
+
+CCTK_INT FUNCTION Boundary_SelectVarForBC(CCTK_POINTER_TO_CONST IN GH, \
+  CCTK_INT IN faces, CCTK_INT IN boundary_width, CCTK_INT IN table_handle, \
+  CCTK_STRING IN var_name, CCTK_STRING IN bc_name)
+CCTK_INT FUNCTION Boundary_SelectGroupForBC(CCTK_POINTER_TO_CONST IN GH, \
+  CCTK_INT IN faces, CCTK_INT IN boundary_width, CCTK_INT IN table_handle, \
+  CCTK_STRING IN group_name, CCTK_STRING IN bc_name)
+
+REQUIRES FUNCTION Boundary_SelectVarForBC
+REQUIRES FUNCTION Boundary_SelectGroupForBC
+
+
+PUBLIC:
+
+COMPLEX extracted_vars[50] TYPE=ARRAY TIMELEVELS=1 DIM=2 SIZE=((lmax+1)*(lmax+1)),ntubes DISTRIB=CONSTANT
+{
+  extraction_vars
+} "Stores extracted lm-modes for each metric component"
+
+
+
+
+

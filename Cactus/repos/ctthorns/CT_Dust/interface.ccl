@@ -1,0 +1,138 @@
+# File produced by Kranc
+
+implements: CT_Dust
+
+inherits:   ADMBase Boundary GenericFD Grid ML_BSSN TmunuBase
+
+
+
+USES INCLUDE: loopcontrol.h
+USES INCLUDE: Symmetry.h
+USES INCLUDE: Boundary.h
+
+CCTK_INT FUNCTION MoLRegisterEvolved(CCTK_INT IN EvolvedIndex, CCTK_INT IN RHSIndex)
+USES FUNCTION MoLRegisterEvolved
+
+SUBROUTINE Diff_coeff(CCTK_POINTER_TO_CONST IN cctkGH, CCTK_INT IN dir, CCTK_INT IN nsize, CCTK_INT OUT ARRAY imin, CCTK_INT OUT ARRAY imax, CCTK_REAL OUT ARRAY q, CCTK_INT IN table_handle)
+USES FUNCTION Diff_coeff
+
+CCTK_INT FUNCTION MultiPatch_GetMap(CCTK_POINTER_TO_CONST IN cctkGH)
+USES FUNCTION MultiPatch_GetMap
+
+CCTK_INT FUNCTION MultiPatch_GetBbox(CCTK_POINTER_TO_CONST IN cctkGH, CCTK_INT IN size, CCTK_INT OUT ARRAY bbox)
+USES FUNCTION MultiPatch_GetBbox
+
+CCTK_INT FUNCTION GetBoundarySpecification(CCTK_INT IN size, CCTK_INT OUT ARRAY nboundaryzones, CCTK_INT OUT ARRAY is_internal, CCTK_INT OUT ARRAY is_staggered, CCTK_INT OUT ARRAY shiftout)
+USES FUNCTION GetBoundarySpecification
+
+CCTK_INT FUNCTION MultiPatch_GetBoundarySpecification(CCTK_INT IN map, CCTK_INT IN size, CCTK_INT OUT ARRAY nboundaryzones, CCTK_INT OUT ARRAY is_internal, CCTK_INT OUT ARRAY is_staggered, CCTK_INT OUT ARRAY shiftout)
+USES FUNCTION MultiPatch_GetBoundarySpecification
+
+CCTK_INT FUNCTION SymmetryTableHandleForGrid(CCTK_POINTER_TO_CONST IN cctkGH)
+USES FUNCTION SymmetryTableHandleForGrid
+
+CCTK_INT FUNCTION Boundary_SelectGroupForBC(CCTK_POINTER_TO_CONST IN GH, CCTK_INT IN faces, CCTK_INT IN boundary_width, CCTK_INT IN table_handle, CCTK_STRING IN group_name, CCTK_STRING IN bc_name)
+USES FUNCTION Boundary_SelectGroupForBC
+
+CCTK_INT FUNCTION Boundary_SelectVarForBC(CCTK_POINTER_TO_CONST IN GH, CCTK_INT IN faces, CCTK_INT IN boundary_width, CCTK_INT IN table_handle, CCTK_STRING IN var_name, CCTK_STRING IN bc_name)
+USES FUNCTION Boundary_SelectVarForBC
+
+public:
+CCTK_REAL CT_D type=GF timelevels=3 tags='tensortypealias="Scalar" tensorweight=0'
+{
+  DD
+} "CT_D"
+
+public:
+CCTK_REAL CT_E type=GF timelevels=3 tags='tensortypealias="Scalar" tensorweight=0'
+{
+  EE
+} "CT_E"
+
+public:
+CCTK_REAL CT_S type=GF timelevels=3 tags='tensortypealias="D" tensorweight=0'
+{
+  SS1,
+  SS2,
+  SS3
+} "CT_S"
+
+public:
+CCTK_REAL CT_rho type=GF timelevels=1 tags='tensortypealias="Scalar" tensorweight=0'
+{
+  rho
+} "CT_rho"
+
+public:
+CCTK_REAL CT_eps type=GF timelevels=1 tags='tensortypealias="Scalar" tensorweight=0'
+{
+  eps
+} "CT_eps"
+
+public:
+CCTK_REAL CT_prs type=GF timelevels=1 tags='tensortypealias="Scalar" tensorweight=0'
+{
+  prs
+} "CT_prs"
+
+public:
+CCTK_REAL CT_u type=GF timelevels=1 tags='tensortypealias="D" tensorweight=0'
+{
+  u1,
+  u2,
+  u3
+} "CT_u"
+
+public:
+CCTK_REAL CT_V type=GF timelevels=1 tags='tensortypealias="U" tensorweight=0'
+{
+  V1,
+  V2,
+  V3
+} "CT_V"
+
+public:
+CCTK_REAL CT_W type=GF timelevels=1 tags='tensortypealias="Scalar" tensorweight=0'
+{
+  W
+} "CT_W"
+
+public:
+CCTK_REAL CT_cttS type=GF timelevels=3 tags='tensortypealias="Scalar" tensorweight=0'
+{
+  cttS
+} "CT_cttS"
+
+public:
+CCTK_REAL CT_cttV type=GF timelevels=3 tags='tensortypealias="D" tensorweight=0'
+{
+  cttV1,
+  cttV2,
+  cttV3
+} "CT_cttV"
+
+public:
+CCTK_REAL CT_rhodp type=GF timelevels=1 tags='tensortypealias="Scalar" tensorweight=0'
+{
+  rhodp
+} "CT_rhodp"
+
+public:
+CCTK_REAL CT_Drhs type=GF timelevels=3 tags='tensortypealias="Scalar" tensorweight=0 Prolongation="None"'
+{
+  DDrhs
+} "CT_Drhs"
+
+public:
+CCTK_REAL CT_Erhs type=GF timelevels=3 tags='tensortypealias="Scalar" tensorweight=0 Prolongation="None"'
+{
+  EErhs
+} "CT_Erhs"
+
+public:
+CCTK_REAL CT_Srhs type=GF timelevels=3 tags='tensortypealias="D" tensorweight=0 Prolongation="None"'
+{
+  SS1rhs,
+  SS2rhs,
+  SS3rhs
+} "CT_Srhs"

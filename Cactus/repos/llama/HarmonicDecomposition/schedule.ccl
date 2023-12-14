@@ -1,0 +1,38 @@
+# Schedule definitions for thorn HarmonicDecomposition
+# $Header:$
+
+STORAGE: decomposed_vars
+
+
+SCHEDULE HarmonicDecomposition_ParamCheck AT PARAMCHECK
+{
+  LANG: C
+  OPTIONS: GLOBAL
+} "Check parameters"
+
+
+SCHEDULE HarmonicDecomposition_Register AT CCTK_INITIAL AFTER SphericalSlice_HasBeenSet
+{
+  LANG: C
+  OPTIONS: GLOBAL
+} "Register variables for spherical slicing"
+
+
+
+SCHEDULE HarmonicDecomposition_Register AT CCTK_POST_RECOVER_VARIABLES AFTER SphericalSlice_HasBeenSet
+{
+  LANG: C
+  OPTIONS: GLOBAL
+} "Register variables for spherical slicing after recovery"
+
+
+
+
+SCHEDULE HarmonicDecomposition_Decompose AT CCTK_ANALYSIS AFTER SphericalSlice_HasBeenSet
+{
+  LANG: C
+  OPTIONS: GLOBAL
+  TRIGGERS: decomposed_vars
+} "Contract sliced variables with sYlm's"
+
+

@@ -1,0 +1,27 @@
+# This is a sample build configuration for Python.
+# Check our guides at https://confluence.atlassian.com/x/x4UWN for more examples.
+# Only use spaces to indent your .yml configuration.
+# -----
+# You can specify a custom docker image from Docker Hub as your build environment.
+image: python:3.9.7-bullseye
+
+pipelines:
+  branches:
+    master:
+      - step:
+          caches:
+            - pip
+          script: # Modify the commands below to build your repository.
+            - pip install sphinx
+            - apt-get update && apt-get install -y rsync
+            - cd doc/userguide
+            - make html
+            - git clone git@bitbucket.org:simfactory/simfactory.bitbucket.io.git
+            - rsync -av _build/html/ simfactory.bitbucket.io/simfactory2/userguide/
+            - cd simfactory.bitbucket.io
+            - git add .
+            - git config --global user.email "simfactory2@bitbucket.org"
+            - git config --global user.name "SimFactory 2 pipeline"
+            - git config --global push.default simple
+            - git diff-index --quiet HEAD || git commit -m "Update simfactory 2 user guide"
+            - git push

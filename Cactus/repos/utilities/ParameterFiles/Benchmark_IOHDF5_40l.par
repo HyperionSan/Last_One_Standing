@@ -1,0 +1,38 @@
+!DESC "Benchmark IO using IOHDF5"
+
+ActiveThorns = "IOHDF5 iobasic time wavetoyc idscalarwave pugh cartgrid3d ioutil ioascii"
+
+# Do 3D output every iteration from every processor for 1 grid function
+IOHDF5::out_every        = 1
+IOHDF5::out_vars         = "wavetoy::phi"
+IO::out_mode             = "np"
+IO::out_proc_every            = 1              
+
+# Send all output to this directory
+IO::out_dir                 = "Benchmark_IOHDF5_40l"
+
+# Set up local grid with size 40x40x40 on each processor
+driver::local_nx           = 40
+driver::local_ny           = 40
+driver::local_nz           = 40       
+
+# Number of iterations
+cactus::cctk_itlast        = 100
+
+# Parameters controlling physical wave problem
+grid::type                 = "box"
+time::dtfac                = 0.5
+idscalarwave::initial_data = "gaussian"
+idscalarwave::sigma        = 0.1
+idscalarwave::radius       = 0
+
+# Provide some ASCII information
+IOBasic::outInfo_every     = 10
+IOBasic::outInfo_vars      = "wavetoy::phi"
+IOASCII::out1D_every       = 50
+IOASCII::out1D_vars        = "wavetoy::phi"
+IOASCII::out1D_z           = "no"
+IOASCII::out1D_y           = "no"
+IOASCII::out1D_d           = "no"
+
+

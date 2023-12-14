@@ -1,0 +1,55 @@
+# Component list for the Cactus Computational Toolkit <http://www.cactuscode.org/>
+# $Revision: 114 $
+# $Date: 2011-09-29 23:05:53 -0500 (Thu, 29 Sep 2011) $
+# $HeadURL: https://svn.einsteintoolkit.org/manifest/trunk/einsteintoolkit.th $
+
+!CRL_VERSION = 1.0
+
+!DEFINE ROOT = Cactus
+
+!INCLUDE = http://svn.einsteintoolkit.org/manifest/branches/ET_2011_10/einsteintoolkit.th
+
+
+# Cactus thorns
+!TARGET   = $ARR
+!TYPE     = svn
+!AUTH_URL = https://svn.cactuscode.org/arrangements/$1/$2/branches/Cactus_4.0.0
+!URL      = http://svn.cactuscode.org/arrangements/$1/$2/branches/Cactus_4.0.0
+!CHECKOUT =
+CactusExamples/DemoInterp
+CactusExamples/FleshInfo
+CactusExamples/HelloWorld
+CactusExamples/IDWaveMoL
+CactusExamples/SampleBoundary
+CactusExamples/SampleIO
+CactusExamples/TimerInfo
+CactusExamples/WaveMoL
+CactusExamples/WaveToy1DF77
+CactusExamples/WaveToy2DF77
+
+
+
+# Additional Cactus thorns
+!TARGET   = $ARR
+!TYPE     = svn
+!AUTH_URL = https://svn.cactuscode.org/projects/$1/$2/branches/Cactus_4.0.0
+!URL      = http://svn.cactuscode.org/projects/$1/$2/branches/Cactus_4.0.0
+!CHECKOUT =
+ExternalLibraries/F5
+ExternalLibraries/curl
+ExternalLibraries/flickcurl
+ExternalLibraries/git
+ExternalLibraries/libpng
+ExternalLibraries/libxml2
+ExternalLibraries/lua
+
+
+
+!TARGET   = $ARR
+!TYPE     = svn
+!URL      = https://svn.cct.lsu.edu/repos/cactus/$1/$2/branches/Cactus_4.0.0
+!CHECKOUT =
+Alpaca/HTTPS
+Alpaca/Server
+Alpaca/UnixSocket
+

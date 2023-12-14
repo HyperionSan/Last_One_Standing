@@ -1,0 +1,32 @@
+#! /bin/bash
+
+echo "Preparing:"
+set -x                          # Output commands
+set -e                          # Abort on errors
+
+cd @RUNDIR@-active
+
+module purge
+module load hdf5/1.10.7/intel-2021.5.0-intel-mpi-2021.5.1
+module list
+
+echo "Checking:"
+pwd
+hostname
+date
+
+echo "Environment:"
+export CACTUS_NUM_PROCS=@NUM_PROCS@
+export CACTUS_NUM_THREADS=@NUM_THREADS@
+export GMON_OUT_PREFIX=gmon.out
+export OMP_NUM_THREADS=@NUM_THREADS@
+export OMP_PLACES=cores # TODO: maybe use threads when smt is used?
+env | sort > SIMFACTORY/ENVIRONMENT
+
+echo "Starting:"
+export CACTUS_STARTTIME=$(date +%s)
+time srun -n ${CACTUS_NUM_PROCS} @EXECUTABLE@ -L 3 @PARFILE@
+echo "Stopping:"
+date
+
+echo "Done."

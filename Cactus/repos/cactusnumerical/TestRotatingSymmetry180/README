@@ -1,0 +1,11 @@
+Cactus Code Thorn TestRotatingSymmetry180
+Author(s)    : Roland Haas <rhaas@illinois.edu>
+Maintainer(s): Roland Haas <rhaas@illinois.edu>
+Licence      : LGPL
+--------------------------------------------------------------------------
+
+1. Purpose
+
+This thorn tests RotatingSymmetry180 by setting up grid functons with known
+symmetries and testing the RotatingSymmety180 applies the correct
+transformation.

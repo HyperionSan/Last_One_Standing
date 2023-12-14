@@ -1,0 +1,644 @@
+ n_x = 6050
+ theta - pi/2 @ numerical equator = 0.E+0
+ 
+ ODE tolerance   [tol]     =  1.00000000000000004E-10
+ ODE threshold   [thres]   =  6050*9.99999999999999999E-15
+ ODE start time  [t_start] =  -100.
+ ODE end time    [t_end]   =  -96.019999999999996
+ ODE output dt   [t_inc]   =  2.00000000000000004E-2
+ 
+ udot called @ time =  0.E+0
+ estimated crossing time = -33.468165762584228
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 2 new time -99.97999999999999
+ udot called @ time =  -100.
+ udot called @ time =  -99.99666666666667
+ udot called @ time =  -99.995555555555555
+ udot called @ time =  -99.991428571428571
+ udot called @ time =  -99.986666666666665
+ udot called @ time =  -99.984999999999985
+ udot called @ time =  -99.97999999999999
+ udot called @ time =  -99.97999999999999
+ udot called @ time =  -99.973333333333315
+ udot called @ time =  -99.964444444444425
+ udot called @ time =  -99.93142857142854
+ udot called @ time =  -99.893333333333274
+ udot called @ time =  -99.879999999999939
+ udot called @ time =  -99.839999999999918
+ udot called @ time =  -99.839999999999918
+ udot called @ time =  -99.786666666666562
+ udot called @ time =  -99.715555555555412
+ udot called @ time =  -99.451428571428295
+ udot called @ time =  -99.146666666666235
+ udot called @ time =  -99.039999999999509
+ udot called @ time =  -98.719999999999345
+ udot called @ time =  -98.719999999999345
+ udot called @ time =  -99.336666666666673
+ udot called @ time =  -99.115555555555559
+ udot called @ time =  -98.294285714285706
+ udot called @ time =  -97.346666666666664
+ udot called @ time =  -97.015000000000001
+ udot called @ time =  -96.019999999999996
+ udot called @ time =  -96.019999999999996
+ udot called @ time =  -98.009999999999991
+ udot called @ time =  -96.683333333333337
+ udot called @ time =  -99.557777777777773
+       max(u^ + sigma/2) = -0.10069E+03
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 3 new time -99.959999999999994
+       max(u^ + sigma/2) = -0.10068E+03
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 4 new time -99.939999999999998
+       max(u^ + sigma/2) = -0.10067E+03
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 5 new time -99.920000000000002
+       max(u^ + sigma/2) = -0.10065E+03
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 6 new time -99.899999999999991
+       max(u^ + sigma/2) = -0.10064E+03
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 7 new time -99.879999999999995
+       max(u^ + sigma/2) = -0.10063E+03
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 8 new time -99.859999999999999
+       max(u^ + sigma/2) = -0.10061E+03
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 9 new time -99.840000000000003
+       max(u^ + sigma/2) = -0.10060E+03
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 10 new time -99.819999999999993
+       max(u^ + sigma/2) = -0.10058E+03
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 11 new time -99.799999999999997
+       max(u^ + sigma/2) = -0.10057E+03
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 12 new time -99.780000000000001
+       max(u^ + sigma/2) = -0.10056E+03
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 13 new time -99.759999999999991
+       max(u^ + sigma/2) = -0.10054E+03
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 14 new time -99.739999999999995
+       max(u^ + sigma/2) = -0.10050E+03
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 15 new time -99.719999999999999
+       max(u^ + sigma/2) = -0.10046E+03
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 16 new time -99.700000000000003
+       max(u^ + sigma/2) = -0.10042E+03
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 17 new time -99.679999999999993
+       max(u^ + sigma/2) = -0.10038E+03
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 18 new time -99.659999999999997
+       max(u^ + sigma/2) = -0.10034E+03
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 19 new time -99.640000000000001
+       max(u^ + sigma/2) = -0.10030E+03
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 20 new time -99.61999999999999
+       max(u^ + sigma/2) = -0.10026E+03
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 21 new time -99.599999999999994
+       max(u^ + sigma/2) = -0.10023E+03
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 22 new time -99.579999999999998
+       max(u^ + sigma/2) = -0.10019E+03
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 23 new time -99.560000000000002
+       max(u^ + sigma/2) = -0.10015E+03
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 24 new time -99.539999999999992
+       max(u^ + sigma/2) = -0.10011E+03
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 25 new time -99.519999999999996
+       max(u^ + sigma/2) = -0.10007E+03
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 26 new time -99.5
+       max(u^ + sigma/2) = -0.10003E+03
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 27 new time -99.47999999999999
+       max(u^ + sigma/2) = -0.99994E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 28 new time -99.459999999999994
+       max(u^ + sigma/2) = -0.99955E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 29 new time -99.439999999999998
+       max(u^ + sigma/2) = -0.99917E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 30 new time -99.420000000000002
+       max(u^ + sigma/2) = -0.99878E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 31 new time -99.399999999999991
+       max(u^ + sigma/2) = -0.99839E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 32 new time -99.379999999999995
+       max(u^ + sigma/2) = -0.99800E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 33 new time -99.359999999999999
+       max(u^ + sigma/2) = -0.99762E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 34 new time -99.340000000000003
+       max(u^ + sigma/2) = -0.99723E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 35 new time -99.319999999999993
+       max(u^ + sigma/2) = -0.99684E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 36 new time -99.299999999999997
+       max(u^ + sigma/2) = -0.99646E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 37 new time -99.280000000000001
+       max(u^ + sigma/2) = -0.99607E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 38 new time -99.259999999999991
+       max(u^ + sigma/2) = -0.99568E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 39 new time -99.239999999999995
+       max(u^ + sigma/2) = -0.99530E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 40 new time -99.219999999999999
+       max(u^ + sigma/2) = -0.99491E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 41 new time -99.200000000000003
+       max(u^ + sigma/2) = -0.99452E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 42 new time -99.179999999999993
+       max(u^ + sigma/2) = -0.99414E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 43 new time -99.159999999999997
+       max(u^ + sigma/2) = -0.99375E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 44 new time -99.140000000000001
+       max(u^ + sigma/2) = -0.99336E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 45 new time -99.11999999999999
+       max(u^ + sigma/2) = -0.99298E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 46 new time -99.099999999999994
+       max(u^ + sigma/2) = -0.99259E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 47 new time -99.079999999999998
+       max(u^ + sigma/2) = -0.99220E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 48 new time -99.060000000000002
+       max(u^ + sigma/2) = -0.99182E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 49 new time -99.039999999999992
+       max(u^ + sigma/2) = -0.99143E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 50 new time -99.019999999999996
+       max(u^ + sigma/2) = -0.99104E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 51 new time -99.
+       max(u^ + sigma/2) = -0.99065E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 52 new time -98.97999999999999
+       max(u^ + sigma/2) = -0.99027E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 53 new time -98.959999999999994
+       max(u^ + sigma/2) = -0.98988E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 54 new time -98.939999999999998
+       max(u^ + sigma/2) = -0.98949E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 55 new time -98.920000000000002
+       max(u^ + sigma/2) = -0.98911E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 56 new time -98.899999999999991
+       max(u^ + sigma/2) = -0.98872E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 57 new time -98.879999999999995
+       max(u^ + sigma/2) = -0.98833E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 58 new time -98.859999999999999
+       max(u^ + sigma/2) = -0.98795E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 59 new time -98.839999999999989
+       max(u^ + sigma/2) = -0.98756E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 60 new time -98.819999999999993
+       max(u^ + sigma/2) = -0.98717E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 61 new time -98.799999999999997
+       max(u^ + sigma/2) = -0.98679E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 62 new time -98.780000000000001
+       max(u^ + sigma/2) = -0.98640E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 63 new time -98.759999999999991
+       max(u^ + sigma/2) = -0.98601E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 64 new time -98.739999999999995
+       max(u^ + sigma/2) = -0.98563E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 65 new time -98.719999999999999
+       max(u^ + sigma/2) = -0.98524E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 66 new time -98.700000000000003
+       max(u^ + sigma/2) = -0.98485E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 67 new time -98.679999999999993
+       max(u^ + sigma/2) = -0.98447E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 68 new time -98.659999999999997
+       max(u^ + sigma/2) = -0.98408E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 69 new time -98.640000000000001
+       max(u^ + sigma/2) = -0.98369E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 70 new time -98.61999999999999
+       max(u^ + sigma/2) = -0.98331E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 71 new time -98.599999999999994
+       max(u^ + sigma/2) = -0.98292E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 72 new time -98.579999999999998
+       max(u^ + sigma/2) = -0.98253E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 73 new time -98.560000000000002
+       max(u^ + sigma/2) = -0.98215E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 74 new time -98.539999999999992
+       max(u^ + sigma/2) = -0.98176E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 75 new time -98.519999999999996
+       max(u^ + sigma/2) = -0.98137E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 76 new time -98.5
+       max(u^ + sigma/2) = -0.98099E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 77 new time -98.47999999999999
+       max(u^ + sigma/2) = -0.98060E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 78 new time -98.459999999999994
+       max(u^ + sigma/2) = -0.98021E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 79 new time -98.439999999999998
+       max(u^ + sigma/2) = -0.97983E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 80 new time -98.420000000000002
+       max(u^ + sigma/2) = -0.97944E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 81 new time -98.399999999999991
+       max(u^ + sigma/2) = -0.97905E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 82 new time -98.379999999999995
+       max(u^ + sigma/2) = -0.97867E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 83 new time -98.359999999999999
+       max(u^ + sigma/2) = -0.97828E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 84 new time -98.339999999999989
+       max(u^ + sigma/2) = -0.97789E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 85 new time -98.319999999999993
+       max(u^ + sigma/2) = -0.97751E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 86 new time -98.299999999999997
+       max(u^ + sigma/2) = -0.97712E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 87 new time -98.280000000000001
+       max(u^ + sigma/2) = -0.97673E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 88 new time -98.259999999999991
+       max(u^ + sigma/2) = -0.97635E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 89 new time -98.239999999999995
+       max(u^ + sigma/2) = -0.97596E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 90 new time -98.219999999999999
+       max(u^ + sigma/2) = -0.97557E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 91 new time -98.200000000000003
+       max(u^ + sigma/2) = -0.97519E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 92 new time -98.179999999999993
+       max(u^ + sigma/2) = -0.97480E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 93 new time -98.159999999999997
+       max(u^ + sigma/2) = -0.97441E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 94 new time -98.140000000000001
+       max(u^ + sigma/2) = -0.97403E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 95 new time -98.11999999999999
+       max(u^ + sigma/2) = -0.97364E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 96 new time -98.099999999999994
+       max(u^ + sigma/2) = -0.97325E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 97 new time -98.079999999999998
+       max(u^ + sigma/2) = -0.97287E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 98 new time -98.060000000000002
+       max(u^ + sigma/2) = -0.97248E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 99 new time -98.039999999999992
+       max(u^ + sigma/2) = -0.97210E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 100 new time -98.019999999999996
+       max(u^ + sigma/2) = -0.97171E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 101 new time -98.
+       max(u^ + sigma/2) = -0.97132E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 102 new time -97.97999999999999
+       max(u^ + sigma/2) = -0.97094E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 103 new time -97.959999999999994
+       max(u^ + sigma/2) = -0.97055E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 104 new time -97.939999999999998
+       max(u^ + sigma/2) = -0.97016E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 105 new time -97.920000000000002
+       max(u^ + sigma/2) = -0.96978E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 106 new time -97.899999999999991
+       max(u^ + sigma/2) = -0.96939E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 107 new time -97.879999999999995
+       max(u^ + sigma/2) = -0.96900E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 108 new time -97.859999999999999
+       max(u^ + sigma/2) = -0.96862E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 109 new time -97.839999999999989
+       max(u^ + sigma/2) = -0.96823E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 110 new time -97.819999999999993
+       max(u^ + sigma/2) = -0.96784E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 111 new time -97.799999999999997
+       max(u^ + sigma/2) = -0.96746E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 112 new time -97.780000000000001
+       max(u^ + sigma/2) = -0.96707E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 113 new time -97.759999999999991
+       max(u^ + sigma/2) = -0.96668E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 114 new time -97.739999999999995
+       max(u^ + sigma/2) = -0.96630E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 115 new time -97.719999999999999
+       max(u^ + sigma/2) = -0.96591E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 116 new time -97.700000000000003
+       max(u^ + sigma/2) = -0.96552E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 117 new time -97.679999999999993
+       max(u^ + sigma/2) = -0.96514E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 118 new time -97.659999999999997
+       max(u^ + sigma/2) = -0.96475E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 119 new time -97.640000000000001
+       max(u^ + sigma/2) = -0.96437E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 120 new time -97.61999999999999
+       max(u^ + sigma/2) = -0.96398E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 121 new time -97.599999999999994
+       max(u^ + sigma/2) = -0.96359E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 122 new time -97.579999999999998
+       max(u^ + sigma/2) = -0.96321E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 123 new time -97.560000000000002
+       max(u^ + sigma/2) = -0.96282E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 124 new time -97.539999999999992
+       max(u^ + sigma/2) = -0.96243E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 125 new time -97.519999999999996
+       max(u^ + sigma/2) = -0.96205E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 126 new time -97.5
+       max(u^ + sigma/2) = -0.96166E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 127 new time -97.47999999999999
+       max(u^ + sigma/2) = -0.96127E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 128 new time -97.459999999999994
+       max(u^ + sigma/2) = -0.96089E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 129 new time -97.439999999999998
+       max(u^ + sigma/2) = -0.96050E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 130 new time -97.420000000000002
+       max(u^ + sigma/2) = -0.96012E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 131 new time -97.399999999999991
+       max(u^ + sigma/2) = -0.95973E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 132 new time -97.379999999999995
+       max(u^ + sigma/2) = -0.95934E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 133 new time -97.359999999999999
+       max(u^ + sigma/2) = -0.95896E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 134 new time -97.339999999999989
+       max(u^ + sigma/2) = -0.95857E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 135 new time -97.319999999999993
+       max(u^ + sigma/2) = -0.95818E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 136 new time -97.299999999999997
+       max(u^ + sigma/2) = -0.95780E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 137 new time -97.280000000000001
+       max(u^ + sigma/2) = -0.95741E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 138 new time -97.259999999999991
+       max(u^ + sigma/2) = -0.95702E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 139 new time -97.239999999999995
+       max(u^ + sigma/2) = -0.95664E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 140 new time -97.219999999999999
+       max(u^ + sigma/2) = -0.95625E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 141 new time -97.200000000000003
+       max(u^ + sigma/2) = -0.95587E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 142 new time -97.179999999999993
+       max(u^ + sigma/2) = -0.95548E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 143 new time -97.159999999999997
+       max(u^ + sigma/2) = -0.95509E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 144 new time -97.140000000000001
+       max(u^ + sigma/2) = -0.95471E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 145 new time -97.11999999999999
+       max(u^ + sigma/2) = -0.95432E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 146 new time -97.099999999999994
+       max(u^ + sigma/2) = -0.95393E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 147 new time -97.079999999999998
+       max(u^ + sigma/2) = -0.95355E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 148 new time -97.060000000000002
+       max(u^ + sigma/2) = -0.95316E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 149 new time -97.039999999999992
+       max(u^ + sigma/2) = -0.95278E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 150 new time -97.019999999999996
+       max(u^ + sigma/2) = -0.95239E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 151 new time -97.
+       max(u^ + sigma/2) = -0.95200E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 152 new time -96.97999999999999
+       max(u^ + sigma/2) = -0.95162E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 153 new time -96.959999999999994
+       max(u^ + sigma/2) = -0.95123E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 154 new time -96.939999999999998
+       max(u^ + sigma/2) = -0.95084E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 155 new time -96.920000000000002
+       max(u^ + sigma/2) = -0.95046E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 156 new time -96.899999999999991
+       max(u^ + sigma/2) = -0.95007E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 157 new time -96.879999999999995
+       max(u^ + sigma/2) = -0.94969E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 158 new time -96.859999999999999
+       max(u^ + sigma/2) = -0.94930E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 159 new time -96.839999999999989
+       max(u^ + sigma/2) = -0.94891E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 160 new time -96.819999999999993
+       max(u^ + sigma/2) = -0.94853E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 161 new time -96.799999999999997
+       max(u^ + sigma/2) = -0.94814E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 162 new time -96.780000000000001
+       max(u^ + sigma/2) = -0.94775E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 163 new time -96.759999999999991
+       max(u^ + sigma/2) = -0.94737E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 164 new time -96.739999999999995
+       max(u^ + sigma/2) = -0.94698E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 165 new time -96.719999999999999
+       max(u^ + sigma/2) = -0.94660E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 166 new time -96.700000000000003
+       max(u^ + sigma/2) = -0.94621E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 167 new time -96.679999999999993
+       max(u^ + sigma/2) = -0.94582E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 168 new time -96.659999999999997
+       max(u^ + sigma/2) = -0.94544E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 169 new time -96.640000000000001
+       max(u^ + sigma/2) = -0.94505E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 170 new time -96.61999999999999
+       max(u^ + sigma/2) = -0.94466E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 171 new time -96.599999999999994
+       max(u^ + sigma/2) = -0.94428E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 172 new time -96.579999999999998
+       max(u^ + sigma/2) = -0.94389E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 173 new time -96.560000000000002
+       max(u^ + sigma/2) = -0.94351E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 174 new time -96.539999999999992
+       max(u^ + sigma/2) = -0.94312E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 175 new time -96.519999999999996
+       max(u^ + sigma/2) = -0.94273E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 176 new time -96.5
+       max(u^ + sigma/2) = -0.94235E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 177 new time -96.47999999999999
+       max(u^ + sigma/2) = -0.94196E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 178 new time -96.459999999999994
+       max(u^ + sigma/2) = -0.94158E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 179 new time -96.439999999999998
+       max(u^ + sigma/2) = -0.94119E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 180 new time -96.420000000000002
+       max(u^ + sigma/2) = -0.94080E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 181 new time -96.399999999999991
+       max(u^ + sigma/2) = -0.94042E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 182 new time -96.379999999999995
+       max(u^ + sigma/2) = -0.94003E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 183 new time -96.359999999999999
+       max(u^ + sigma/2) = -0.93965E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 184 new time -96.339999999999989
+       max(u^ + sigma/2) = -0.93926E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 185 new time -96.319999999999993
+       max(u^ + sigma/2) = -0.93887E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 186 new time -96.299999999999997
+       max(u^ + sigma/2) = -0.93849E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 187 new time -96.280000000000001
+       max(u^ + sigma/2) = -0.93810E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 188 new time -96.259999999999991
+       max(u^ + sigma/2) = -0.93771E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 189 new time -96.239999999999995
+       max(u^ + sigma/2) = -0.93733E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 190 new time -96.219999999999999
+       max(u^ + sigma/2) = -0.93694E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 191 new time -96.200000000000003
+       max(u^ + sigma/2) = -0.93656E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 192 new time -96.179999999999993
+       max(u^ + sigma/2) = -0.93617E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 193 new time -96.159999999999997
+       max(u^ + sigma/2) = -0.93578E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 194 new time -96.140000000000001
+       max(u^ + sigma/2) = -0.93540E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 195 new time -96.11999999999999
+       max(u^ + sigma/2) = -0.93501E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 196 new time -96.099999999999994
+       max(u^ + sigma/2) = -0.93463E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 197 new time -96.079999999999998
+       max(u^ + sigma/2) = -0.93424E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 198 new time -96.060000000000002
+       max(u^ + sigma/2) = -0.93385E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 199 new time -96.039999999999992
+       max(u^ + sigma/2) = -0.93347E+02
+ udot called @ time =  0.E+0
+ *** call range_integrate @ time lvl 200 new time -96.019999999999996
+       max(u^ + sigma/2) = -0.93308E+02
+ 
+  The cost of the integration in calls to RHS was 32
+ 
+ udot called @ time =  0.E+0

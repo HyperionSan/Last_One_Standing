@@ -1,0 +1,9 @@
+TEST wavecl-cpu
+{
+  NPROCS 2
+}
+
+TEST wavecl-gpu
+{
+  NPROCS 2
+}

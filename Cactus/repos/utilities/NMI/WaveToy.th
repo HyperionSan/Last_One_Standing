@@ -1,0 +1,54 @@
+!CRL_VERSION = 1.0
+
+!DEFINE ROOT = Cactus
+!DEFINE ARR  = $ROOT/arrangements
+
+
+
+# Cactus Flesh
+!TARGET   = $ROOT
+!TYPE     = cvs
+!AUTH_URL = :pserver:cvs.cactuscode.org/cactusdevcvs
+!URL      = :pserver:cvs.cactuscode.org/cactusdevcvs
+!ANON_USER= cvs_anon
+!ANON_PASS= anon
+!CHECKOUT = Cactus
+!NAME     = .
+
+
+
+# Cactus thorns
+!TARGET   = $ARR
+!TYPE     = cvs
+!AUTH_URL = :pserver:cvs.cactuscode.org/cactusdevcvs
+!URL      = :pserver:cvs.cactuscode.org/cactusdevcvs
+!ANON_USER= cvs_anon
+!ANON_PASS= anon
+!CHECKOUT = 
+CactusBase/Boundary
+CactusBase/CartGrid3D
+CactusBase/CoordBase
+CactusBase/IOASCII
+CactusBase/IOBasic
+CactusBase/IOUtil
+CactusBase/InitBase
+CactusBase/LocalInterp
+CactusBase/LocalReduce
+CactusBase/MoL
+CactusBase/SymBase
+CactusBase/Time
+
+CactusPUGH/PUGH            
+CactusPUGH/PUGHInterp
+CactusPUGH/PUGHReduce
+CactusPUGH/PUGHSlab
+
+CactusWave/IDScalarWave    
+CactusWave/IDScalarWaveC   
+CactusWave/IDScalarWaveCXX 
+CactusWave/WaveBinarySource
+CactusWave/WaveToyC        
+CactusWave/WaveToyCXX      
+CactusWave/WaveToyF77      
+CactusWave/WaveToyF90      
+CactusWave/WaveToyFreeF90  

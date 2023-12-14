@@ -1,0 +1,87 @@
+#!/bin/bash
+
+benchmarks=$(cat <<EOF
+BenchIO_FlexIO,BenchIO_FlexIO_8proc_80l
+BenchIO_FlexIO,BenchIO_FlexIO_eachproc_80l
+BenchIO_FlexIO,BenchIO_FlexIO_onefile_80
+BenchIO_HDF5,BenchIO_HDF5_8proc_80l
+BenchIO_HDF5,BenchIO_HDF5_eachproc_80l
+BenchIO_HDF5,BenchIO_HDF5_onefile_80l
+Bench_BSSN_Carpet,Bench_BSSN_Carpet_1lev_60l
+Bench_BSSN_Carpet,Bench_BSSN_Carpet_1lev_75l
+Bench_BSSN_Carpet,Bench_BSSN_Carpet_3lev_32l
+Bench_BSSN_Carpet,Bench_BSSN_Carpet_3lev_42l
+Bench_BSSN_PUGH,Bench_BSSN_PUGH_80l
+Bench_BSSN_PUGH,Bench_BSSN_PUGH_100l
+Bench_Whisky_Carpet,Bench_Whisky_Carpet_36l
+Bench_Whisky_Carpet,Bench_Whisky_Carpet_48l
+EOF
+)
+
+hostname=$(hostname)
+
+MPICH_DIR=/usr/local/packages/mpich-1.2.6..14a_intel8.0
+
+outdir=$(pwd)/RESULTS
+mkdir -p $outdir
+
+for benchmark1 in $benchmarks
+do
+    executable=$(echo $benchmark1 | cut -d, -f1)
+    benchmark=$(echo $benchmark1 | cut -d, -f2)
+    echo "Submitting jobs for benchmark $benchmark..."
+
+    #for nodes in 384 256 192 128 96 64 48 32 24 16 12 8 6 4 3 2 1 0
+    for nodes in 1
+    do
+        fnodes=$(printf '%04d' $nodes)
+        ppn=2
+        if [ $nodes == 0 ]
+        then
+            nodes=1
+            ppn=1
+        fi
+        echo "   Submitting jobs for $nodes nodes..."
+
+        pushd $outdir > /dev/null
+
+        serialise=''
+        for iter in 1 2 3
+        do
+            jobid=$(qsub $serialise <<EOF
+#!/bin/bash
+#PBS -q workq
+#PBS -r n
+#PBS -l walltime=2:00:00,nodes=$nodes:ppn=$ppn
+#PBS -V
+#PBS -N n${fnodes}i${iter}
+#PBS -o $benchmark.$fnodes.$iter.out
+#PBS -e $benchmark.$fnodes.$iter.err
+
+echo "Preparing:"
+set -e
+cd $outdir
+hostname
+pwd
+date
+echo "PBS nodes:"
+cat \$PBS_NODEFILE
+echo "Environment:"
+env
+echo "Starting:"
+date
+time $MPICH_DIR/bin/mpirun -np \$(cat \$PBS_NODEFILE | wc -l) -machinefile \$PBS_NODEFILE ../exe/cactus_$executable -L 2 -parameter-level strict ../BENCHMARKS/$benchmark.par
+echo "Stopping:"
+date
+echo "Done."
+EOF
+            )
+#            serialise="-W depend=afterany:$jobid"
+
+        done
+
+        popd > /dev/null
+
+    done
+
+done

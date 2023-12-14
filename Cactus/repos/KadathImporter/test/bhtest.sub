@@ -1,0 +1,28 @@
+#! /bin/bash
+
+echo "Checking:"
+pwd
+hostname
+date
+
+basepath=`realpath ../../../`
+procs=4
+threads=1
+
+echo "Environment:"
+export CACTUS_NUM_PROCS=$procs
+export CACTUS_NUM_THREADS=$threads
+export GMON_OUT_PREFIX=gmon.out
+export OMP_NUM_THREADS=$threads
+
+echo "Starting:"
+export CACTUS_STARTTIME=$(date +%s)
+
+export MP_DEBUG_NOTIMEOUT=yes
+
+time mpiexec -np $procs ${basepath}/exe/cactus_test -L 3 bhtest.par
+
+echo "Stopping:"
+date
+
+echo "Done."

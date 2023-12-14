@@ -1,0 +1,64 @@
+# /*@@
+#   @file      Benchmark_IOFlexIO_40l.th
+#   @date      Sun Apr  2 16:08:24 2000
+#   @author    Gabrielle Allen
+#   @desc 
+#   Thorn list and parameter file for benchmarking 3D IO using
+#   the FlexIO/IEEEIO libraries
+#   @enddesc 
+#   @version $Header$
+# @@*/
+
+CactusBase/Boundary          # :pserver:cvs_anon@cvs.cactuscode.org:/cactus
+CactusBase/CartGrid3D        # :pserver:cvs_anon@cvs.cactuscode.org:/cactus
+CactusBase/IOUtil            # :pserver:cvs_anon@cvs.cactuscode.org:/cactus
+CactusBase/IOBasic           # :pserver:cvs_anon@cvs.cactuscode.org:/cactus
+CactusBase/Time              # :pserver:cvs_anon@cvs.cactuscode.org:/cactus
+CactusPUGHIO/IOASCII         # :pserver:cvs_anon@cvs.cactuscode.org:/cactus
+CactusPUGH/PUGH              # :pserver:cvs_anon@cvs.cactuscode.org:/cactus
+CactusPUGHIO/IOFlexIO        # :pserver:cvs_anon@cvs.cactuscode.org:/cactus
+CactusWave/IDScalarWave      # :pserver:cvs_anon@cvs.cactuscode.org:/cactus
+CactusWave/WaveToyC          # :pserver:cvs_anon@cvs.cactuscode.org:/cactus
+external/IEEEIO              # :pserver:cvs_anon@cvs.cactuscode.org:/cactus
+
+# ParameterFile Benchmark_IOFlexIO_40l.par << END
+#
+#!DESC "Benchmark IO using IOFlexIO"
+#
+#ActiveThorns = "ioflexio iobasic time wavetoyc idscalarwave pugh cartgrid3d ioutil ioascii"
+#
+## Do 3D output every iteration from every processor for 1 grid function
+#IOFlexIO::out3D_every      = 1
+#IOFlexIO::out3D_vars       = "wavetoy::phi"
+#IO::out3D_mode             = "np"
+#IO::out3D_procs            = 1              
+#
+## Send all output to this directory
+#IO::outdir                 = "Benchmark_IOFlexIO_40l"
+#
+## Set up local grid with size 40x40x40 on each processor
+#driver::local_nx           = 40
+#driver::local_ny           = 40
+#driver::local_nz           = 40       
+#
+## Number of iterations
+#cactus::cctk_itlast        = 100
+#
+## Parameters controlling physical wave problem
+#grid::type                 = "box"
+#time::dtfac                = 0.5
+#idscalarwave::initial_data = "gaussian"
+#idscalarwave::sigma        = 0.1
+#idscalarwave::radius       = 0
+#
+## Provide some ASCII information
+#IOBasic::outInfo_every     = 10
+#IOBasic::outInfo_vars      = "wavetoy::phi"
+#IOASCII::out1D_every       = 50
+#IOASCII::out1D_vars        = "wavetoy::phi"
+#IOASCII::out1D_z           = "no"
+#IOASCII::out1D_y           = "no"
+#IOASCII::out1D_d           = "no"
+#
+# END
+

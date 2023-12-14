@@ -1,0 +1,67 @@
+\documentclass{article}
+
+% Use the Cactus ThornGuide style file
+% (Automatically used from Cactus distribution, if you have a 
+%  thorn without the Cactus Flesh download this from the Cactus
+%  homepage at www.cactuscode.org)
+\usepackage{../../../../doc/latex/cactus}
+
+\begin{document}
+
+\title{ADMConstraints}
+\author{Gabrielle Allen}
+\date{$ $Date$ $}
+
+\maketitle
+
+% Do not delete next line
+% START CACTUS THORNGUIDE
+
+\begin{abstract}
+Calculate the values of the Hamiltonian and Momentum Constraints on the computational grid for output.
+\end{abstract}
+
+\section{Physics}
+
+This analysis thorn calculates the values of the Hamiltonian and
+momentum constraint equations on the computational grid during a spacetime
+evolution. The Hamiltonian Constraint (grid function: ham) is given by
+
+\begin{equation}
+ H = R - K^{i}_{\;\;j} K^{j}_{\;\;i} + trK^2 - 16 \pi \rho
+\end{equation}
+
+The Momentum Constraints  (grid functions momx, momy, momz) are given by
+
+\begin{equation}
+M_i = \nabla_j K_i^{\;\;j} - \nabla_i trK - 8 \pi S_i
+\end{equation}
+
+where
+
+\begin{equation}
+S_i = -g_{ia} n_b T^{ab} = - g_i^a n^b T_{ab} = -\frac{1}{\alpha} (T_{i0} - \beta^j T_{ij})
+\end{equation}
+
+\section{Comments}
+
+\begin{itemize}
+
+\item Symmetry boundary conditions ({\tt CactusBase/CartGrid3D}) are implemented.
+
+\item Default behaviour is to apply so called flat boundary conditions to the calculated values of the constraint equations.
+
+\item Excision ({\tt Excision/LegoExcision}) is included.
+
+\item The 3-metric is only included through the Macros in {\tt CactusEinstein/Einstein} and as such the physical metric is used.
+
+\item Matter is included using the {\tt CalcTmuNu} mechanism.
+
+\item The constraint calculation is default performed at the ANALYSIS time bin, if the constraint values are needed at every iteration, the parameter {\tt constraints\_persist} should be used to schedule the calculation instead at POSTSTEP.
+
+\end{itemize}
+
+% Do not delete next line
+% END CACTUS THORNGUIDE
+
+\end{document}

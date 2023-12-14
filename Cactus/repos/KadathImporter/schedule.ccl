@@ -1,0 +1,49 @@
+# Schedule definitions for thorn KadathImporter
+
+if (CCTK_EQUALS (initial_data,    "Kadath") ||
+    CCTK_EQUALS (initial_lapse,   "Kadath") ||
+    CCTK_EQUALS (initial_shift,   "Kadath") ||
+    CCTK_EQUALS (initial_dtlapse, "Kadath") ||
+    CCTK_EQUALS (initial_dtshift, "Kadath"))
+{
+  SCHEDULE KadathImporter_check_parameters AT paramcheck
+  {
+    LANG: C
+  } "Check parameters"
+
+	if (CCTK_EQUALS (type, "BBH"))
+	{
+	  SCHEDULE KadathImporter IN ADMBase_InitialData
+	  {
+	    LANG: C
+	  } "Set up binary black hole initial data"
+  }
+	if (CCTK_EQUALS (type, "BH"))
+	{
+	  SCHEDULE KadathImporter IN ADMBase_InitialData
+	  {
+	    LANG: C
+	  } "Set up black hole initial data"
+  }
+	if (CCTK_EQUALS (type, "BNS"))
+	{
+	  SCHEDULE KadathImporter IN HydroBase_Initial BEFORE ADMBase_PostInitial
+	  {
+	    LANG: C
+	  } "Set up binary neutron star initial data"
+  }
+	if (CCTK_EQUALS (type, "NS"))
+	{
+	  SCHEDULE KadathImporter IN HydroBase_Initial BEFORE ADMBase_PostInitial
+	  {
+	    LANG: C
+	  } "Set up neutron star initial data"
+  }
+	if (CCTK_EQUALS (type, "BHNS"))
+	{
+	  SCHEDULE KadathImporter IN HydroBase_Initial BEFORE ADMBase_PostInitial
+	  {
+	    LANG: C
+	  } "Set up black hole neutron star initial data"
+  }
+}

@@ -1,0 +1,12 @@
+ &null_input
+ nn = 55
+ nx = 2 
+ nt = 3350 
+ it_skip = 100  
+ rwt = 1.0
+ time = -100.0
+ cfl = 0.5
+ null_output =  t
+ mass = 1. 
+ disip = 0.5
+/

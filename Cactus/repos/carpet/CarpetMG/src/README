@@ -1,0 +1,90 @@
+Old documentation:
+
+solve L(u) = r
+set f := L(u) - r
+
+given:  f = L(u ) - r
+wanted: 0 = L(u') - r
+known:  R(f) - f is small
+assume: R(u'-u) is also small
+define: fc = R(f)
+        uc = R(u)
+        fc = L(uc) - rc   (defines rc)
+solve:  L(uc') = rc
+use:    R(u'-u) = uc'-uc   (defines u')
+yields: f' = L(u') - r
+where f' is smaller than f
+
+uc <- R(u)
+fc <- R(f)
+rc <- fc
+fc <- L(uc) - rc
+rc <- fc
+then solve L(uc) = rc
+
+the above is identical to:
+uc <- R(u)
+rc <- R(f)
+rc <- L(uc) - rc
+then solve L(uc) = rc
+
+now change the notation:
+varc      <- R(var)
+resc-rhsc <- R(res-rhs)
+rhsc      <- resc-rhsc
+resc-rhsc <- L(varc) - rhsc
+rhsc      <- resc-rhsc
+then solve L(varc) = rhsc
+
+the above is identical to:
+varc <- R(var)
+rhsc <- R(res-rhs)
+rhsc <- L(varc) - rhsc
+then solve L(varc) = rhsc
+
+
+
+*******************************************************************************
+
+
+
+New documentation:
+
+equation: L(varc) = rhsc
+
+
+
+resf <- L(varf)
+resf <- resf - rhsf
+
+varc <- varc // R(varf)
+savc <- varc
+resc <- 0
+resc <- resc // R(resf)
+rhsc <- resc
+resc <- L(varc)
+rhsc <- rhsc - resc
+
+varc <- L(varc) = rhsc
+
+resc <- varc
+resc <- resc - savc
+resf <- 0
+resf <- P(resc)
+varf <- varf + resf
+
+
+
+rhsc <- R(L(varf) - rhsf) - L(R(varf))
+varc <- L(varc) = R(L(varf) - rhsf) - L(R(varf))
+varf <- varf + P(varc - R(varf))
+
+delc <- L(R(varf) + delc) = R(L(varf) - rhsf) - L(R(varf))
+delf = P(delc)
+
+
+
+L(varf       ) - rhcf = resf
+
+
+L(varf + delf) - rhcf = 0

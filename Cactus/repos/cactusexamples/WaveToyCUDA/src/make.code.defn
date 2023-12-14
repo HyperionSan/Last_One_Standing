@@ -1,0 +1,8 @@
+# Main make.code.defn file for thorn WaveToyCUDA
+
+# Source files in this directory
+#SRCS = wave.cc init.cu evol.cu boundary.cu
+SRCS = init.cu
+
+# Subdirectories containing source files
+SUBDIRS = 

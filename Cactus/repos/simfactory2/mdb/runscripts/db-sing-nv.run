@@ -1,0 +1,33 @@
+#! /bin/bash
+
+echo "Preparing:"
+set -x                          # Output commands
+set -e                          # Abort on errors
+
+cd @RUNDIR@-active
+
+module purge
+module load mvapich2
+module load gcc/9.3.0
+module list
+
+echo "Checking:"
+pwd
+hostname
+date
+
+echo "Environment:"
+export CACTUS_NUM_PROCS=@NUM_PROCS@
+export CACTUS_NUM_THREADS=@NUM_THREADS@
+export GMON_OUT_PREFIX=gmon.out
+export OMP_NUM_THREADS=@NUM_THREADS@
+export OMP_PLACES=cores # TODO: maybe use threads when smt is used?
+env | sort > SIMFACTORY/ENVIRONMENT
+
+echo "Starting:"
+export CACTUS_STARTTIME=$(date +%s)
+time srun -u -A @ALLOCATION@ -p checkpt -N @NODES@ -n @NUM_PROCS@ --ntasks-per-node @PPN_USED@ singularity exec --nv --bind /var/spool --bind /project/sbrandt --bind /etc/ssh/ssh_known_hosts --bind /work --bind /scratch /work/sbrandt/images/etworkshop.simg @EXECUTABLE@ -L 3 @PARFILE@
+echo "Stopping:"
+date
+
+echo "Done."

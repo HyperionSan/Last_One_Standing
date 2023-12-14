@@ -1,0 +1,13 @@
+#! /bin/bash
+#COBALT -A @ALLOCATION@
+#COBALT -q @QUEUE@
+#COBALT -t @WALLTIME@
+#COBALT -n @NODES@
+#COBALT --attrs mcdram=cache:numa=quad
+#COBALT @("@CHAINED_JOB_ID@" != "" ? "--dependencies @CHAINED_JOB_ID@" : "")@
+#COBALT --jobname @SIMULATION_NAME@
+#COBALT -M @EMAIL@
+#COBALT -o @RUNDIR@/@SIMULATION_NAME@.out
+#COBALT -e @RUNDIR@/@SIMULATION_NAME@.err
+cd @SOURCEDIR@
+@SIMFACTORY@ run @SIMULATION_NAME@ --basedir=@BASEDIR@ --machine=@MACHINE@ --restart-id=@RESTART_ID@ @FROM_RESTART_COMMAND@

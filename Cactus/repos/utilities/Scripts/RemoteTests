@@ -1,0 +1,825 @@
+eval 'exec perl -sS $0 ${1+"$@"}' if 0;
+#!/usr/local/bin/perl -s
+
+# remove "if 0" from the command line
+$#ARGV -= 2;
+
+#/*@@
+#   @file      RemoteTests
+#   @date      Mon Feb 10 15:21:12 CET 2003
+#   @author    Ian Kelley
+#   @desc
+#       RemoteTests will either check out a new copy of Cactus, or update one by 
+#       using the GetCactus script.                                              
+#                                                                           
+#       It will then run the testsuites for the thorns you have checked out and  
+#       email the results back to you.
+#
+#   To get help
+#     ./RemoteTests -help
+#   @enddesc
+# @@*/
+
+
+# It would be nice to use strict variable checking, but I do funny things like:
+#    $var = 'gmake'; @gmake = qw(foo bar); foreach my $value ($@var) { print $_; }
+# And strict 'reference' checking doesn't like this as far as I remember...
+
+#use strict;
+#use vars qw($echo $configoptions $separatelogs $logdir $getcactusdir $install $configfile $makecommand $mailto $mailfrom $mailallresults $nomailsubject $anonymous $repository $verbose $thornlist $config $new $help $h $options);
+
+if ($help) 
+{
+print <<EOC;
+##########################
+# ->> RemoteTests <<- #
+#############################################################################
+# This program will either check out a new copy of Cactus, or update one by #
+# using the GetCactus script.                                               #
+#                                                                           #
+# It will then run the testsuites for the thorns you have checked out and   #
+# email the results back to you.                                            #
+#                                                                           #
+# If a file remotetestsrc exists in the current directory, variables listed #
+# there will take presidence over command line variables.                   #
+#                                                                           #
+#    The format of remottestsrc is:                                         #
+#       variablename=value                                                  #
+#    Example:                                                               #
+#      \$config=mytestconfiguration                                         #
+#      \$install=CactusTestDir                                              #
+#      \$mailto=me\@myemail.com                                             #
+#                                                                           #
+# Note: Command line options are documented by the -h or -options           #
+#############################################################################
+EOC
+exit 0;
+}
+
+############################################################################
+##                    STANDARD HELP FUNCTION                              ##
+############################################################################
+if ($h || $options) 
+{
+   print "\nFor a summary of what RemoteTests does, please run './RemoteTests -help'\n";
+   print "\nNote: Remember the file \"remotetestsrc\" can contain any of these parameters in name/value pairs.  This can save command line typing time.\n";
+   print "\nSyntax:\n";
+   print "\t./RemoteTests";
+   print "\n\nGlobal Options:\n";
+   print "\t-separatelogs    : (opt) creates separate logs for everything\n";
+   print "\t-logdir=      : (opt) directory to dump the logs to\n";
+   print "\t-getcactusdir=   : (opt) default is current directory\n"; 
+   print "\t-install=        : (opt) subdirectory to install \"Cactus/\" to\n";
+   print "\t-configfile=     : (opt) file to read in command line opts from\n";
+   print "\t-makecommand=    : (opt) command to run for gmake (default: gmake)\n";
+   print "\t-configoptions=  : (opt) config options to pass to gmake\n";
+   print "\n\nMailing Options:";
+   print "\t-mailto=         : (opt) email address of recip. of results\n";
+   print "\t-mailfrom=       : (opt) email address of sender of results\n";
+   print "\t-mailallresults  : (opt) mails all the results to you, otherwise summary \n"; 
+   print "\t-nomailsubject   : (opt) sometimes 'mail' doesn't like subjects\n";
+   print "\n\nCheckout Options:";
+   print "\t-anonymous=      : (req) [yes/no] anonymous checkout?\n";
+   print "\t-repository=     : (req) [standard/development] which CVS?\n";
+   print "\t-echo            : (opt) will echo output to screen\n";
+   print "\t-verbose=        : (req) [yes/no] verbose gmake & GetCactus\n";
+   print "\t-thornlist=      : (req) relative directory of thornlist\n";
+   print "\t-config=         : (opt) name of configuration\n";
+   print "\t-new             : (opt) overwrite existing config (if exists)\n";
+   print "\t-help            : (opt) blurb about what this script does\n";
+   print "\t-options|-h      : (opt) this screen\n";
+   print "\nExample:\n";
+   print "\t./RemoteTests -anonymous=yes -repository=development -verbose=no -thornlist=../ThornLists/WaveToyC.th -new\n\n";
+   exit 0;
+}
+
+# these are variables we use for program/log output
+# (... note the below variables do get defined...)
+#my @rcvar;
+#my @gmake;
+#my @testsuite;
+#my @getcactus;
+
+# the user friendly names of the sections in results
+my %sections;
+
+# these are results of parsing @testsuite
+my $summary;
+my $results;
+
+# directory of thornlist, start directory of script, and short hostname
+my $thornlistdir;
+my $startdir;
+my $hostname;
+
+# variables for keeping track of how long things are taking
+my $startime      = 0;
+my $getcactustime = 0;
+my $gmaketime     = 0;
+my $testsuitetime = 0;
+my $endtime       = 0;
+my $totaltime     = 0;
+
+# start directory
+$startdir = `pwd`;
+chomp $startdir;
+
+# just get the first part of the hostname, up to a '.'
+$hostname = `hostname`;
+chomp $hostname;
+if ($hostname !~ /\w/) {
+   $hostname = $ENV{"HOST"};
+   if ($hostname !~ /\w/) {
+      $hostname = $ENV{"HOSTNAME"};
+      if ($hostname !~ /\w/) {
+         $hostname = defined $config ? $config : "unknown_host";
+      }
+   }
+}
+      
+$hostname =~ s/(.*?)\..*/$1/g;
+
+# Read in optional configuration file
+&ReadConfigFile if (defined $configfile);
+
+# deal with home directories...
+if ($thornlist =~ s/^\~//) {
+   $thornlist = $ENV{'HOME'} . $thornlist;
+}
+
+# no thornlist = fatal error
+if (! -e $thornlist) {
+   die "\nFatal Error: Could not find thornlist ($thornlist), exiting.\nPlease run ./RemoteTests -help for help\n\n$!";
+}
+
+# Parse thornlist directory and filename from comman line
+if (defined $thornlist) {
+   if ($thornlist =~ s/(.*\/)(.*)/$2/) {
+   $thornlistdir = $1;
+   }
+}
+
+# if thornlistdir is not an absolute path, chop it up!
+if (! ($thornlistdir =~ /^\//)) {
+  if ($thornlistdir =~ /^\w+/) {
+     $thornlistdir = "$startdir/$thornlistdir";
+  } 
+  else {
+    my $chop = $startdir;
+    while ($thornlistdir =~ s/\.\.\///) {
+       $chop =~ s/(.*)(\/.*?)$/\1/;
+    }
+    $thornlistdir = "$chop/$thornlistdir"; 
+  }
+}
+
+# If not all the command line arguments were specified, set some default values
+$makecommand = "gmake"                      if (! defined $makecommand);
+$logdir      = $startdir                    if (! defined $logdir);
+$config      = $hostname                    if (! defined $config);
+$install     = "$startdir/Cactus_$config"   if (! defined $install);
+$mailto      = $ENV{"USER"}                 if (! defined $mailto);
+$mailfrom    = $mailto                      if (! defined $mailfrom);
+$anonymous   = "yes"                        if (! defined $anonymous);
+$repository  = "development"                if (! defined $repository);
+$verbose     = "no"                         if (! defined $verbose);
+$separatelogs ||=1;
+
+# these are the different sections we create logs for
+%sections = (
+   "Section 1: Variables from remotetestsrc:", "rcvar",
+   "Section 2: Results of TestSuites:", "testsuite",
+   "Section 3: Results of ${makecommand}:", "$makecommand",
+   "Section 4: Results of GetCactus", "getcactus"
+);
+
+# prepare log file directory
+if (! -d $logdir) {
+   if (! mkdir($logdir, 0777)) {
+      print STDERR "\nERROR: Could not create logfile directory $logdir: $!\nERROR: All logs will be stored in $startdir/\n";
+      $logdir = $startdir;
+   }
+}
+
+$logdir .= "/" if ($logdir !~ /\/$/);
+    
+
+# Prepare Directory for Installation, and Find GetCactus
+&PrepareDirectory;
+&FindGetCactusScript;
+
+# Take an initial time stamp of when stuff begins to happen 
+$startime = time;
+
+# Run GetCactus
+my @getcactus_output;
+($getcactustime,@getcactus_output) = &RunGetCactus;
+
+my $success_flag = 0; 
+
+# go through the output of getcactus and see if we get the string
+# 'checkout complete' which indicates all went well with getcactus
+foreach (@getcactus_output) {
+   if (/^\s+checkout complete\s*?/i) {
+      $success_flag = 1;
+   }
+}
+  
+# subject to set for sending email
+my $mailsubject = "";
+
+# we didn't get the desired flag, set the subject to failed, and mail results
+if (! $success_flag) {
+   @getcactus_output   = ("GetCactus Failed" , @getcactus_output);
+   $mailsubject = "RemoteTest failed at checkout on $config";
+# getcactus was successful, we will now try to compile and runtestsuites
+} else  {
+   chdir ($install) || die "Cannot chdir to $install: $!";
+   my @gmake_output;
+   ($gmaketime, @gmake_output) = &RunGmake;
+
+   # go through and see if we get 'All Done' from gmake <config>, which 
+   # indicates it compiled correctly
+   $success_flag = 0;
+   foreach (@gmake_output) {
+      if (/^\s*?All Done\s*?!\s*?/i) {
+         $success_flag = 1;
+      }
+   }
+
+   # could not compile
+   if (! $success_flag) {
+      $mailsubject = "RemoteTest failed at compile on $config";
+   # we compiled OK, lets try to run the testsuites
+   } else {
+      $testsuitetime = &RunTestsuite;
+      $mailsubject = "RemoteTest results for $config";
+   }
+}
+
+#=-= Find out total running time =-=#
+$endtime = time;
+
+#=-= Make the time Pretty =-=#
+&FormatTime;
+
+#=-= Read Results From Tests, and email them =-=#
+&ReadResults;
+
+# we should now go back to the 'root' directory, because we had changed to the 'install' directory
+chdir ($startdir);
+
+# write a big master logfile
+&Log("${logdir}remotetests.log");
+
+# write out separate files for each step, if that was requested
+&SeparateLogs     if (defined $separatelogs); # these go in $logdir
+
+# if we are not supposed to give a mail subject, because it was specified to supress it 
+# (for certain 'mail' programs), will will set the subject to blank.
+$mailsubject = "" if ($nomailsubject);
+
+# if we are supposed to mail the results, mail them... 
+if (defined $mailto) {
+   # if specified, mail all results (can be quite large)
+   if ($mailallresults) {
+      &Mail($mailsubject, "${logdir}remotetests.log"); 
+   # mail just the summary if it wasn't specified to mail all results
+   } else {
+      &Mail($mailsubject, "${logdir}summary.log");
+   }
+}
+
+print STDERR "\nFinished.\n";
+
+#/*@@
+#  @routine   FormatTime
+#  @date      Mon Feb 10 15:24:52 CET 2003
+#  @author    Ian Kelley 
+#  @desc
+#    Takes the various time stamps created by program, and formats them
+#  @enddesc
+#  @calls
+#  @calledby
+#  @history
+#
+#  @endhistory
+#
+#@@*/
+sub FormatTime 
+{
+   # try to get how log things have taken
+   $getcactustime -= $startime;
+   $gmaketime     -= $startime;
+   $testsuitetime -= $startime;
+   $totaltime      = $endtime - $startime;
+
+   $testsuitetime -= $gmaketime;
+   $gmaketime     -= $getcactustime;
+
+   $getcactustime /= 60;
+   $gmaketime     /= 60;
+   $testsuitetime /= 60;
+   $totaltime     /= 60;
+
+   ## Create Legible Format for Time Output ##
+   $getcactustime = $getcactustime >= 0 ? sprintf("%.2f", $getcactustime) : 0;
+   $gmaketime     = $gmaketime >= 0 ? sprintf("%.2f", $gmaketime): 0;
+   $testsuitetime = $testsuitetime >= 0 ? sprintf("%.2f", $testsuitetime) : 0;
+   $totaltime     = sprintf("%.2f", $totaltime);
+
+} ## END :FormatTime:
+
+#/*@@
+#  @routine   RunGmake
+#  @date      Mon Feb 10 15:24:52 CET 2003
+#  @author    Ian Kelley 
+#  @desc
+#     Runs gmake on the "now" checked out version of cactus + thorns
+#  @enddesc
+#  @calls
+#  @calledby
+#  @history
+#
+#  @endhistory
+#
+#@@*/
+sub RunGmake 
+{
+   my $command = "$makecommand ${config}-config $configoptions THORNLIST_DIR=$thornlistdir THORNLIST=$thornlist PROMPT=no";
+   my @extra_gmake;
+
+   print STDERR "\nCompiling with:\n\t$command\n";
+
+   open(PROGRAM, "$command 2>&1 |") || &Bail("Cannot $makecommand $config-config: $!");
+   while (<PROGRAM>) 
+   {
+      print STDERR $_ if (defined $echo);
+      push @gmake, $_;
+   }
+   close PROGRAM;
+
+   if (! (-e "exe/cactus_$config")) 
+   {
+      $command = "$makecommand ${config} $configoptions THORNLIST_DIR=$thornlistdir THORNLIST=$thornlist PROMPT=no";
+      print STDERR "\nNo exe Found, running gmake again with:\n\t$command\n";
+
+      open(PROGRAM, "$command 2>&1 |") || &Bail("Cannot $makecommand $config-config: $!");
+      while (<PROGRAM>) 
+      {
+         print STDERR $_ if (defined $echo);
+         push @extra_gmake, $_;
+      }
+   
+      push @gmake, "\n";
+      push @gmake, "##################################################################################\n";
+      push @gmake, "## ->> Executable was not created on first pass, trying to compile again... <<- ##\n";
+      push @gmake, "##################################################################################\n\n";
+      push @gmake, @extra_gmake;
+      close PROGRAM;
+   }
+
+   return (time, @gmake);
+} ## END :RunGmake:
+
+#/*@@
+#  @routine   FindGetCactusScript
+#  @date      Mon Feb 10 15:24:52 CET 2003
+#  @author    Ian Kelley 
+#  @desc
+#     Will attempt to find the location of the 'GetCactus' script, which is used by 
+#     RemoteTests to checkout and update Cactus
+#  @enddesc
+#  @calls
+#  @calledby
+#  @history
+#
+#  @endhistory
+#
+#@@*/
+sub FindGetCactusScript 
+{
+   if (defined $getcactusdir) {
+      $getcactusdir .= '/' if ($getcactudir !~ /\/$/);
+   } else {
+      my $remotetest_dir = $0;
+      $remotetest_dir =~ s/RemoteTests(\.pl)?$//;
+ 
+      my $temp = "${remotetest_dir}GetCactus";
+  
+      if (-e $temp) {
+         $getcactusdir = $remotetest_dir eq "" ? "./" : $remotetest_dir;
+      } else {
+         $getcactusdir = ""; 
+      }
+   }
+}
+
+#/*@@
+#  @routine   RunGetCactus
+#  @date      Mon Feb 10 15:24:52 CET 2003
+#  @author    Ian Kelley 
+#  @desc
+#     Runs the GetCactus script to checkout cactus + thorns            
+#  @enddesc
+#  @calls
+#  @calledby
+#  @history
+#
+#  @endhistory
+#
+#@@*/
+sub RunGetCactus 
+{
+   my $command = "${getcactusdir}GetCactus -install=$install -anonymous=$anonymous -repository=$repository -verbose=$verbose -defaults";
+   $command .= " $thornlistdir$thornlist" if (($thornlist ne "") && (defined $thornlist));
+
+   my $date = `date +"%b %d %R"`;
+   chomp $date;
+
+   print STDERR "\nStart Time: $date\n\nRunning:\n\t$command\n";
+
+   open(PROGRAM, "$command 2>&1 |") || &Bail("Cannot run GetCactus: $!");
+
+   while (<PROGRAM>) 
+   {
+      print STDERR $_ if (defined $echo);
+      push @getcactus, $_;
+   }
+   close PROGRAM;
+
+   return (time, @getcactus);
+} ## END :RunGetCactus:
+
+#/*@@
+#  @routine   PrepareDirectory
+#  @date      Mon Feb 10 15:24:52 CET 2003
+#  @author    Ian Kelley 
+#  @desc
+#     If the install directory exists, and the -new switch is given, remove the old install directory
+#  @enddesc
+#  @calls
+#  @calledby
+#  @history
+#
+#  @endhistory
+#
+#@@*/
+sub PrepareDirectory
+{ 
+   if ((-d "$install") && (defined $new)) {
+      print "\nRemoving previous version of Cactus:\n\trm -Rf $install\n";
+      system("rm -R $install");
+   }
+}
+
+#/*@@
+#  @routine   ReadConfigFile
+#  @date      Mon Feb 10 15:24:52 CET 2003
+#  @author    Ian Kelley 
+#  @desc
+#     Read from "remotetestsrc" configuration file for run time options
+#  @enddesc
+#  @calls
+#  @calledby
+#  @history
+#
+#  @endhistory
+#
+#@@*/
+sub ReadConfigFile 
+{
+   my ($tempvar) = "";
+
+   open (CONFIG, $configfile) 
+      && print STDERR "\nReading \"remotetestsrc\" configuration file\n";
+
+   while (<CONFIG>) 
+   {
+      /\s*?\$(.*?)\s*?=/;
+      $tempvar = $1;
+
+      if (! defined $$tempvar) {
+         push @rcvar, $_;
+         eval $_;
+      } else {
+         $tempvar = "$tempvar defined on command line";
+         push @rcvar, $tempvar;
+      }
+   }
+   close CONFIG;
+} ## END :ReadConfigFile:
+
+#/*@@
+#  @routine   SeparateLogs
+#  @date      Mon Feb 10 15:24:52 CET 2003
+#  @author    Ian Kelley 
+#  @desc
+#     Will print the results of each process run, such as gmake, to a separate logfile
+#  @enddesc
+#  @calls
+#  @calledby
+#  @history
+#
+#  @endhistory
+#
+#@@*/
+sub SeparateLogs {
+
+   my ($message) = "";
+  # my ($tempvar);
+
+   foreach my $heading (sort keys %sections) 
+   {
+      # get the value, which is the name of the \@array
+      $tempvar = $sections{$heading};
+      my $outputfile = "${logdir}${tempvar}.log";
+      open(FILE, ">$outputfile") || warn "\nCould not open output file ($outputfile): $!";
+
+      print FILE &Header;
+      print FILE &CreateSection($heading);
+
+      foreach (@${tempvar}) {
+         print FILE $_;
+      }
+      close FILE; 
+   }
+
+   open (FILE, ">${logdir}summary.log");
+   print FILE &Header . $summary;# . $results;
+   close FILE;
+}
+
+#/*@@
+#  @routine   Log
+#  @date      Mon Feb 10 15:24:52 CET 2003
+#  @author    Ian Kelley 
+#  @desc
+#     Opens logfile, and prints &ProgramOutput to it
+#  @enddesc
+#  @calls
+#  @calledby
+#  @history
+#
+#  @endhistory
+#
+#@@*/
+sub Log 
+{
+   my ($logfile) = shift;
+
+   open(LOGFILE, ">${logfile}") || warn "\nCould not open logfile for output ($logfile): $!";
+
+   print LOGFILE @_;
+   print LOGFILE &ProgramOutput;
+
+   close LOGFILE;
+} ## END :Log:
+
+#/*@@
+#  @routine   RunTestsuite
+#  @date      Mon Feb 10 15:24:52 CET 2003
+#  @author    Ian Kelley 
+#  @desc
+#     Runs the testsuites associated with this checkout of cactus
+#  @enddesc
+#  @calls
+#  @calledby
+#  @history
+#
+#  @endhistory
+#
+#@@*/
+sub RunTestsuite 
+{
+   my $command = "$makecommand ${config}-testsuite PROMPT=no";
+
+   print STDERR "\nRunning:\n\t$command\n";
+
+   open(PROGRAM, "$command 2>&1 |") || &Bail("Cannot $makecommand $config-testsuite");
+
+   while (<PROGRAM>) {
+      print STDERR $_ if (defined $echo);
+      push @testsuite, $_;
+   }
+   close PROGRAM;
+
+   return time;
+} ## END :RunTestsuite:
+
+#/*@@
+#  @routine   Bail
+#  @date      Mon Feb 10 15:24:52 CET 2003
+#  @author    Ian Kelley 
+#  @desc
+#     Attempts to exit nicely with an error email sent to user 
+#  @enddesc
+#  @calls
+#  @calledby
+#  @history
+#
+#  @endhistory
+#
+#@@*/
+sub Bail 
+{
+   my ($subject) = shift;
+
+   &Log("abnormal_exit.log", @_);
+
+   die $subject;                               #-- exit program
+} ## END :Bail:
+
+#/*@@
+#  @routine   ProgramOutput
+#  @date      Mon Feb 10 15:24:52 CET 2003
+#  @author    Ian Kelley 
+#  @desc
+#     Takes all current program output, and returns it as a scalar
+#  @enddesc
+#  @calls
+#  @calledby
+#  @history
+#
+#  @endhistory
+#
+#@@*/
+sub ProgramOutput 
+{
+   my ($message) = &Header . $summary . $results;
+   #my ($tempvar);
+
+   foreach my $heading (sort keys %sections) 
+   {
+      $message .= &CreateSection($heading);
+
+      my $array = $sections{$heading};
+      foreach (@${array}) {
+         $message .= $_;
+      }
+   }
+
+   return ($message);
+} ## END :ProgramOutput:
+
+#/*@@
+#  @routine   Header
+#  @date      Mon Feb 10 15:24:52 CET 2003
+#  @author    Ian Kelley 
+#  @desc
+#     Prints out the top of the mail message, time spent, version of cactus, etc
+#  @enddesc
+#  @calls
+#  @calledby
+#  @history
+#
+#  @endhistory
+#
+#@@*/
+sub Header 
+{
+   my ($header) = "";
+   
+   $header .= "Total Processing Time: $totaltime min.\n\n";
+   $header .= "Time Spent w/GetCactus: $getcactustime min.\n";
+   $header .= "Time Spent w/${makecommand}: $gmaketime min.\n";
+   $header .= "Time Spent w/${makecommand} $config--testsuite: $testsuitetime min.\n\n";
+   $header .= `pwd` . "\n";
+   $header .= "The following log files (should) have been created:\n";
+   $header .= "   Directory: $logdir \n";
+   $header .= "   Host: $hostname\n\n";
+   $header .= "   Remote Test config...: rcvar.log\n";
+   $header .= "   Test suite results...: testsuite.log\n";
+   $header .= "   Compiling results....: ${makecommand}.log\n";
+   $header .= "   CVS retrieval results: getcactus.log\n";
+   $header .= "   All results..........: remotetests.log\n\n";
+   $header .= &ReadVersion . "\n";    
+
+   return $header;
+} ## END :Header:
+
+#/*@@
+#  @routine   ReadVersion
+#  @date      Mon Feb 10 15:24:52 CET 2003
+#  @author    Ian Kelley 
+#  @desc
+#     Reads the current version of Cactus being tested, for inserting into email
+#  @enddesc
+#  @calls
+#  @calledby
+#  @history
+#
+#  @endhistory
+#
+#@@*/
+sub ReadVersion 
+{
+   my ($ver);
+
+   open (VER, "exe/cactus_$config -v |"); 
+   $ver = <VER>;
+   close VER;
+
+   $ver =~ s/.*?:\s+//;                     #-- strip off leading path
+
+   chomp $ver;
+   return $ver;                             #-- return version information
+} ## END :ReadVersion:
+
+#/*@@
+#  @routine   CreateSection
+#  @date      Mon Feb 10 15:24:52 CET 2003
+#  @author    Ian Kelley 
+#  @desc
+#  @calls
+#     Puts the name of a given section enclosed in a box and returns it
+#  @enddesc
+#  @calledby
+#  @history
+#
+#  @endhistory
+#
+#@@*/
+sub CreateSection 
+{
+   my ($section_name) = shift;
+   my ($formatted_name) = "";
+   my ($length) = length($section_name) + 14; 
+
+   $formatted_name .= "\n";
+   $formatted_name .= "#" x $length;
+   $formatted_name .= "\n" . "## ->> $section_name <<- ##" . "\n";
+   $formatted_name .= "#" x $length;
+   $formatted_name .= "\n";
+
+   return $formatted_name;
+}  ## END :CreateSection:
+
+#/*@@
+#  @routine   ReadResults
+#  @date      Mon Feb 10 15:24:52 CET 2003
+#  @author    Ian Kelley 
+#  @desc
+#     Reads results from the Cactus testsuites, and summarizes
+#  @enddesc
+#  @calls
+#  @calledby
+#  @history
+#
+#  @endhistory
+#
+#@@*/
+sub ReadResults 
+{
+   $results = "";                    #-- couple global variables 
+   $summary = "";
+
+   my $beginsummary = 0;             #-- beginning of test summary indicator
+
+   foreach (@testsuite) 
+   {
+      if (/^\s*?\-+\s*?$/) {                        
+         $results .= $_;          
+      } elsif (/(^Running.*?:)/) {                      
+         $results .= "\n$1\n";
+      } elsif (/\s+Test\s+.*/) {                        
+         $results .= $_;
+      } elsif ((/^\s*?=+\s*?$/) && ($beginsummary)) {                           
+         $summary .= $_;
+         $beginsummary=0;
+      } elsif (/^\s*?=+\s*?$/) {                           
+         $summary .= $_;
+         $beginsummary = 1;
+      } elsif ($beginsummary == 1) {  
+         $summary .= $_;
+      }
+   }
+
+   return $summary;
+} ## END :ReadResults:
+
+#/*@@
+#  @routine   Mail 
+#  @date      Mon Feb 10 15:24:52 CET 2003
+#  @author    Ian Kelley 
+#  @desc
+#     Emails results of test to specified person                               
+#  @enddesc
+#  @calls
+#  @calledby
+#  @history
+#
+#  @endhistory
+#
+#@@*/
+sub Mail {
+   my ($subject) = shift;
+   my ($file)    = shift;
+
+   $subject = "-s \"$subject\"" if ($subject =~ /\w/);
+
+   my $command = "mail $subject $mailto < $file";
+   print STDERR "\nMailing results ($command)" if ($verbose);
+
+   system("$command");
+} ## END :Mail:

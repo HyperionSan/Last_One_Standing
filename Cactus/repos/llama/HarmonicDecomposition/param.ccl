@@ -1,0 +1,80 @@
+
+
+RESTRICTED:
+
+INT nslices "Number of detectors"
+{
+   0:100 :: ""
+} 0
+
+
+
+INT which_slice_to_take[100] "Assign SphericalSlices on which to decompose"
+{
+ 0:* :: "positive integral number"
+} 0
+
+
+INT lmax "Maximum l for extraction" 
+{
+  0:* :: "between l_min and anything"
+} 4
+
+
+INT lmin "Lowest l for extraction"
+{
+  0:10 :: "between 0 and l_max"
+} 0
+
+
+
+PRIVATE:
+
+
+#BOOLEAN precalc_sYlms "Whether to precalculate sYlm's and store them. Note that although speed-up might be significant if you have many variables to decompose, there will be storage necessary for lmax^2 additional arrays for each slice on each processor!"
+#{
+#} no
+
+
+KEYWORD grid_type "Specify type of grid. This is ment as a cross-check to SphericalSlice in order to avoid user errors."
+{
+  "1patch" :: "offers extremely accurate integration but requires interpolation"
+  "6patch" :: "might not require interpolation if a Multipatch-system is present but integration is less accurate"
+} "1patch"
+
+
+INT spin_weight[42] "spin weight for extraction"
+{
+  *:* :: "0 recovers normal Ylm; match array index w/ variable index to assign spin to particular var."
+} 0
+
+
+
+INT number_of_vars "number of variables in vars"
+{
+0:42 :: "42 seems like a reasonable upper bound...?"
+} 0
+
+
+### The default number_of_vars is set to match the number inserted by hand below ###
+
+STRING vars[42] "Extract modes from this list of grid functions (names)"
+{
+   .* :: "A regexp which matches everything"
+} "not_a_var"
+
+
+KEYWORD verbose "Level of verbosity"
+{
+  "normal"  ::  "Normal output"
+  "details" ::  "Some more information"
+} "normal"
+
+
+
+SHARES: SphericalSlice
+USES KEYWORD type
+USES INT nslices as ss_nslices
+USES INT nphi
+USES INT ntheta
+

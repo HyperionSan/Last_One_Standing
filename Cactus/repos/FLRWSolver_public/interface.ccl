@@ -1,0 +1,7 @@
+# Interface definition for thorn FLRWSolver
+
+implements: FLRWSolver
+
+inherits: HydroBase, EOS_Omni, ADMBase, Constants, StaticConformal, CoordBase
+
+USES INCLUDE: SpaceMask.h

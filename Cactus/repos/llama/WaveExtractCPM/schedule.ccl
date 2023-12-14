@@ -1,0 +1,182 @@
+# Schedule definitions for thorn WaveExtractCPM
+
+
+# test if this makes a difference
+STORAGE: MoncriefQ
+
+
+# FIXME : 3D only for 3D corotation undoing
+STORAGE: metric_tmp
+
+if(active)
+{
+  STORAGE: sym_factor_group, handles_group, do_nothing_group
+
+  # FIXME : This could be moved where it is needed
+  STORAGE: gridsizes_group
+  STORAGE: surface_arrays
+  STORAGE: surface_integrands
+  STORAGE: interp_metric_arrays
+  STORAGE: Schwarzschild_Mass_Radius_group
+  STORAGE: MoncriefQ_Results_group, Schwarzschild_Mass_Radius_Results_group
+  STORAGE: current_detector_group,current_detector_radius_group
+  STORAGE: my_out_every_det
+  STORAGE: l_m_modes_info_group
+  STORAGE: current_detector_group
+  STORAGE: current_detector_radius_group
+
+  schedule WavExtrCPM_ParamCheck at PARAMCHECK
+  {
+    LANG: C
+  } "Check Parameters for WaveExtractCPM"
+
+  schedule WavExtrCPM_Startup at STARTUP AFTER IOUtil_Startup
+  {
+    LANG: C
+  } "Register WaveExtractCPM as an IO Method"
+
+
+
+  # Initial Setup
+  schedule WavExtrCPM_Init at BASEGRID after SpatialCoordinates
+  {
+    LANG: FORTRAN
+  } "Setup weights for integration"
+
+
+  schedule WavExtrCPM_Setup_Detectors at BASEGRID after SpatialCoordinates
+  {
+    LANG: FORTRAN
+    OPTIONS: LEVEL
+  } "Initial setup of all detectors"
+
+
+
+  # Analysis
+  if (use_spherical_surface) {
+    schedule WavExtrCPM_Setup_SphericalSurface at BASEGRID AFTER SphericalSurface_Setup AFTER WavExtrCPM_ResetCurrDet
+    {
+      LANG: FORTRAN
+      OPTIONS: LOCAL #GLOBAL
+    } "setup detectors from spherical surface"
+  }
+
+  schedule WavExtrCPM_ResetCurrDet at ANALYSIS \
+           before WavExtrCPM_CalcsAtDetector
+  {
+    LANG: C
+    OPTIONS: GLOBAL
+  } "Reset the value of the current_detector, needed for the while loop next"
+
+  # Create a new group which contains all the calculations done at 
+  # the detectors. The loop is over the detectors.
+  # FIXME : LOTS OF STORAGE SHOULD ONLY BE TURNED ON IN THIS GROUP
+  schedule group WavExtrCPM_CalcsAtDetector \
+           while WaveExtractCPM::current_detector \
+           at ANALYSIS after WavExtrCPM_ResetCurrDet
+  {
+  } "Calculations done for each detector, we loop over the detectors"
+
+  schedule WavExtrCPM_SetupSphere in WavExtrCPM_CalcsAtDetector
+  {
+    LANG: FORTRAN
+    OPTIONS: GLOBAL
+  } "Setup sintheta, sinphi arrays"
+
+  if (use_carpetinterp2) {
+    schedule WavExtrCPM_ProjectSphere in WavExtrCPM_CalcsAtDetector \
+        after WavExtrCPM_SetupSphere
+    {
+      LANG: C #FORTRAN
+        OPTIONS: GLOBAL
+    } "Interpolate 3D quantities into 2D grid arrays (on the sphere), project onto sphere"
+
+    schedule WavExtrCPM_MetricToSphericalBasis in WavExtrCPM_CalcsAtDetector \
+        after WavExtrCPM_ProjectSphere
+    {
+      LANG: C #FORTRAN
+        OPTIONS: GLOBAL
+    } "Interpolate 3D quantities into 2D grid arrays (on the sphere), project onto sphere"
+
+  } else {
+      schedule WavExtrCPM_ProjectSphereCactusInterp in WavExtrCPM_CalcsAtDetector \
+          after WavExtrCPM_SetupSphere
+      {
+        LANG: FORTRAN
+          OPTIONS: GLOBAL
+      } "Interpolate 3D quantities into 2D grid arrays (on the sphere), project onto sphere"
+
+    schedule WavExtrCPM_MetricToSphericalBasis in WavExtrCPM_CalcsAtDetector \
+        after WavExtrCPM_ProjectSphereCactusInterp
+    {
+      LANG: C #FORTRAN
+        OPTIONS: GLOBAL
+    } "Interpolate 3D quantities into 2D grid arrays (on the sphere), project onto sphere"
+  }
+  
+  schedule WavExtrCPM_SchwarzMassRad in WavExtrCPM_CalcsAtDetector \
+           after WavExtrCPM_MetricToSphericalBasis
+  {
+    LANG: FORTRAN
+    OPTIONS: GLOBAL
+  } "Calculate Schwarzschild Radius and Mass and spherical background"
+
+  if (subtract_spherical_background) {
+    schedule WavExtrCPM_SubtrSpherMetric in WavExtrCPM_CalcsAtDetector \
+             after WavExtrCPM_SchwarzMassRad
+    {
+      LANG: FORTRAN
+      OPTIONS: GLOBAL
+    } "Substract spherical background part of metric from metric"
+  }
+
+  schedule WavExtrCPM_MoncriefQ in WavExtrCPM_CalcsAtDetector \
+           after WavExtrCPM_SubtrSpherMetric
+  {
+    LANG: FORTRAN
+    OPTIONS: GLOBAL
+  } "Compute Moncrief Qeven, Qodd from Regge Wheeler quantities"
+
+  if (maximum_detector_number < switch_output_format)
+  {
+    schedule WavExtrCPM_WriteData in WavExtrCPM_CalcsAtDetector \
+            after WavExtrCPM_MoncriefQ
+    {
+      LANG: C
+      OPTIONS: GLOBAL
+    } "Write out results to disk and stdout - one file for each detector and (l,m) mode"
+    schedule WavExtrCPM_AdjustDetector in WavExtrCPM_CalcsAtDetector \
+            after WavExtrCPM_WriteData
+    {
+      LANG: C
+      OPTIONS: GLOBAL
+    } "Decrease current_detector, go the the next detector"
+  }
+  else
+  {
+    schedule WavExtrCPM_AdjustDetector in WavExtrCPM_CalcsAtDetector \
+            after WavExtrCPM_MoncriefQ
+    {
+      LANG: C
+      OPTIONS: GLOBAL
+    } "Decrease current_detector, go the the next detector"
+  }
+
+  schedule WavExtrCPM_TimerInfo in WavExtrCPM_CalcsAtDetector \
+           after WavExtrCPM_AdjustDetector
+  {
+    LANG: C
+    OPTIONS: GLOBAL
+  } "Output Timer Info if requested"
+
+
+  if (maximum_detector_number >= switch_output_format)
+  {
+    schedule WavExtrCPM_WriteLotsOfData after WavExtrCPM_CalcsAtDetector \
+             at ANALYSIS
+    {
+      LANG: C
+      OPTIONS: GLOBAL
+    } "Output one file per (l,m) mode, all detectors in one file"
+  }
+}

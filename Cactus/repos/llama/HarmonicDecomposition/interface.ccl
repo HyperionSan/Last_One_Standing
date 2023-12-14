@@ -1,0 +1,61 @@
+# Interface definition for thorn HarmonicDecomposition
+# $Header:$
+
+implements: HarmonicDecomposition
+inherits: SphericalSlice
+
+USES INCLUDE HEADER: spherical_slices.hh
+
+
+# Register a Cactus variable for being sliced and return registration number
+CCTK_INT FUNCTION \
+    SphericalSlice_RegisterVariable \
+         (CCTK_POINTER_TO_CONST IN varname, \
+          CCTK_INT IN sn, \
+          CCTK_INT IN timelevels, \
+          CCTK_POINTER_TO_CONST IN distrib_method)
+REQUIRES FUNCTION SphericalSlice_RegisterVariable
+
+
+# Return value of scalar product with spin-weighted spherical harmonics sYlm
+CCTK_COMPLEX FUNCTION \
+    SphericalSlice_ContractVariableWithsYlm \
+         (CCTK_INT IN varno, \
+          CCTK_INT IN timelevel, \
+          CCTK_INT IN s, \
+          CCTK_INT IN l, \
+          CCTK_INT IN m)
+REQUIRES FUNCTION SphericalSlice_ContractVariableWithsYlm
+
+
+# Return an array of all values of scalar product with all spin-weighted spherical harmonics sYlm up to lmax
+CCTK_INT FUNCTION \
+    SphericalSlice_ContractVariableWithAllsYlm \
+         (CCTK_INT IN varno, \
+          CCTK_INT IN timelevel, \
+          CCTK_INT IN s, \
+          CCTK_INT IN lmin, \
+          CCTK_INT IN lmax, \
+          CCTK_COMPLEX OUT ARRAY coeffs)
+REQUIRES FUNCTION SphericalSlice_ContractVariableWithAllsYlm \
+
+
+# Synchronzie slice, i.e. interpolate a whole set of variables on the same slice
+CCTK_INT FUNCTION \
+    SphericalSlice_CollectiveSyncVariables \
+         (CCTK_POINTER_TO_CONST IN cctkGH_, \
+	  CCTK_POINTER_TO_CONST IN varno, \
+	  CCTK_INT IN number_of_vars)
+REQUIRES FUNCTION SphericalSlice_CollectiveSyncVariables \
+
+
+
+PUBLIC:
+
+COMPLEX decomposed_vars[number_of_vars] TYPE=ARRAY TIMELEVELS=1 DIM=2 SIZE=((lmax-lmin+1)*(lmax-lmin+1)),nslices DISTRIB=CONSTANT
+{
+  decomp_vars
+} "Stores global_integrated_all for each variable"
+
+
+

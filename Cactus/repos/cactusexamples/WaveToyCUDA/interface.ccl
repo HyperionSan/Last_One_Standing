@@ -1,0 +1,8 @@
+# Interface definition for thorn WaveToyCUDA
+
+IMPLEMENTS: WaveToyCUDA
+
+CCTK_REAL scalar TYPE=gf TIMELEVELS=3
+{
+  u
+} "Scalar"

@@ -1,0 +1,29 @@
+# Interface definition for thorn EOSBase_General
+# $Header$
+
+implements: EOSBase
+
+INCLUDES: EOS_Utils.h IN EOS_GeneralUtils.h
+
+CCTK_INT FUNCTION EOS_RegisterCall(CCTK_INT IN table_handle, \
+                                   CCTK_INT IN CCTK_FPOINTER \
+                                     EOS_fn(CCTK_INT IN param_table, \
+                                            CCTK_INT IN n_elems, \
+                                            CCTK_POINTER ARRAY IN indeps, \
+                                            CCTK_INT ARRAY IN which_deps, \
+                                            CCTK_POINTER ARRAY OUT deps))
+PROVIDES FUNCTION EOS_RegisterCall WITH EOSBase_Register LANGUAGE C
+
+CCTK_INT FUNCTION EOS_SetupCall(CCTK_INT IN table_handle)
+PROVIDES FUNCTION EOS_SetupCall WITH SetupCall LANGUAGE C
+
+CCTK_INT FUNCTION EOS_SetGFs(CCTK_POINTER_TO_CONST IN GH, \
+                             CCTK_INT IN call_handle)
+PROVIDES FUNCTION EOS_SetGFs WITH SetGFs LANGUAGE C
+
+CCTK_INT FUNCTION EOS_SetArrays(CCTK_INT IN call_handle)
+PROVIDES FUNCTION EOS_SetArrays WITH SetArrays LANGUAGE C
+
+CCTK_INT FUNCTION EOS_SetInverseArrays(CCTK_INT IN call_handle, \
+                                       CCTK_INT IN table_handle)
+PROVIDES FUNCTION EOS_SetInverseArrays WITH SetInverseArrays LANGUAGE C

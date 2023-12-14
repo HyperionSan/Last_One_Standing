@@ -1,0 +1,12 @@
+ActiveThorns = "PUGH WormBase HTTPD HTTPDExtra IOUtil GridFileServer"
+
+httpd::port = 7210
+httpd::pause = 0
+
+cactus::cctk_itlast = 150000000
+
+WormBase::ResetIteration  = "yes"
+
+GridFileServer::copy_server = "yes"
+GridFileServer::copy_client = "no"
+

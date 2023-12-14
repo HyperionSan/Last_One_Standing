@@ -1,0 +1,296 @@
+#!/usr/bin/perl -w
+# Author: Steven R. Brandt, Frank Loeffler, Erik Schnetter
+# This file goes through the arrangements directory and finds
+# all installed thorns and uses them to produce a master thorn list.
+# Currently supports svn, subversion, git, and mercurial.
+use strict;
+use Cwd;
+use FileHandle;
+use Data::Dumper;
+
+my $repos = {};
+my $fd = new FileHandle;
+$/ = undef;
+my $log = new FileHandle;
+open($log,">log.txt");
+
+# Find all thorns
+for my $param_ccl (<arrangements/*/*/param.ccl>) {
+    $param_ccl =~ m{^(arrangements/(.*)/(.*))/param.ccl$};
+    my ($dir,$arrangement,$thorn) = ($1,$2,$3);
+    #print "Processing $arrangement/$thorn...\n";
+
+    # Follow symbolic links
+    $dir = "arrangements";
+    if (-l "$dir/$arrangement") {
+        $dir = "$dir/" . readlink "$dir/$arrangement";
+    } else {
+        $dir = "$dir/$arrangement";
+    }
+    if (-l "$dir/$thorn") {
+        $dir = "$dir/" . readlink "$dir/$thorn";
+    } else {
+        $dir = "$dir/$thorn";
+    }
+
+    # CVS
+    my $cvs_root = undef;
+    if (-e "$dir/CVS/Root") { $cvs_root = "$dir/CVS"; }
+    if(defined $cvs_root) {
+        open($fd,"$cvs_root/Root");
+        my $c = <$fd>;
+        close($fd);
+        $c =~ s/\s+$//;
+        # See if CVS repository name matches thorn path name
+        my $repository_file = "$cvs_root/Repository";
+        open($fd,$repository_file) or
+            die ("Could not find file 'Repository' in $cvs_root");
+        my $repository = <$fd>;
+        close($fd);
+        chop($repository);
+        if ($repository !~ m{(^|(.*)/)$thorn$}) {
+            die ("Repository mixup in $cvs_root\n($repository != $arrangement/$thorn)");
+        }
+        # figure out the module
+        my $module = $2;
+        # All ok
+        $repos->{"$c|$module"}->{$arrangement}->{$thorn}++;
+        #print "   CVS repo $c\n";
+        next;
+    }
+
+    # SVN
+    my $svn_repo = undef;
+    if (-e "$dir/.svn") { $svn_repo = "$dir/.svn"; }
+    if (-e "$dir/../.svn") { $svn_repo = "$dir/../.svn"; }
+    if (-e "$dir/../../.svn") { $svn_repo = "$dir/../../.svn"; }
+    if (-e "$dir/../../../.svn") { $svn_repo = "$dir/../../../.svn"; }
+    if(defined $svn_repo) {
+        my $pwd = getcwd();
+        chdir("arrangements/$arrangement/$thorn") or
+            die("Could not change into directory arrangements/$arrangement/$thorn");
+        my @out = `svn info`;
+        my @svn_url = grep(/^URL: /, @out);
+        my $url = undef;
+        if ($#svn_url == 0 and $svn_url[0] != m/^URL: (.*)$/) {
+            $url = $1;
+        } else {
+            # Doing things the right way (svn info) didn't work, so punt.
+            # Maybe the output will be helpful even if it isn't perfect.
+            my $fd = new FileHandle;
+            open($fd,".svn/entries");
+            while(<$fd>) {
+                if(/\bhttps?:\S+/) {
+                    $url = $&;
+                    last;
+                }
+            }
+        }
+        die "could not find repo for $thorn" unless(defined($url));
+        if ($url =~ m{^([^:]+)://([^:/]+):?(.+)}) {
+            my $method = $1;
+            my $host   = $2;
+            my $path   = $3;
+
+            # Method and host are easy, parsing the path has more
+            # possibilities, and which to use we can only guess when
+            # looking at at least one thorn and arrangement name
+            my $name = undef;
+            if ($path =~ m{(.*)/$arrangement/$thorn$}) {
+                $name = "$1/$arrangement";
+            } elsif ($path =~ m{(.*)/$arrangement/$thorn(/.*)?$}) {
+                $name = "$1/\@ARRANGEMENT\@/\@THORN\@$2";
+            } elsif ($path =~ m{(.*)/$thorn((/.*)?)$}) {
+                $name = "$1/\@THORN\@$2";
+            }
+            if (!$name) {
+                warn ("Could not figure out REPOSITORY_NAME for $url in $dir");
+                chdir($pwd);
+                next;
+            }
+            # All ok
+            $repos->{"svn|$method:$host:$name"}->{$arrangement}->{$thorn}++;
+            #print "   svn repo $method:$host:$name\n";
+        } else
+        { die("Could not parse subversion URL $url"); }
+        chdir($pwd);
+        next;
+    }
+
+    # Git
+    my $git_root = undef;
+    if (-e "$dir/.git") { $git_root = "$dir"; }
+    if (-e "$dir/../.git") { $git_root = "$dir/.."; }
+    if (-e "$dir/../../.git") { $git_root = "$dir/../.."; }
+    if (-e "$dir/../../../.git") { $git_root = "$dir/../../.."; }
+    if(defined $git_root) {
+        my $home = getcwd();
+        chdir($git_root);
+        my $thorn_home = getcwd();
+
+        my $fd = new FileHandle;
+        open($fd,".git/config") or die "could not open .git/config";
+        my $c = <$fd>;
+        close($fd);
+
+        my $url;
+        if($c =~ /url\s*=\s*(\S+)/) {
+            $url = $1;
+        } else {
+            die "could not locate url for git repo for $arrangement/$thorn";
+        }
+
+        my $git;
+        if($url =~ m{([^:/]+?)(\.git)?$}) {
+            $git  = $1;
+        } else {
+            die "could not determine git repo from $url";
+        }
+
+        my $source;
+        if ($thorn_home =~ m{$git_root/(.*)/$arrangement/$thorn$}) {
+            $source = "$git/$1";
+        } elsif(-e "$arrangement/$thorn") {
+            $source = $git;
+        } elsif(-e "$thorn/param.ccl") {
+            $source = ".";
+        } else {
+            warn "could not determine git source for $arrangement/$thorn";
+            chdir($home);
+            next;
+        }
+
+        $repos->{"git|$url|$source"}->{$arrangement}->{$thorn}++;
+        #print "   git repo $url\n";
+        chdir($home);
+        next;
+    }
+
+    # Mercurial (hg)
+    my $hg_root = undef;
+    if (-e "$dir/.hg") { $hg_root = "$dir"; }
+    if (-e "$dir/../.hg") { $hg_root = "$dir/.."; }
+    if (-e "$dir/../../.hg") { $hg_root = "$dir/../.."; }
+    if (-e "$dir/../../../.hg") { $hg_root = "$dir/../../.."; }
+    if(defined $hg_root) {
+        my $home = getcwd();
+        chdir($hg_root);
+        my $thorn_home = getcwd();
+
+        my $fd = new FileHandle;
+        open($fd,".hg/hgrc") or die "could not open .hg/hgrc";
+        my $c = <$fd>;
+        close($fd);
+
+        my $url;
+        if($c =~ /default\s*=\s*(\S+)/) {
+            $url = $1;
+        } else {
+            die "could not locate url for mercurial repo for $arrangement/$thorn";
+        }
+
+        my $hg;
+        if($url =~ m{([^:/]+?)$}) {
+            $hg  = $1;
+        } else {
+            die "could not determine mercurial repo from $url";
+        }
+
+        my $source;
+        if ($thorn_home =~ m{$hg_root/(.*)/$arrangement/$thorn$}) {
+            $source = "$hg/$1";
+        } elsif(-e "$arrangement/$thorn") {
+            $source = $hg;
+        } elsif(-e "$thorn/param.ccl") {
+            $source = ".";
+        } else {
+            die "could not determine mercurial source for $arrangement/$thorn";
+        }
+
+        $repos->{"hg|$url|$source"}->{$arrangement}->{$thorn}++;
+        #print "   Mercurial repo $url\n";
+        chdir($home);
+        next;
+    }
+}
+
+# Output data in thornlist format
+for my $repo (sort(keys %$repos)) {
+
+    # CVS
+    if($repo =~ /:pserver:(.*)\@(.*):(.*)\|(.*)/) {
+        my ($user,$loc,$name,$module) = ($1,$2,$3,$4);
+        print "!REPOSITORY_TYPE pserver\n";
+        print "!REPOSITORY_LOCATION $loc\n";
+        print "!REPOSITORY_NAME $name\n";
+        print "!REPOSITORY_USER $user\n";
+        print "!REPOSITORY_MODULE $module\n"
+            if($module =~ m{/});
+        print "\n";
+
+        for my $arrangement (sort(keys %{$repos->{$repo}})) {
+            for my $thorn (sort(keys %{$repos->{$repo}->{$arrangement}})) {
+                print $arrangement,"/",$thorn,"\n";
+            }
+            print "\n";
+        }
+
+    # Subversion
+    } elsif ($repo =~ m{^svn\|([^:/]+):?([^:]+):(.+)}) {
+        my $method = $1;
+        my $host   = $2;
+        my $name   = $3;
+
+        print "!REPOSITORY_TYPE svn:$method://\n";
+        print "!REPOSITORY_LOCATION $host\n";
+        print "!REPOSITORY_NAME $name\n";
+        print "!REPOSITORY_USER UNKNOWN\n";
+        print "\n";
+
+        for my $arrangement (sort(keys %{$repos->{$repo}})) {
+            for my $thorn (sort(keys %{$repos->{$repo}->{$arrangement}})) {
+                print "$arrangement/$thorn\n";
+             }
+             print "\n";
+        }
+
+    # Git
+    } elsif($repo =~ /^git\|(.*?)\|(.*)/) {
+        print "!REPOSITORY_TYPE git\n";
+        print "!REPOSITORY_LOCATION $1\n";
+        print "!REPOSITORY_NAME $2\n";
+        print "\n";
+        for my $arrangement (sort(keys %{$repos->{$repo}})) {
+            for my $thorn (sort(keys %{$repos->{$repo}->{$arrangement}})) {
+                print "$arrangement/$thorn\n";
+             }
+             print "\n";
+        }
+
+    # Mercurial
+    } elsif($repo =~ /^hg\|(.*?)\|(.*)/) {
+        print "!REPOSITORY_TYPE hg\n";
+        print "!REPOSITORY_LOCATION $1\n";
+        print "!REPOSITORY_NAME $2\n";
+        print "\n";
+        for my $arrangement (sort(keys %{$repos->{$repo}})) {
+            for my $thorn (sort(keys %{$repos->{$repo}->{$arrangement}})) {
+                print "$arrangement/$thorn\n";
+             }
+             print "\n";
+        }
+
+    # UNKNOWN
+    } else {
+        print "!REPOSITORY_TYPE UNKNOWN\n\n";
+        for my $arrangement (sort(keys %{$repos->{$repo}})) {
+            for my $thorn (sort(keys %{$repos->{$repo}->{$arrangement}})) {
+                print "$arrangement/$thorn\n";
+             }
+             print "\n";
+        }
+    }
+}
+
+close($log);
+

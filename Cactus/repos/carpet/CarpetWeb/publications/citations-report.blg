@@ -1,0 +1,49 @@
+This is BibTeX, Version 0.99d (TeX Live 2010/MacPorts 2010_0)
+Capacity: max_strings=500000, hash_size=500000, hash_prime=425003
+The top-level auxiliary file: citations-report.aux
+The style file: apsrev-titles-manyauthors.bst
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Database file #1: citations-report.bib
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+You've used 28 entries,
+            3482 wiz_defined-function locations,
+            1310 strings with 16964 characters,
+and the built_in function-call counts, 24515 in all, are:
+= -- 1262
+> -- 1104
+< -- 152
++ -- 972
+- -- 271
+* -- 3571
+:= -- 2392
+add.period$ -- 28
+call.type$ -- 28
+change.case$ -- 159
+chr.to.int$ -- 27
+cite$ -- 28
+duplicate$ -- 2280
+empty$ -- 1874
+format.name$ -- 622
+if$ -- 4498
+int.to.chr$ -- 2
+int.to.str$ -- 29
+missing$ -- 325
+newline$ -- 99
+num.names$ -- 85
+pop$ -- 593
+preamble$ -- 1
+purify$ -- 112
+quote$ -- 0
+skip$ -- 894
+stack$ -- 0
+substring$ -- 458
+swap$ -- 1934
+text.length$ -- 148
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 168
+warning$ -- 0
+while$ -- 64
+width$ -- 0
+write$ -- 335

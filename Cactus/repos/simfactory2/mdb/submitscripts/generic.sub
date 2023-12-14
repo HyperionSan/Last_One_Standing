@@ -1,0 +1,14 @@
+#! /bin/bash
+
+# This submitscript is used internally by simfactory as a template during the
+# sim setup and sim setup-silent commands
+# Edit at your own risk
+
+cd @SOURCEDIR@
+CHAINED_JOB_ID='@CHAINED_JOB_ID@'
+if [ "${CHAINED_JOB_ID}" != '' ]; then
+    while ps "${CHAINED_JOB_ID}" >/dev/null; do
+        sleep 60
+    done
+fi
+exec @SIMFACTORY@ run @SIMULATION_NAME@ --basedir=@BASEDIR@ --machine=@MACHINE@ --restart-id=@RESTART_ID@ @FROM_RESTART_COMMAND@

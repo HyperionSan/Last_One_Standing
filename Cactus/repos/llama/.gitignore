@@ -1,0 +1,20 @@
+# Lines starting with '#' are considered comments.
+
+.DS_Store
+
+*.[oa]
+*~
+.#*
+
+doc/*.aux
+doc/*.log
+doc/*.out
+doc/documentation.pdf
+doc/*.synctex.gz
+doc/.documentation.lb
+*/doc/*.aux
+*/doc/*.log
+*/doc/*.out
+*/doc/documentation.pdf
+*/doc/*.synctex.gz
+*/doc/.documentation.lb

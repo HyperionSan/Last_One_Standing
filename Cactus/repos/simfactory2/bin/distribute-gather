@@ -1,0 +1,103 @@
+#!/bin/bash
+
+# a simple script to pull testsuite results
+# usage: distribute-gather [machine1] [machine2]
+# when called without arguments look up machines from *.out files in logdir
+# write output files (eventually) to resultsdir
+
+# TODO:
+# 1. rewrite in python using simfactory's python classes the way distribute
+# does
+
+if [ x$VERBOSE = xyes ] ; then
+  set -x
+fi
+set -e
+shopt -s nullglob
+
+# distribute has a complex way of computing the number of threads and it is
+# simplest to copy&paste the python code that computes it
+function get_threads() {
+  local machine=$1 procs=$2
+  python2 <<EOF
+import sys
+import os
+import re
+BASE_PATH = os.sep.join(os.path.abspath("$0").split(os.sep)[:-2])
+sys.path.append(os.path.join(BASE_PATH, "lib"))
+import simenv
+#from libutil import *
+SimEnvironment = simenv.init(BASE_PATH, "$0", None, None)
+def get_mdb_entry(machine, key):
+    description = simenv.ConfigurationDatabase.GetMachine(machine)
+    assert description
+    value = description.GetKey(key)
+    if re.search(r"@USER@", value):
+        user = description.GetKey("user")
+        value = re.sub(r"@USER@", user, value)
+    return value
+
+max_threads = int(get_mdb_entry("$machine", "num-threads"))
+ppn         = int(get_mdb_entry("$machine", "ppn"))
+max_nodes   = int(get_mdb_entry("$machine", "nodes"))
+nodes       = max(1, $procs / ppn)
+nodes       = min(max_nodes, nodes)
+cores       = nodes * ppn
+procs       = min(cores, $procs)
+threads     = max(1, cores / procs)
+threads     = min(max_threads, threads)
+print threads
+EOF
+}
+
+logdir="log"
+: ${resultsdir=$logdir}
+sourcesuffix=$(basename $PWD)
+
+bindir=${0%/*}
+
+if [ $# -eq 0 ] ; then
+  machines=($(echo $logdir/*.out | sed "s!$logdir/!!g;s![.]out\\b!!g"))
+  echo "Gathering from ${machines[@]}"
+else
+  machines=($(echo $@))
+fi
+
+thismachine=$($bindir/sim whoami | awk '{print $3}')
+
+# gather files from clusters, trying to minimize number of ssh connections
+for machine in ${machines[@]} ; do
+  echo "Gathering data for $machine" >&3
+  # mustn't have a newline as the last character in the execute string
+  if [ x$thismachine != x$machine ] ; then
+    REMOTE="--remote $machine"
+  else
+    REMOTE=
+  fi
+  $bindir/sim $REMOTE execute '
+    for run in testsuite-'$machine'-'$sourcesuffix'-sim-procs00000{1,2} ; do
+      if '$bindir'/sim list-simulations --machine '$machine' $run | grep -qE "(FINISHED|INACTIVE)" ; then
+        outdir=$('$bindir'/sim --machine '$machine' get-output-dir $run)
+        if [ -n "$outdir" ] ; then
+          # we use --TESTSUITE-RESULTS-BEGIN-- and --TESTSUITE-RESULTS-END-- as a
+          # marker for where a new output file begins in the output, we could try
+          # and use something like tar if desired though that is not totally
+          # trivial since tar files cannot be siply concatenated
+          echo "--TESTSUITE-RESULTS-BEGIN-- $run.log"
+          cat $outdir/TEST/sim/summary.log
+          echo "--TESTSUITE-RESULTS-END-- $run.log"
+        fi
+      fi
+    done' | awk -vlogdir=$logdir '
+  /^--TESTSUITE-RESULTS-BEGIN--/,/--TESTSUITE-RESULTS-END--/ {
+    if(/^--TESTSUITE-RESULTS-/) fn=$2
+    else print >logdir"/"fn
+  }'
+
+  # rename log files to format expected by php based status update page
+  for log in $logdir/testsuite-$machine-*.log ; do
+    procs=$(awk '/Processes *->/{print $3}' $log)
+    threads=$(get_threads $machine $procs)
+    mv $log $resultsdir/${machine}__${procs}_${threads}.log
+  done
+done 3>&1 &>$logdir/distribute-gather.log 

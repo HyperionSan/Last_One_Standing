@@ -1,0 +1,1874 @@
+\documentclass{article}
+
+% Use the Cactus ThornGuide style file
+% (Automatically used from Cactus distribution, if you have a 
+%  thorn without the Cactus Flesh download this from the Cactus
+%  homepage at www.cactuscode.org)
+\usepackage{../../../../doc/latex/cactus}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{latexsym}
+
+
+\begin{document}
+
+\author{Seth Hopper, Barry Wardell}
+
+\title{WaveExtractCPM}
+
+\date{\today}
+
+\maketitle
+
+% START CACTUS THORNGUIDE
+
+% Add all definitions used in this documentation here 
+\def\a   {\alpha}
+\def\b   {\beta}
+\def\p   {\phi}
+\def\t   {\theta}
+\def\Y   {Y_{lm}}
+\def\Ys  {Y^*_{lm}}
+\def\Yt  {Y_{lm,\theta}}
+\def\Ytt {Y_{lm,\theta\theta}}
+\def\Ytp {Y_{lm,\theta\phi}}
+\def\Yp  {Y_{lm,\phi}}
+\def\Ypp {Y_{lm,\phi\phi}}
+\def\Yz  {Y_{l0}}
+\def\Yzt {Y_{l0,\theta}}
+\def\Yztt{Y_{l0,\theta\theta}}
+\def\c   {\cos\theta}
+\def\s   {\sin\theta}
+
+\newcommand{\bi}{\begin{itemize}}
+\newcommand{\ei}{\end{itemize}}
+
+\newcommand{\be}{\begin{equation}}
+\newcommand{\ee}{\end{equation}}
+
+\newcommand{\ba}{\begin{array}}
+\newcommand{\ea}{\end{array}}
+
+\renewcommand{\l}{\left(}
+\renewcommand{\r}{\right)}
+\renewcommand{\a}{\alpha}
+\renewcommand{\b}{\beta}
+\newcommand{\g}{\gamma}
+\newcommand{\G}{\Gamma}
+\renewcommand{\d}{\delta}
+\newcommand{\D}{\Delta}
+\newcommand{\e}{\epsilon}
+\newcommand{\ve}{\varepsilon}
+\newcommand{\La}{\Lambda}
+\newcommand{\la}{\lambda}
+\renewcommand{\O}{\Omega}
+\renewcommand{\o}{\omega}
+\renewcommand{\th}{\theta}
+\newcommand{\Th}{\Theta}
+\renewcommand{\q}{\quad}
+\newcommand{\vp}{\varphi}
+
+\newcommand{\pa}{\partial}
+\newcommand{\bs}{\boldsymbol}
+\newcommand{\exact}[1]{\mathsf{#1}}
+\renewcommand{\Bar}[1]{\makebox{$\bar{#1}$}}
+
+
+% \begin{abstract}
+%
+% \end{abstract}
+%
+\section{Introduction}
+
+The WaveExtractCPM thorn uses the Cunningham-Price-Moncrief formalism
+\cite{cunningham78,cunningham79} to calculate first order gauge invariant waveforms from a
+numerical spacetime. It relies on the basic assumption that the region of the spacetime where the
+extraction spheres are located is well-modelled as a linear perturbation to a Schwarzschild black
+hole. In addition to waveforms, the thorn can also compute other quantities such as mass, angular
+momentum and spin.
+
+This thorn should not be used blindly, it will always return some waveform, however it is up to the
+user to determine whether this is the appropriate expected first order gauge invariant waveform.
+
+\section{Physical System}
+
+Consider a known, background solution to the Einstein equations
+$g_{\mu \nu}$.  A first-order perturbation to that metric, $p_{\mu \nu}$
+yields
+\be
+\exact{g}_{\mu \nu} = g_{\mu \nu} + p_{\mu \nu} \q \q 
+|p_{\mu \nu}| \ll |g_{\mu \nu}| .
+\ee
+We denote covariant derivatives with respect to the background metric 
+$g_{\mu \nu}$ with
+$\nabla_{\mu}$ or $_{| \mu}$.
+Standard textbook analysis yields the first-order vacuum field equations
+in an unchosen gauge
+(defining $\Box \equiv {_{| \a}}^{\a}$ and $p \equiv {p^{\a}}_{\a}$)
+\be
+\label{eq:firstOrderEFE} 
+- \Box p_{\mu \nu}
+- {p}_{| \mu \nu} 
++ {p^{\a}}_{\nu | \mu \a} 
++ p^{\ \, \a}_{\mu \ \  | \nu \a} 
+= 0.
+\ee
+Or, in Lorenz gauge
+(${{\Bar p}_{\mu \nu |}}^{\nu} = 0$)
+\be
+\label{eq:firstOrderTR_EFE}
+\Box \Bar p_{\mu \nu}
++ 2 R_{\a \mu \b \nu} {\Bar p}^{\a \b}
+= 0,
+\ee
+where an overbear indicates trace-reversal:
+$\Bar p_{\mu \nu} = p_{\mu \nu} - \tfrac{1}{2} g_{\mu \nu} p$.
+
+
+\subsection{The $\mathcal{M}^2 \times \mathcal S^2$ decomposition
+in a spherically symmetric spacetime}
+
+Now we specialize to a spherically symmetric background.
+In this section we introduce formalism from \cite{MP_2005} for doing a harmonic
+decomposition of scalar, vectors, and tensors in such a spacetime.
+We specialize to Schwarzschild spacetime with Schwarzschild coordinates
+and decompose its metric $g_{\mu \nu}$
+on two submanifolds, yielding $g_{ab}$ and $g_{AB} = r^{2} \O_{AB}$.  
+Here $a, b, \ldots \in \{ 0, 1\}$ and $A, B, \ldots \in \{ \th, \phi\}$.  
+The $x^a$ coordinates span the ``$(t, r)$ plane'' while $x^A$ are 
+the standard two-sphere polar and azimuthal coordinates.  
+In matrix form we have
+\be
+g_{\mu \nu} \doteq 
+\left[
+\ba{cccc}
+g_{00} & g_{01} & 0 & 0 \\
+g_{10} & g_{11} & 0 & 0 \\
+0 & 0 & r^2 \O_{\th \th} & r^2 \O_{\th \phi} \\
+0 & 0 & r^2 \O_{\phi \th} & r^2 \O_{\phi \phi}
+\ea
+\right] = 
+\left[
+\ba{cccc}
+g_{00} & g_{01} & 0 & 0 \\
+g_{10} & g_{11} & 0 & 0 \\
+0 & 0 & r^2 & 0 \\
+0 & 0 & 0 & r^2 \sin^2 \th
+\ea
+\right] .
+\ee
+Specifically, we are interested in an expression of the Schwarzschild metric that is covariant under two-dimensional transformations: $x^a \to x'^a$.  The line element can be written as
+\be
+ds^2 = g_{ab} \ dx^a dx^b + r^2 \O_{AB} \ d x^A d x^B.
+\ee
+In Schwarzschild coordinates, the submanifold $\mathcal M^2$ has a metric and inverse
+\be
+g_{ab} \doteq 
+\left[  
+\ba{cc}
+-f & 0 \\
+0 & 1/f
+\ea
+\right],
+\q \q
+g^{ab} \doteq 
+\left[  
+\ba{cc}
+-1/f & 0 \\
+0 & f
+\ea
+\right],
+\q \q
+f \equiv 1 - \frac{2M}{r},
+\label{eq:M2metric}
+\ee
+where $M$ is the mass of the system. 
+The unit two-sphere has a metric and inverse
+\be
+\O_{AB} \doteq 
+\left[
+\ba{cc}
+1 & 0 \\
+0 & \sin^2 \th
+\ea
+  \right], \q \q
+  \O^{AB} \doteq 
+\left[
+\ba{cc}
+1 & 0 \\
+0 & 1 / \sin^{2} \th
+\ea
+  \right].
+\label{M2Metric}
+\ee
+Note that in general (off the \emph{unit} two-sphere) we use the metric $g_{AB} \equiv r^{2} \O_{AB}$.
+
+
+\subsection{Even parity}
+Of the ten MP amplitudes, seven are in the even-parity sector.
+Using the decomposition of Martel and Poisson \cite{MP_2005}, they are 
+\begin{align}
+\label{eq:MPEven}
+p_{ab} \l x^{\mu} \r &= \sum_{\ell, m} h_{ab}^{\ell m} Y^{\ell m}, 
+& p_{aB}  \l x^{\mu} \r &= \sum_{\ell, m} j_a^{\ell m} Y_B^{\ell m}, 
+& p_{AB} \l x^{\mu} \r &= r^2 \sum_{\ell, m} \Big( K^{\ell m} \O_{AB} Y^{\ell m} 
++  G^{\ell m} Y^{\ell m}_{AB} \Big).
+\end{align}
+The even-parity scalar ($Y^{\ell m}$), vector ($Y^{\ell m}_{A}$), 
+and tensor ($Y^{\ell m}_{AB}$ and $\O_{AB} Y^{\ell m}$) spherical
+harmonics are defined in \cite{MP_2005}.  Note that $Y_{AB}^{\ell m}$ is 
+the trace-free tensor spherical harmonic, which differs from what
+Regge and Wheeler used in their original work \cite{RW_1957}.  
+
+If we have the metric perturbation, we can compute the amplitudes
+by using the completeness of the spherical harmonics.  First in the 
+${\cal M}^{2}$ sector,
+\be
+%\int p_{ab} \bar{Y}_{\ell' m'} d \O = 
+%\sum_{\ell, m} h_{ab}^{\ell m} \int Y^{\ell m}  \bar{Y}_{\ell' m'} d \O 
+%= 
+%\sum_{\ell, m} h_{ab}^{\ell m}  \d_{\ell \ell'} \d_{m m'}
+%\q \q
+%\Rightarrow
+%\q \q
+h_{ab}^{\ell m} = \int p_{ab} \bar{Y}_{\ell' m'}d \O
+\ee
+%In the off diagonal sector,
+%\be
+%\int p_{aB} \bar{Y}^{B}_{\ell' m'} d \O
+%= \sum_{\ell, m} j_a^{\ell m} \int Y_B^{\ell m} \bar{Y}^{B}_{\ell' m'} d \O
+%= \sum_{\ell, m} j_a^{\ell m} \frac{1}{r^{2}} \ell (\ell+1) \d_{\ell \ell'} \d_{m m'} 
+%\ee
+%so
+\be  
+j_a^{\ell m} 
+=
+\frac{r^{2}}{\ell (\ell+1)} \int p_{aB} \bar{Y}^{B}_{\ell m} d \O .
+\ee
+%In the ${\cal S}^{2}$ sector,
+%\begin{align}
+%\int p_{AB}  \O^{AB} \bar{Y}_{\ell' m'}  d \O
+%& = r^2 \sum_{\ell, m} \int \Big( K^{\ell m} \O_{AB} Y^{\ell m} 
+%+  G^{\ell m} Y^{\ell m}_{AB} \Big)  \O^{AB} \bar{Y}_{\ell' m'}  d \O \\
+%& = 2 r^2 \sum_{\ell, m}  K^{\ell m} \int Y^{\ell m} \bar{Y}_{\ell' m'}  d \O,
+%\end{align}
+%implying
+\begin{align}
+K^{\ell m} & =
+\frac{1}{2}
+\int p_{AB}  g^{AB} \bar{Y}^{\ell m}  d \O.
+\end{align}
+Lastly
+\begin{align}
+\int p_{AB} \bar{Y}^{AB}_{\ell' m'}  d \O
+& = r^2 \sum_{\ell, m} \int \Big( K^{\ell m} \O_{AB} Y^{\ell m} 
++  G^{\ell m} Y^{\ell m}_{AB} \Big)  \bar{Y}^{AB}_{\ell' m'}  d \O \\
+& = r^2 \sum_{\ell, m}  G^{\ell m} 
+\int Y^{\ell m}_{AB} \bar{Y}^{AB}_{\ell' m'}  d \O \\
+& = r^2 \sum_{\ell, m}  G^{\ell m} 
+ \frac{1}{2 r^{4}} 
+ (\ell-1) \ell \l \ell + 1 \r  (\ell+2) \d_{\ell \ell'} \d_{mm'},
+\end{align}
+and thus
+\be
+ G^{\ell m} 
+ =
+2 r^{2} \frac{(\ell-2)!}{(\ell+2)!}
+ \int p_{AB} \bar{Y}^{AB}_{\ell m}  d \O
+\ee
+We can now expand out the sums. See Appendix \ref{harmonics} for the components
+of the vector and tensor spherical harmonics. In going from the expressions
+above to these, 
+note the inverse metric $g^{AB}$, which provides factors of $1/r^{2}$ and 
+$1 / \sin^{2} \th$.
+\begin{align}
+h_{tt}^{\ell m} = \int p_{tt} \bar{Y}_{\ell' m'}d \O, \q \q
+h_{tr}^{\ell m} = \int p_{tr} \bar{Y}_{\ell' m'}d \O, \q \q
+h_{rr}^{\ell m} = \int p_{rr} \bar{Y}_{\ell' m'}d \O,
+\end{align}
+\begin{align}
+j_t^{\ell m} 
+& =
+\frac{r^{2}}{\ell (\ell+1)} 
+\int \l
+p_{t \th} \bar{Y}^{\th}_{\ell m} 
++
+p_{t \phi} \bar{Y}^{\phi}_{\ell m} 
+\r d \O 
+=
+\frac{1}{\ell (\ell+1)} 
+\int \l
+p_{t \th} \bar{Y}_{\th}^{\ell m} 
++
+\frac{1}{\sin^{2} \th} p_{t \phi} \bar{Y}^{\ell m}_{\phi}
+\r d \O \\
+j_r^{\ell m} 
+&=
+\frac{r^{2}}{\ell (\ell+1)} 
+\int \l
+p_{r \th} \bar{Y}^{\th}_{\ell m} 
++
+p_{r \phi} \bar{Y}^{\phi}_{\ell m} 
+\r d \O 
+=
+\frac{1}{\ell (\ell+1)} 
+\int \l
+p_{r \th} \bar{Y}^{\ell m}_{ \th}
++
+\frac{1}{\sin^{2} \th}
+p_{r \phi} \bar{Y}^{\ell m}_{ \phi}
+\r d \O 
+\end{align}
+\begin{align}
+K^{\ell m} & =
+\frac{1}{2}
+\int 
+\l 
+p_{\th \th}  g^{\th \th} 
++
+p_{\phi \phi}  g^{\phi \phi} 
+\r
+\bar{Y}^{\ell m}  d \O 
+=
+\frac{1}{2 r^{2}}
+\int 
+\l 
+p_{\th \th}  
++
+\frac{1}{\sin^{2} \th}
+p_{\phi \phi} 
+\r
+\bar{Y}^{\ell m}  d \O 
+\end{align}
+\begin{align}
+ G^{\ell m} 
+ &=
+2 r^{2} \frac{(\ell-2)!}{(\ell+2)!}
+ \int 
+ \left[ 
+ p_{\th \th} \bar{Y}^{\th \th}_{\ell m} 
+ +
+2 p_{\th \phi} \bar{Y}^{\th \phi}_{\ell m} 
+ +
+ p_{\phi \phi} \bar{Y}^{\phi \phi}_{\ell m}  \right] d \O \\
+ &=
+\frac{2}{r^{2}} \frac{(\ell-2)!}{(\ell+2)!}
+ \int 
+ \left[ 
+ p_{\th \th} \bar{Y}_{\th \th}^{\ell m} 
+ +
+\frac{2}{\sin^{2} \th}
+p_{\th \phi} \bar{Y}_{\th \phi}^{\ell m} 
+ +
+ \frac{1}{\sin^{4} \th}
+ p_{\phi \phi} \bar{Y}_{\phi \phi}^{\ell m}  \right] d \O 
+ \end{align}
+
+For the remainder of this section, we drop $\ell$ and $m$ 
+indices for the sake of brevity.
+
+In Schwarzschild coordinates, the amplitudes defined here are related to 
+Regge and Wheeler's original quantities.  In the ``$t,r$ sector,'' 
+$h_{tt} = f H_{0}$, 
+$h_{tr} = H_{1}$,
+and 
+$h_{rr} = H_{2} / f$.  For the off-diagonal 
+elements, $j_{t} = h_{0}$ and
+$j_{r} = h_{1}$.  Finally, on the two-sphere 
+$G_{\rm here} = G_{\rm RW}$, while
+$K_{\rm here} = K_{\rm RW} 
+- \ell (\ell + 1) G / 2$.  
+
+In the even-parity sector there are four gauge-invariant fields, formed 
+from linear combinations of the metric perturbation amplitudes and their first derivatives
+\cite{MP_2005}
+\begin{align}
+\begin{split}
+\tilde h_{tt} &= h_{tt} - 2 \pa_{t} j_{t} 
++ \frac{2M f}{r^{2}} j_{r} 
++ r^{2} \pa_{t}^{2} G 
+- M f \pa_{r} G \\
+\tilde h_{tr} &= h_{tr} 
+- \pa_{r} j_{t} 
+- \pa_{t} j_{r} 
++ \frac{2M }{ f r^{2}} j_{t} 
++ r^{2} \pa_{t} \pa_{r} G 
++ \frac{r - 3M}{f} \pa_{t} G \\
+\tilde h_{rr} &= h_{rr} 
+- 2 \pa_{r} j_{r} 
+- \frac{2M}{f r^{2}} j_{r} 
++ r^{2} \pa_{r}^{2} G 
++ \frac{2r - 3M}{f} \pa_{r} G \\
+\tilde K &= K - \frac{2f}{r} j_{r} + rf \pa_{r} G + (\la+1) G .
+\end{split}
+\end{align}
+Note that in RW gauge $G = j^{t} = j^{r} = 0$.  Examining the gauge 
+invariant quantities, we find
+\be
+\tilde h_{tt} = h_{tt}, 
+\q \q \tilde h_{tr} = h_{tr},
+\q \q \tilde h_{rr} = h_{rr},
+\q \q \tilde K = K.
+\ee
+Written in terms of the gauge-invariant fields, 
+the seven vacuum field equations 
+(for our purposes, we are deep in the wave zone and 
+are not concerned with the isolated source) are
+\begin{align}
+- \pa_r^2  \tilde K - \frac{3r - 5M}{r^2 f} \pa_r  \tilde K 
++ \frac{f}{r} \pa_r  \tilde h_{rr}
++\frac{\l \la + 2 \r r + 2M}{r^3}  \tilde h_{rr} + \frac{\la}{ r^2 f}  \tilde K 
+&= 0, \\
+\label{eq:evenEq2}
+ \pa_t \pa_r  \tilde K 
++ \frac{r - 3M}{r^2 f} \pa_t  \tilde K - \frac{f}{r} \pa_t  \tilde h_{rr} 
+- \frac{\la + 1}{ r^2}  \tilde h_{tr} &= 0, \\
+ - \pa_t^2  \tilde K 
++ \frac{(r-M)f}{r^2} \pa_r  \tilde K 
++ \frac{2f}{r} \pa_t  \tilde h_{tr} 
+- \frac{f}{r} \pa_r  \tilde h_{tt} 
++ \frac{(\la + 1)r + 2M}{r^3}  \tilde h_{tt} 
+- \frac{f^2}{r^2}  \tilde h_{rr} 
+- \frac{\la f}{r^2}  \tilde K &= 0, \\
+\pa_t  \tilde h_{rr} - \pa_r  \tilde h_{tr} 
++ \frac{1}{f} \pa_t  \tilde K - \frac{2M}{r^2 f}  \tilde h_{tr} &= 0, \\
+-\pa_t  \tilde h_{tr} 
++ \pa_r  \tilde h_{tt} - f \pa_r  \tilde K - \frac{r - M}{r^2 f}  \tilde h_{tt} 
++ \frac{(r-M) f}{r^2}  \tilde h_{rr} &= 0, \\
+\begin{split}
+-\pa_t^2  \tilde h_{rr} 
++ 2 \pa_t \pa_r  \tilde h_{tr} - \pa_r^2  \tilde h_{tt} 
+- \frac{1}{f} \pa_t^2  \tilde K + f \pa_r^2  \tilde K  \hspace{7cm}& \\
++ \frac{2 (r - M) }{r^2 f} \pa_t  \tilde h_{tr}
+- \frac{r - 3M}{r^2 f} \pa_r  \tilde h_{tt}  
+- \frac{(r-M) f}{r^2} \pa_r  \tilde h_{rr} 
+ + \frac{2(r-M)}{r^2} \pa_r  \tilde K \hspace{2.5cm} & \\
++ \frac{( \la +1) r^2 - 2(\la + 2) M r + 2M^2}{r^4 f^2}  \tilde h_{tt}
+- \frac{(\la+1) r^2 - 2\la M r - 2 M^2}{r^4}  \tilde h_{rr} &= 0,
+\end{split} \\
+\frac{1}{f}  \tilde h_{tt} - f  \tilde h_{rr} &= 0 ,
+\end{align}
+where we have introduced
+\be
+\La(r) \equiv \la + \frac{3M}{r},
+\q \q
+\la \equiv \frac{ \l \ell+2 \r \l \ell-1 \r }{2}. 
+\ee 
+
+We use the gauge invariant \emph{Zerilli-Moncrief} master function
+(see \cite{Moncrief_1974,CPM_1979}, modifying the approach of 
+\cite{Zerilli_1970}), which is 
+\be
+\label{eq:masterEven}
+\Psi_{\rm even} (t,r)
+\equiv \frac{r}{\la + 1}
+\left[ \tilde K 
++ \frac{f}{\La}
+\l f \tilde h_{rr} - r \pa_r \tilde K \r \right],
+\ee
+in Schwarzschild coordinates.
+Plugging in the gauge invariant fields from above, one finds
+\be
+\Psi_{\rm even} (t,r)
+= r G - \frac{2 f}{\La} j_{r} 
++
+\frac{r}{\la + 1}
+\left[
+K + \frac{f}{\La} \l f h_{rr} - r \pa_{r} K \r
+\right]
+\ee
+Conveniently, all the second-order derivatives cancel.  
+We are also interested in the time derivative of the master function,
+which is used for computing energy and angular momentum fluxes.
+We differentiate Eq. (\ref{eq:masterEven}) with respect to time, using 
+Eq. (\ref{eq:evenEq2}) to remove the $\pa_{t} \pa_{r} \tilde K$ terms.
+Then, substituting in the gauge invariant fields we find
+\be
+\pa_{t} \Psi_{\rm even} (t,r)
+= r \pa_{t} G 
++
+\frac{1}{\La}
+\left[
+-f h_{tr} - \frac{2M}{r^{2}} j_{t}
++ f \pa_{r} j_{t}
++ r \pa_{t} K - f \pa_{t} j_{r}
+\right] .
+\ee
+Again, simplification happens and
+we are left with at most first-order derivatives of the MP amplitudes.
+
+
+
+
+\subsection{Odd parity}
+The remaining three MP amplitudes belong to the odd-parity sector,
+\begin{align}
+\label{eq:MPOdd}
+p_{ab} \l x^{\mu} \r = 0, 
+\q \q 
+p_{aB} \l x^{\mu} \r  = \sum_{\ell, m} h_a^{\ell m} X_B^{\ell m},  
+\q \q
+p_{AB} \l x^{\mu} \r  = \sum_{\ell, m} h_2^{\ell m} X^{\ell m}_{AB} .
+\end{align}
+The vector ($X_B^{\ell m}$) and tensor ($X_{AB}^{\ell m}$) spherical 
+harmonics are those defined in \cite{MP_2005}.  Note that the tensor 
+spherical harmonics differ from those used by Regge and Wheeler by a minus 
+sign.  
+
+If we have the metric perturbation, we can compute the amplitudes
+by using the completeness of the spherical harmonics
+%\be
+%\int p_{aB} \bar{X}^{B}_{\ell' m'} d \O
+% = \sum_{\ell, m} h_a^{\ell m} \int X_B^{\ell m}  \bar{X}^{B}_{\ell' m'} d \O
+% = \sum_{\ell, m} h_a^{\ell m} \frac{1}{r^{2}} \ell (\ell+1) \d_{\ell \ell'} \d_{m m'} 
+%\ee
+%and thus
+\be
+h_a^{\ell m} 
+= \frac{r^{2}}{\ell (\ell+1)} \int p_{aB} \bar{X}^{B}_{\ell m} d \O.
+\ee
+%For the $S^{2}$ sector
+%\be
+%\int p_{AB} \bar{X}^{AB}_{\ell' m'} d \O
+%= \sum_{\ell, m} h_2^{\ell m}
+%\int X^{\ell m}_{AB} \bar{X}^{AB}_{\ell' m'}  d \O
+%= \sum_{\ell, m} h_2^{\ell m}
+% \frac{1}{2 r^{4}} 
+% (\ell-1) \ell \l \ell + 1 \r  (\ell+2) \d_{\ell \ell'} \d_{mm'}
+%\ee
+\be
+ h_2^{\ell m}
+=
+2 r^{4} \frac{(\ell-2)!}{(\ell+2)!} 
+\int p_{AB} \bar{X}^{AB}_{\ell m} d \O
+\ee
+We can now expand out the sums. See Appendix \ref{harmonics} for the components
+of the vector and tensor spherical harmonics. In going from the expressions
+above to these, 
+note the inverse metric $g^{AB}$, which provides factors of $1/r^{2}$ and 
+$1 / \sin^{2} \th$.
+\begin{align}
+h_t^{\ell m} 
+&= \frac{r^{2}}{\ell (\ell+1)}  
+\int 
+\l p_{t \th} \bar{X}^{\th}_{\ell m} 
++ p_{t \phi} \bar{X}^{\phi}_{\ell m} \r d \O 
+= 
+\frac{1}{\ell (\ell+1)}  
+\int 
+\frac{1}{\sin \th}
+\l - p_{t \th} \bar{Y}^{\ell m}_{, \phi}
++ p_{t \phi}  \bar{Y}^{\ell m}_{, \th} \r d \O 
+\\
+h_r^{\ell m} 
+&= \frac{r^{2}}{\ell (\ell+1)}  
+\int 
+\l p_{r \th} \bar{X}^{\th}_{\ell m} 
++ p_{r \phi} \bar{X}^{\phi}_{\ell m} \r d \O 
+= 
+\frac{1}{\ell (\ell+1)}  
+\int 
+\frac{1}{\sin \th}
+\l - p_{r \th} \bar{Y}^{\ell m}_{, \phi}
++ p_{r \phi}  \bar{Y}^{\ell m}_{, \th} \r d \O 
+\end{align}
+\begin{align}
+h_2^{\ell m} 
+&= 
+2 r^{4} \frac{(\ell-2)!}{(\ell+2)!} 
+\int 
+\l 
+p_{\th \th} \bar{X}^{\th \th}_{\ell m} 
++
+2 p_{\th \phi} \bar{X}^{\th \phi}_{\ell m} 
++
+p_{\phi \phi} \bar{X}^{\phi \phi}_{\ell m} 
+\r
+d \O \\
+& =
+2 \frac{(\ell-2)!}{(\ell+2)!} 
+\int 
+ \frac{1}{\sin \th}
+\Bigg[ 
+p_{\th \th} 
+\l 
+  \frac{\cos \th}{\sin \th} \bar{Y}^{\ell m}_{, \phi}
+ - \bar{Y}^{\ell m}_{, \th \phi}
+ \r
+ -
+ p_{\th \phi} 
+\l
+ \frac{1}{\sin^{2} \th} \bar{Y}^{\ell m}_{, \phi \phi}
+ + \frac{\cos \th}{\sin \th} \bar{Y}^{\ell m}_{, \th }
+ - \bar{Y}^{\ell m}_{, \th \th}
+\r \nonumber
+\\
+& \hspace{55ex} +
+p_{\phi \phi} 
+ \l
+ \frac{1}{\sin^{2} \th}
+\bar{Y}^{\ell m}_{, \phi \th}
+- \frac{\cos \th}{\sin^{3} \th} \bar{Y}^{\ell m}_{, \phi}
+\r
+\Bigg]
+d \O 
+\end{align}
+
+
+
+For the remainder of this section, we again drop $\ell$ and $m$ 
+indices.
+
+
+These MP amplitudes are related to Regge and Wheeler's quantities through
+$ h_{t} = h_0 $,
+$ h_{r} = h_1 $,
+and 
+$ h_{2}^{\rm here} = -h^{\rm RW}_2 $.
+
+In the odd-parity sector there are two gauge-invariant fields, formed 
+from linear combinations of the metric perturbation amplitudes and their first derivatives
+\cite{MP_2005}
+\be
+\tilde h_{t} \equiv h_{t} - \frac{1}{2} \frac{\pa h_{2}}{\pa t},
+\q \q
+\tilde h_{r} \equiv h_{r} - \frac{1}{2} \frac{\pa h_{2}}{\pa r} 
++ \frac{h_{2}}{r}.
+\ee
+Note that in Regge-Wheeler gauge $h_{2} = 0$ and then
+\be
+\tilde h_{t} \equiv h_{t},
+\q \q
+\tilde h_{r} \equiv h_{r}.
+\ee
+Written in terms of the  gauge-invariant fields, 
+the three vacuum field equations 
+(for our purposes, we are deep in the wave zone and 
+are not concerned with the isolated source) are
+\begin{align}
+ - \pa_t \pa_r  \tilde h_r + \pa_r^2  \tilde h_t - \frac{2}{r} \pa_t \tilde  h_r 
+- \frac{2 (\la + 1) r - 4M}{r^3 f}  \tilde h_t &= 0, \\
+\label{eq:oddEq2}
+\pa_t^2 \tilde  h_r - \pa_t \pa_r  \tilde h_t + \frac{2}{r} \pa_t \tilde  h_t 
++ \frac{2 \la f }{r^2} \tilde  h_r &= 0, \\
+ -\frac{1}{f} \pa_t \tilde  h_t + f \pa_r \tilde  h_r 
+ + \frac{2M}{r^2} \tilde  h_r &= 0 ,
+\end{align}
+where, recall that we have defined
+\be
+\la \equiv \frac{ \l \ell+2 \r \l \ell-1 \r }{2}. 
+\ee 
+
+
+In the odd-parity sector, we use the gauge-invariant
+\emph{Cunningham-Price-Moncrief} master function \cite{CPM_1978}, which in Schwarzschild coordinates is
+\be
+\Psi_{\rm odd}(t,r) \equiv \frac{r}{\la} 
+\left[ \pa_r \tilde h_t  - \pa_t \tilde  h_r 
+- \frac{2}{r} \tilde  h_{t} \right] .
+\label{eq:masterOdd}
+\ee
+Plugging in the gauge invariant fields from above, we find that
+all the $h_{2}$ terms cancel and the result is simply
+\be
+\Psi_{\rm odd}(t,r) \equiv \frac{r}{\la} 
+\left[ \pa_r  h_t  - \pa_t   h_r 
+- \frac{2}{r}   h_{t} \right] .
+\ee
+We are also interested in the time derivative of the master function,
+which is used for computing energy and angular momentum fluxes.
+We differentiate Eq. (\ref{eq:masterOdd}) with respect to time, using 
+Eq. (\ref{eq:oddEq2}) to remove the $\pa_{t} \pa_{r} \tilde h_{t}$ and
+$\pa_{t}^{2} \tilde h_{r}$ terms.
+Then, substituting in the gauge invariant fields we find
+\be
+\pa_{t} \Psi_{\rm odd} = 
+\frac{f}{r} \left[  
+2 h_{r} + \frac{2}{r} h_{2} - \pa_{r} h_{2}
+\right].
+\ee
+In RW gauge where $h_{2}$ vanishes it becomes clear that 
+the CPM function $\Psi_{\rm odd}$ is just twice
+the time integral of the original RW function 
+$\Psi_{\rm RW} = f h_{r} / r$.
+
+
+
+\subsection{Wave Forms}
+
+The energy and angular 
+momentum fluxes, for each $\ell, m$ mode, can be written as \cite{Thorne_1980}
+\begin{align}
+\label{eq:EAndLDot}
+\dot E_{\ell m} &= \frac{1}{64 \pi} 
+\frac{(\ell+2)!}{(\ell-2)!} 
+\l
+\left| \dot \Psi^{\ell m}_{\rm even} \right|^2
++
+\left| \dot \Psi^{\ell m}_{\rm odd} \right|^2
+\r, \\ 
+\dot L_{\ell m} &= 
+\frac{ i m }{64 \pi} \frac{(\ell+2)!}{(\ell-2)!} 
+\l
+ \dot \Psi^{\ell m}_{\rm even}  \Psi^{\pm \, *}_{\ell m} 
++
+ \dot \Psi^{\ell m}_{\rm odd}  \Psi^{\pm \, *}_{\ell m} 
+\r.
+\end{align}
+Here, an asterisk signifies complex conjugation. 
+Assume a spacetime $g_{\alpha\beta}$ can be written as a Schwarzschild background
+$g_{\alpha\beta}^{(0)}$ with perturbation $h_{\alpha\beta}$,
+\begin{equation}
+g_{\alpha\beta} = g^{(0)}_{\alpha\beta} + h_{\alpha\beta}.
+\end{equation}
+In spherical coordinates, $(t,r,\theta,\phi)$, the background metric is given by
+\begin{equation}
+g^{(0)} = 
+\left( \begin{array}{cccc}
+ -f & 0      & 0   & 0                \\
+ 0  & f^{-1} & 0   & 0                \\
+ 0  & 0      & r^2 & 0                \\
+ 0  & 0      & 0   & r^2 \sin^2\theta
+\end{array}\right),
+\qquad
+f(r)=1-\frac{2M}{r}.
+\end{equation}
+The 3-metric perturbations $\gamma_{ij}$ can be decomposed using tensor spherical harmonics to
+obtain a set of metric perturbation amplitudes $\gamma_{ij}^{lm}(t,r)$, where
+$$
+  \gamma_{ij}(t,r,\theta,\phi)=\sum_{l=0}^\infty \sum_{m=-l}^l
+                       \gamma_{ij}^{lm}(t,r)
+$$
+and
+$$
+  \gamma_{ij}(t,r,\t,\p) = \sum_{k=0}^6 p_k(t,r) {\bf V}_k(\t,\p),
+$$
+with ${\bf V}_k$ being a basis for tensors on a 2-sphere in 3-D Euclidean space.
+
+
+Working with the Regge-Wheeler basis (see Appendix~\ref{reggewheeler}) the 3-metric is then
+expanded in terms of the (six) standard Regge-Wheeler functions $c_1^{\times lm}$, $c_2^{\times
+lm}$, $h_1^{+lm}$, $H_2^{+lm}$, $K^{+lm}$, $G^{+lm}$ \cite{regge,moncrief74}. Each of these
+functions is either {\it odd} ($\times$) or {\it even} ($+$) parity. The decomposition is then
+written
+\begin{eqnarray}
+\gamma_{ij}^{lm} & = & c_1^{\times lm}(\hat{e}_1)_{ij}^{lm}
+                   +   c_2^{\times lm}(\hat{e}_2)_{ij}^{lm} 
+\nonumber\\
+                 & + & h_1^{+lm}(\hat{f}_1)_{ij}^{lm} 
+                   +   A^2 H_2^{+lm}(\hat{f}_2)_{ij}^{lm}
+                   +   R^2 K^{+lm}(\hat{f}_3)_{ij}^{lm}
+                   +   R^2 G^{+lm}(\hat{f}_4)_{ij}^{lm},
+\end{eqnarray}
+which we can write in an expanded form as 
+\begin{align}
+\gamma_{rr}^{lm} 
+  & = A^2 H_2^{+lm} \Y,
+\\
+\gamma_{r\t}^{lm} 
+  & = - c_1^{\times lm} \frac{1}{\s} \Yp+h_1^{+lm}\Yt,
+\\
+\gamma_{r\p}^{lm} 
+  & = c_1^{\times lm} \s \Yt+ h_1^{+lm}\Yp,
+\\
+\gamma_{\t\t}^{lm} 
+  & = c_2^{\times lm}\frac{1}{\s}(\Ytp-\cot\t \Yp) 
+      + R^2 K^{+lm}\Y + R^2 G^{+lm}    \Ytt,
+\\
+\gamma_{\t\p}^{lm} 
+  & = -c_2^{\times lm}\s \frac{1}{2} 
+  \left(
+  \Ytt-\cot\t \Yt-\frac{1}{\sin^2\theta}\Y \right)
+  + R^2 G^{+lm}(\Ytp-\cot\t \Yp),
+\\
+\gamma_{\p\p}^{lm}
+  & =  -\s c_2^{\times lm} (\Ytp - \cot\t \Yp)
+        +R^2 K^{+lm}\sin^2\t \Y
+        +R^2 G^{+lm} (\Ypp+\s\c \Yt).
+\end{align}
+A similar decomposition allows the four gauge components of the 4-metric to be written in terms of
+{\it three} even-parity variables $H_0$, $H_1$ and $h_0$, and {\it one} odd-parity variable $c_0$,
+\begin{eqnarray}
+  g_{tt}^{lm} & = & N^2 H_0^{+lm} \Y,
+\\
+  g_{tr}^{lm} & = & H_1^{+lm} \Y,
+\\
+  g_{t\t}^{lm} & = & h_0^{+lm} \Yt - c_0^{\times lm}\frac{1}{\s}\Yp,
+\\
+  g_{t\p}^{lm} & = & h_0^{+lm} \Yp + c_0^{\times lm} \s \Yt.
+\end{eqnarray} 
+Also, from $g_{tt}=-\alpha^2+\beta_i\beta^i$,we have
+\begin{equation}
+  \alpha^{lm} = -\frac{1}{2}NH_0^{+lm}Y_{lm}.
+\end{equation}
+
+It is useful to also write this with the perturbation split into even and odd parity parts:
+$$
+g_{\alpha\beta} = {g}^{(0)}_{\alpha\beta} +
+   \sum_{l,m} h^{lm,odd}_{\alpha\beta}
++\sum_{l,m} h^{lm,even}_{\alpha\beta}
+$$
+where (dropping some superscripts)
+\begin{eqnarray*}
+h_{\alpha\beta}^{odd}
+&=&
+\left( 
+\begin{array}{cccc}
+0 & 0 &  - c_0\frac{1}{\s}\Yp
+    & c_0 \s \Yt
+\\
+. & 0 & - c_1\frac{1}{\s} \Yp
+  & c_1 \s \Yt
+\\
+. & . & c_2\frac{1}{\s}(\Ytp-\cot\t \Yp)  
+  & c_2\frac{1}{2} \left(\frac{1}{\s}
+          \Ypp+\c\Yt-\s\Ytt\right)
+\\
+.&.&.&c_2 (-\s \Ytp+\c \Yp)
+\end{array}
+\right)
+\\
+h_{\alpha\beta}^{even}
+&=&
+\left( 
+\begin{array}{cccc}
+N^2 H_0\Y & H_1\Y       & h_0\Yt          & h_0 \Yp             \\ 
+.       & A^2H_2\Y & h_1\Yt          & h_1 \Yp             \\
+.       & .           & R^2K\Y+r^2G\Ytt & R^2(\Ytp-\cot\t\Yp) \\
+.       & .           & .                & R^2 K\sin^2\t\Y+R^2G(\Ypp+\s\c\Yt)
+\end{array}
+\right)
+\end{eqnarray*}
+
+Now, for such a Schwarzschild background we can define two (and only two)
+unconstrained gauge invariant quantities 
+  $Q^{\times}_{lm}=Q^{\times}_{lm}(c_1^{\times lm},c_2^{\times lm})$ 
+and
+  $Q^{+}_{lm}=Q^{+}_{lm}(K^{+ lm},G^{+ lm},H_2^{+lm},h_1^{+lm})$, 
+which from
+\cite{abrahams96a} are
+\begin{eqnarray}
+Q^{\times}_{lm} 
+  & = & \sqrt{\frac{2(l+2)!}{(l-2)!}}\left[c_1^{\times lm}
+        + \frac{1}{2}\left(\partial_r c_2^{\times lm} - \frac{2}{r}
+        c_2^{\times lm}\right)\right] \frac{S}{r}
+\\
+Q^{+}_{lm}
+  & = & \frac{1}{\Lambda}\sqrt{\frac{2(l-1)(l+2)}{l(l+1)}}
+        (4rS^2 k_2+l(l+1)r k_1) 
+\\
+  & \equiv &
+        \frac{1}{\Lambda}\sqrt{\frac{2(l-1)(l+2)}{l(l+1)}}
+        \left(l(l+1)S(r^2\partial_r G^{+lm}-2h_1^{+lm})+
+        2rS(H_2^{+lm}-r\partial_r K^{+lm})+\Lambda r K^{+lm}\right)
+\end{eqnarray}
+where
+\begin{eqnarray}
+k_1 & = & K^{+lm} + \frac{S}{r}(r^2\partial_r G^{+lm} - 2h^{+lm}_1) \\
+k_2 & = & \frac{1}{2S}
+          \left[H^{+lm}_2-r\partial_r k_1-\left(1-\frac{M}{rS}\right) 
+            k_1 + S^{1/2}\partial_r
+          (r^2 S^{1/2} \partial_r G^{+lm}-2S^{1/2}h_1^{+lm})\right]
+\\
+&\equiv& \frac{1}{2S}\left[H_2-rK_{,r}-\frac{r-3M}{r-2M}K\right]
+\end{eqnarray}
+
+\noindent
+NOTE: These quantities compare with those in Moncrief \cite{moncrief74} by
+\begin{eqnarray*}
+\mbox{Moncriefs odd parity Q: }\qquad Q^\times_{lm} &=&
+ \sqrt{\frac{2(l+2)!}{(l-2)!}}Q
+ \\
+\mbox{Moncriefs even parity Q: } \qquad Q^+_{lm} &=&
+ \sqrt{\frac{2(l-1)(l+2)}{l(l+1)}}Q
+\end{eqnarray*}
+
+Note that these quantities only depend on the purely spatial 
+Regge-Wheeler functions, and not the gauge parts. (In the Regge-Wheeler 
+and Zerilli gauges, these are just respectively (up to a rescaling)
+ the Regge-Wheeler 
+and Zerilli functions).
+These quantities satisfy the wave equations
+\begin{eqnarray*}
+  &&(\partial^2_t-\partial^2_{r^*})Q^\times_{lm}+S\left[\frac{l(l+1)}{r^2}-\frac{6M}{r^3}
+  \right]Q^{\times}_{lm}  =  0 
+  \\
+  &&(\partial^2_t-\partial^2_{r^*})Q^+_{lm}+S\left[
+    \frac{1}{\Lambda^2}\left(\frac{72M^3}{r^5}-\frac{12M}{r^3}(l-1)(l+2)\left(1-\frac{3M}{r}\right)
+    \right)+\frac{l(l-1)(l+1)(l+2)}{r^2\Lambda}\right]Q^+_{lm}=0
+\end{eqnarray*}
+where
+\begin{eqnarray*}
+  \Lambda &=& (l-1)(l+2)+6M/r \\
+  r^*     &=& r+2M\ln(r/2M-1)
+\end{eqnarray*}
+ 
+
+
+
+\section{Numerical Implementation}
+
+The implementation assumes that the numerical solution, on a Cartesian
+grid, is approximately Schwarzshild on the spheres of constant
+$r=\sqrt(x^2+y^2+z^2)$ where the waveforms are extracted. The general
+procedure is then:
+
+\begin{itemize}
+
+  \item Project the required metric components, and radial derivatives
+  of metric components, onto spheres of constant coordinate radius
+  (these spheres are chosen via parameters).
+
+  \item Transform the metric components and there derivatives on the
+  2-spheres from Cartesian coordinates into a spherical coordinate
+  system.
+
+  \item Calculate the physical metric on these spheres if a conformal
+  factor is being used.
+
+  \item Calculate the transformation from the coordinate radius to an
+  areal radius for each sphere.
+
+  \item Calculate the $S$ factor on each sphere. Combined with the
+  areal radius This also produces an estimate of the mass.
+
+  \item Calculate the six Regge-Wheeler variables, and required radial
+  derivatives, on these spheres by integration of combinations of the
+  metric components over each sphere.
+
+  \item Contruct the gauge invariant quantities from these
+  Regge-Wheeler variables.
+
+\end{itemize}
+
+\subsection{Project onto Spheres of Constant Radius}
+
+This is performed by interpolating the metric components, and if
+needed the conformal factor, onto the spheres. Although 2-spheres are
+hardcoded, the source code could easily be changed here to project
+onto e.g. 2-ellipsoids.
+
+\subsection{Calculate Radial Transformation}
+
+The areal coordinate $\hat{r}$ of each sphere is calculated by
+%
+\begin{equation}
+  \hat{r}    =  \hat{r}(r) = \left[
+            \frac{1}{4\pi}
+            \int\sqrt{\gamma_{\t\t}
+            \gamma_{\p\p}}d\t d\p \right]^{1/2}
+\end{equation}
+%
+from which
+%
+\begin{equation}
+\frac{d\hat{r}}{d\eta} = \frac{1}{16\pi \hat{r}}
+  \int\frac{\gamma_{\t\t,\eta}\gamma_{\p\p}+\gamma_{\t\t}\gamma_{\p\p,\eta}}
+  {\sqrt{\gamma_{\t\t}\gamma_{\p\p}}} \ d\t d\p
+\end{equation}
+%
+Note that this is not the only way to combine metric components to get
+the areal radius, but this one was used because it gave better values
+for extracting close to the event horizon for perturbations of black
+holes.
+
+\subsection{Calculate $S$ factor and Mass Estimate}
+
+\begin{equation}
+S(\hat{r}) = \left(\frac{\partial\hat{r}}{\partial r}\right)^2 \int \gamma_{rr} \ d\t d\p
+\end{equation}
+
+\begin{equation}
+M(\hat{r}) = \hat{r}\frac{1-S}{2}
+\end{equation}
+
+\subsection{Calculate Regge-Wheeler Variables}
+
+\begin{eqnarray*}
+c_1^{\times lm}  &=&  \frac{1}{l(l+1)}
+                      \int \frac{\gamma_{\hat{r}\p}Y^*_{lm,\t}
+                                -\gamma_{\hat{r}\t} Y^*_{lm,\p} }
+                     {\s}d\Omega
+\\
+c_2^{\times lm} & = & -\frac{2}{l(l+1)(l-1)(l+2)}
+                      \int\left\{
+           \left(-\frac{1}{\sin^2\t}\gamma_{\t\t}+\frac{1}
+           {\sin^4\t}\gamma_{\p\p}\right)
+           (\s Y^*_{lm,\t\p}-\c Y^*_{lm,\p})
+\right.
+\\
+&&\left.
+           + \frac{1}{\s} \gamma_{\t\p}
+           (Y^*_{lm,\t\t}-\cot\t Y^*_{lm,\t}
+           -\frac{1}{\sin^2\t}Y^*_{lm,\p\p}) \right\}d\Omega
+\\
+h_1^{+lm} &=& \frac{1}{l(l+1)}
+            \int \left\{
+                \gamma_{\hat{r}\t} Y^*_{lm,\t} + \frac{1}{\sin^2\t}
+                \gamma_{\hat{r}\p}Y^*_{lm,\p}\right\} d\Omega
+\\
+H_2^{+lm} &=& S  \int \gamma_{\hat{r}\hat{r}} \Ys d\Omega
+\\
+K^{+lm}   &=& \frac{1}{2\hat{r}^2} \int \left(\gamma_{\t\t}+
+           \frac{1}{\sin^2\t}\gamma_{\p\p}\right)\Ys
+           d\Omega
+\\
+          &&+\frac{1}{2\hat{r}^2(l-1)(l+2)}
+\int \left\{
+  \left(\gamma_{\t\t}-\frac{\gamma_{\p\p}}{\sin^2\t}\right)
+    \left(Y^*_{lm,\t\t}-\cot\t Y^*_{lm,\t}-\frac{1}{\sin^2\t}
+    Y^*_{lm,\p\p}\right) 
+\right.
+\\
+&&\left.
+   + \frac{4}{\sin^2\t}\gamma_{\t\p}(Y^*_{lm,\t\p}-\cot\t
+     Y^*_{lm,\p})
+     \right \} d\Omega
+\\
+G^{+lm}  &=& \frac{1}{\hat{r}^2 l(l+1)(l-1)(l+2)}
+  \int \left\{
+  \left(\gamma_{\t\t}-\frac{\gamma_{\p\p}}{\sin^2\t}\right)
+    \left(Y^*_{lm,\t\t}-\cot\t Y^*_{lm,\t}-\frac{1}{\sin^2\t}
+    Y^*_{lm,\p\p}\right) 
+\right.
+\\
+&&\left.
+   +\frac{4}{\sin^2\t}\gamma_{\t\p}(Y^*_{lm,\t\p}-\cot\t
+   Y^*_{lm,\p})
+   \right\}d\Omega
+\end{eqnarray*}
+where
+\begin{eqnarray}
+\gamma_{\hat{r}\hat{r}}      & = & \frac{\partial r}{\partial \hat{r}}
+                       \frac{\partial r}{\partial \hat{r}}
+                       \gamma_{rr} 
+\\
+\gamma_{\hat{r}\t} & = & \frac{\partial r}{\partial \hat{r}}
+                       \gamma_{r\t} 
+\\
+\gamma_{\hat{r}\p}   & = & \frac{\partial r}{\partial \hat{r}}
+                       \gamma_{r\p}
+\end{eqnarray}
+
+\subsection{Calculate Gauge Invariant Quantities}
+
+\begin{eqnarray}
+Q^{\times}_{lm} 
+  & = & \sqrt{\frac{2(l+2)!}{(l-2)!}}\left[c_1^{\times lm}
+        + \frac{1}{2}\left(\partial_{\hat{r}} c_2^{\times lm} - \frac{2}{\hat{r}}
+        c_2^{\times lm}\right)\right] \frac{S}{\hat{r}}
+\\
+Q^{+}_{lm}
+  & = & \frac{1}{(l-1)(l+2)+6M/\hat{r}}\sqrt{\frac{2(l-1)(l+2)}{l(l+1)}}
+        (4\hat{r}S^2 k_2+l(l+1)\hat{r} k_1) 
+\end{eqnarray}
+where
+\begin{eqnarray}
+k_1 & = & K^{+lm} + \frac{S}{\hat{r}}(\hat{r}^2\partial_{\hat{r}} G^{+lm} - 2h^{+lm}_1) \\
+k_2 & = & \frac{1}{2S}
+          [H^{+lm}_2-\hat{r}\partial_{\hat{r}} k_1-(1-\frac{M}{\hat{r}S}) k_1 + S^{1/2}\partial_{\hat{r}}
+          (\hat{r}^2 S^{1/2} \partial_{\hat{r}} G^{+lm}-2S^{1/2}h_1^{+lm}
+\end{eqnarray}
+
+\section{Using This Thorn}
+
+Use this thorn very carefully. Check the validity of the waveforms by running
+tests with different resolutions, different outer boundary conditions, etc
+to check that the waveforms are consistent.
+
+%\subsection{Basic Usage}
+
+\subsection{Output Files}
+
+Although Extract is really an {\tt ANALYSIS} thorn, at the moment it
+is scheduled at {\tt POSTSTEP}, with the iterations at which output is
+performed determined by the parameter {\it itout}. Output files from
+{\tt Extract} are always placed in the main output directory defined
+by {\tt CactusBase/IOUtil}.
+
+Output files are generated for each detector (2-sphere) used, and
+these detectors are identified in the name of each output file by {\tt
+R1}, {\tt R2}, \ldots.
+
+The extension denotes whether coordinate time ({\.tl}) or proper time
+({\.ul}) is used for the first column.
+
+\begin{itemize}
+
+  \item {\tt rsch\_R?.[tu]l} 
+
+	The extracted areal radius on each 2-sphere.
+
+  \item {\tt mass\_R?.[tu]l}
+
+	Mass estimate calculated from $g_{rr}$ on each 2-sphere.
+
+  \item {\tt Qeven\_R?\_??.[tu]l}
+
+	The even parity gauge invariate variable ({\it waveform}) on 
+	each 2-sphere. This is a complex quantity, the 2nd column is 
+	the real part, and the third column the imaginary part.
+
+  \item {\tt Qodd\_R?\_??.[tu]l}
+
+	The odd parity gauge invariate variable ({\it waveform}) on 
+	each 2-sphere. This is a complex quantity, the 2nd column is 
+	the real part, and the third column the imaginary part.
+
+  \item {\tt ADMmass\_R?.[tu]l}
+
+	Estimate of ADM mass enclosed within each 2-sphere.
+	(To produce this set {\tt doADMmass = ``yes''}).
+
+  \item {\tt momentum\_[xyz]\_R?.[tu]l}
+
+	Estimate of momentum at each 2-sphere.
+	(To produce this set {\tt do\_momentum = ``yes''}).
+
+  \item {\tt spin\_[xyz]\_R?.[tu]l}
+
+	Estimate of momentum at each 2-sphere.
+	(To produce this set {\tt do\_spin = ``yes''}).
+
+
+\end{itemize}
+
+\section{History}
+This document (and the WaveExtractCPM thorn itself) are based on the Extract thorn writen by
+Gabrielle Allen. Much of the source code for Extract comes from a code written outside of Cactus
+for extracting waveforms from data generated by the NCSA G-Code for comparison with linear
+evolutions of waveforms extracted from the Cauchy initial data. This work was carried out in
+collaboration with Karen Camarda and Ed Seidel.
+
+\appendix
+\section{Spherical harmonics}
+
+Now, consider spherical harmonics, starting with the scalar case.  They are eigenfunctions, satisfying the equation
+\be
+\label{eq:SH1}
+\left[ \frac{1}{ \sin \th} \pa_\th \l \sin \th \cdot \pa_\th \r
+  + \frac{1}{\sin^2 \th} \pa_\phi^2  + \ell \l \ell + 1 \r \right] Y_{\ell m} (\th, \phi)  = 0.
+\ee
+Acting on a test scalar function $f$ we have
+\begin{align}
+\O^{AB} D_A D_B f & = \O^{AB} \l \pa_A \pa_B - {\G^C}_{AB} \pa_C  \r f \\
+& =  \pa^2_\th f - {\G^C}_{\th \th} \pa_C f +  \frac{1}{\sin^2 \th} \pa^2_\phi f - \frac{1}{\sin^2 \th}{\G^C}_{\phi \phi} \pa_C f  \\
+&=\l \frac{1}{ \sin \th} \pa_\th \l \sin \th \cdot \pa_\th \r
+  + \frac{1}{\sin^2 \th} \pa_\phi^2 \r f.
+\end{align}
+So, we can write Eq.~(\ref{eq:SH1}) in the compact form
+\be
+\left[ \O^{AB} D_A D_B + \ell \l \ell + 1 \r \right] Y_{\ell m} (\th, \phi) = 0.
+\ee
+The solution to this equation with standard normalization \cite{Jackson} is
+\be
+Y_{\ell m} = \sqrt{\frac{2\ell + 1}{4 \pi} \frac{(\ell-m)!}{(\ell+m)!}} \ P_\ell^m(\cos \th) e^{i m \phi}
+\ee
+where $P_\ell^m$ are the associated Legendre functions.  These are an 
+orthonormal set of functions,
+\be
+\label{eq:Y_Orth}
+\int Y_{\ell m} (\th, \phi) \bar Y_{\ell'm'} (\th, \phi) d \O = \d_{\ell \ell'} \d_{m m'}.
+\ee
+Here $d\O = \sin \th \ d \th \ d \phi $ and the overbar represents complex conjugation.
+
+We can use the covariant derivative $D_A$ to take derivatives of this scalar function to define vector  and tensor spherical harmonics.  There are even-  and odd-parity vector spherical harmonics.  We define the even ones as the covariant derivative of the scalar harmonics:
+\be
+Y_A^{\ell m} \l \th, \phi \r \equiv D_A Y^{\ell m} \l \th , \phi \r \doteq \left[
+\ba{c}
+\pa_\th Y_{\ell m}  \\
+\pa_\phi Y_{\ell m} 
+\ea
+  \right].
+\ee
+In order to create the odd-parity vectorial harmonics we need to define the Levi-Civita tensor on the two-sphere:
+\be
+\ve_{AB} \doteq 
+\left[
+\ba{cc}
+0 & \sin \th \\
+-\sin \th & 0
+\ea
+  \right].
+\ee
+Using this, the odd-parity harmonics are
+\be
+X_A^{\ell m} \l \th, \phi \r \equiv - {\ve_A}^B D_B Y^{\ell m} \l  \th, \phi \r = - \O^{C B} \ve_{A C} Y_B^{\ell m} \l  \th, \phi \r.
+\ee
+Switching to matrices we can calculate the components:
+\begin{align}
+X_A^{\ell m} \l \th, \phi \r & \doteq 
+-  \left[
+\ba{cc}
+0 & \sin \th \\
+-\sin \th & 0
+\ea
+\right] 
+\left[
+\ba{cc}
+1 & 0 \\
+0 & 1/\sin^{2} \th
+\ea
+\right]
+\left[
+\ba{c}
+\pa_\th Y_{\ell m}  \\
+\pa_\phi Y_{\ell m} 
+\ea
+\right] \\
+& \doteq 
+\left[
+\ba{c}
+-\pa_\phi Y_{\ell m} / \sin \th \\
+\sin \th \ \pa_\th Y_{\ell m} 
+\ea
+\right].
+\end{align}
+
+The tensor spherical harmonics also are either even- and odd-parity.  
+There are two even-parity ones,
+\be
+Y_{\ell m} \O_{AB} \doteq
+\left[
+\ba{cc}
+Y_{\ell m} & 0 \\
+0 & \sin^2 \th Y_{\ell m}
+\ea
+\right]
+\ee
+and the more complicated
+\begin{align}
+Y^{\ell m}_{AB} & \equiv \left[ D_A D_B + \frac{1}{2} \ell \l \ell + 1 \r \O_{AB} \right] Y_{\ell m} \\
+& =  \pa_A \pa_B Y_{\ell m}  -  {\G^C}_{AB} \pa_C Y_{\ell m} + \frac{1}{2} \ell \l \ell + 1 \r \O_{AB} Y_{\ell m}.
+\end{align}
+We've already calculated the connection coefficients, so evaluating this is straightforward, leaving us with the components
+\be
+Y^{\ell m}_{AB} \doteq
+\left[
+\ba{cc}
+\l \pa_\th^2 + \frac{\ell(\ell+1)}{2} \r Y_{\ell m} & \l \pa_{\th} \pa_{\phi} - \cot \th \ \pa_\phi \r Y_{\ell m} \\
+\l \pa_{\th} \pa_{\phi} - \cot \th \ \pa_\phi \r Y_{\ell m} & \l \pa_\phi^2 + \sin \th \cos \th \ \pa_\th + \frac{\ell(\ell+1)}{2} \sin^2 \th \r Y_{\ell m}
+\ea
+\right].
+\ee
+The odd-parity tensor harmonics are
+\begin{align}
+X_{AB}^{\ell m} & = - \frac{1}{2} \left[ {\ve_A}^C D_B + {\ve_B}^C D_A \right] D_C Y_{\ell m} \\
+& = - \frac{1}{2} \left[ {\ve_A}^\th D_B D_\th + {\ve_A}^\phi D_B D_\phi + {\ve_B}^\phi D_A D_\th + {\ve_B}^\phi D_A D_\phi \right]  Y_{\ell m}.
+\end{align}
+In matrix form we have
+\be
+X_{AB}^{\ell m}
+\doteq
+\left[
+\ba{cc}
+\l -\frac{1}{\sin \th} \pa_\th \pa_\phi + \frac{\cos \th}{\sin^2 \th} \pa_\phi \r Y_{\ell m}
+ &  -\frac{1}{2} \l \frac{\pa^2_\phi}{\sin \th} + \cos \th \ \pa_\th   - \sin \th \ \pa^2_{\th}  \r Y_{\ell m}  \\
+ -\frac{1}{2} \l \frac{\pa^2_\phi}{\sin \th} + \cos \th \ \pa_\th   - \sin \th \ \pa^2_{\th}  \r Y_{\ell m}  
+ & \l \sin \th \ \pa_\phi \pa_\th - \cos \th \ \pa_\phi \r Y_{\ell m}
+\ea
+\right].
+\ee
+
+Now we look at some identities involving these spherical harmonics.
+%For brevity's sake we suppress the $\ell$ and $m$ indices.
+We have already seen in Eq.~(\ref{eq:Y_Orth}) that
+the scalar spherical harmonics are orthonormal.  Now consider
+\begin{align}
+\int Y^{A}_{\ell m} \bar Y_A^{\ell' m'}  d \O 
+&=
+\frac{1}{r^{2}} \int \O^{AB} D_{A} Y_{\ell m} D_B \bar Y_{\ell'm'}  d \O \\
+&=
+\frac{1}{r^{2}} \int \l \pa_{\th} Y_{\ell m} \pa_{\th} \bar Y_{\ell'm'} 
++ \frac{1}{\sin^{2} \th} \pa_{\phi} Y_{\ell m} \pa_{\phi} \bar Y_{\ell'm'}\r 
+\sin \th \ d \th \ d \phi .
+\end{align}
+We integrate by parts (note that surface terms vanish by periodicity
+as we integrate of the full $4 \pi$ steradians) and find
+\begin{align}
+\int Y^{A}_{\ell m} \bar Y_A^{\ell' m'}  d \O 
+&=
+\frac{1}{r^{2}} \int \bigg[ - \frac{1}{\sin \th} \pa_{\th} \l \sin \th \ \pa_{\th} Y_{\ell m} \r  \bar Y_{\ell'm'} \nonumber \\
+& \hspace{30ex}
+- \frac{1}{\sin^{2} \th} \pa_{\phi}^{2} Y_{\ell m}  \bar Y_{\ell'm'}\bigg] 
+\sin \th \ d \th \ d \phi \\
+& = \frac{1}{r^{2}} \ell (\ell+1) \d_{\ell \ell'} \d_{m m'}.
+\end{align}
+The odd-parity equivalent is
+\begin{align}
+\int X^{A}_{\ell m} \bar X_A^{\ell' m'}  d \O 
+&=
+\int {\ve^{A}}_{C} Y^{C}_{\ell m} {\ve_{A}}^{B} \bar Y_B^{\ell' m'}  d \O .
+\end{align}
+This 2D contraction of the Levi-Civita tensor gives 
+the negative of the Kronecker delta, and therefore
+\begin{align}
+\int X^{A}_{\ell m} \bar X_A^{\ell' m'}  d \O 
+&= \int {\d^{B}}_{C} Y^{C}_{\ell m}  \bar Y_B^{\ell' m'}  d \O  
+= \int Y^{A}_{\ell m} \bar Y_A^{\ell' m'}  d \O 
+= \frac{1}{r^{2}} \ell (\ell+1) \d_{\ell \ell'} \d_{m m'}.
+\end{align}
+Now, when we contract the even and odd-parity vector harmonics we get
+\begin{align}
+\int Y^{A}_{\ell m} \bar X_A^{\ell' m'}  d \O 
+&= 
+-\int D_{A} Y^{\ell m} \ve^{AB} D_{B} \bar Y^{\ell' m'}  d \O .
+\end{align}
+By parts integration we have
+\begin{align}
+\int Y^{A}_{\ell m} \bar X_A^{\ell' m'}  d \O 
+&= 
+\int \ve^{AB} D_{A} D_{B} Y^{\ell m}\bar Y^{\ell' m'}  d \O  = 0
+= \int \bar Y^{A}_{\ell m}  X_A^{\ell' m'}  d \O ,
+\end{align}
+because of the derivatives commute while the Levi-Civita tensor is 
+antisymmetric. 
+Consider now $ \O^{AB} D_{A} D_{B} Y_{C}^{\ell m} 
+ = \O^{AB} D_{A} D_{B} D_{C} Y^{\ell m}. $
+The two closest covariant derivatives commute, but we have to use the rule
+\be
+ \left[ D_{A}, D_{B} \right] V^{C} = {R^{C}}_{DAB} V^{D} 
+ \q \q
+ \Rightarrow
+ \q \q
+ \left[ D_{A}, D_{B} \right] V_{C} =  R_{C \ \ AB}^{\ \ D} V_{D}  
+\ee
+to commute the outer two, and therefore
+\begin{align}
+\O^{AB} D_{A} D_{B} Y_{C}^{\ell m} & = \O^{AB} D_{A} D_{C} D_{B} Y^{\ell m} \\
+&= \O^{AB} \l D_{C} D_{A} D_{B} + R_{B \ \ AC}^{\ \ D} D_{D} \r Y^{\ell m}.
+\end{align}
+Using the differential equation for the scalar harmonics, we get
+\begin{align}
+\O^{AB} D_{A} D_{B} Y_{C}^{\ell m} &=
+- \ell (\ell+1) Y^{\ell m}_{C} 
++ \O^{AB} \frac{1}{r^{2}} \O^{DE}
+\l \O_{BA} \O_{EC} - \O_{BC} \O_{EA} \r Y_{D}^{\ell m} \\
+&= \Big[ 1 - \ell (\ell+1) \Big] Y^{\ell m}_{C}.
+\end{align}
+Additionally, we have
+\begin{align}
+\O^{AB} D_{A} D_{B} X_{C}^{\ell m} = 
+- {\ve_{C}}^{D} \O^{AB} D_{A} D_{B} Y_{D}^{\ell m}
+= \Big[ 1 - \ell (\ell+1) \Big] X^{\ell m}_{C}.
+\end{align}
+Taking the divergence $Y_{\ell m}^{A}$  and $X_{\ell m}^{A}$ gives
+\begin{align}
+D_{A} Y_{\ell m}^{A} &= \frac{1}{r^{2}} \O^{AB} D_{A} D_{B} Y_{\ell m} 
+= - \frac{\ell (\ell+1)}{r^{2}} Y_{\ell m} \\
+D_{A} X_{\ell m}^{A} &= - \frac{1}{r^{2}} \O^{AB} D_{A} {\ve_{B}}^{C} D_{C} Y_{\ell m} 
+= - \frac{1}{r^{2}} \ve^{AC} D_{A} D_{C} Y_{\ell m}  = 0.
+\end{align}
+
+
+
+Now we consider contractions of the tensor harmonics.  First of all,
+because they are each trace free, we have
+\be
+\O^{AB} Y_{AB}^{\ell m} = \O^{AB} X_{AB}^{\ell m} = 0.
+\ee
+This is clear from inspecting the matrix forms of these harmonics above.
+Note that this implies that both $Y_{AB}^{\ell m}$ and $X_{AB}^{\ell m}$ 
+are orthogonal to $\O_{AB} Y_{\ell m}$.
+Now, we consider
+\begin{align}
+& \int Y^{AB}_{\ell m} \bar Y_{AB}^{\ell'm'}  d \O  \nonumber \\
+&= \int g^{AC} g^{BD} \left[  D_C D_D 
++ \frac{\ell \l \ell + 1 \r}{2}  \O_{DC} 
+\right] Y_{\ell m}
+\left[ D_A D_B + \frac{\ell' \l \ell' + 1 \r}{2} \O_{AB} \right] \bar Y^{\ell' m'}d \O\\ 
+&=  \frac{1}{r^{4}}
+\int \left[-  \O^{AC} \O^{BD} D_A D_C D_D Y_{\ell m} D_B \bar Y^{\ell' m'} 
+- \frac{1}{2} \ell' \l \ell' + 1 \r 
+\ell \l \ell + 1 \r Y_{\ell m}  \bar Y^{\ell' m'} \right] d \O  
+\end{align}
+So, in order to evaluate this we need the harmonic operator 
+($\O^{AB} D_{A} D_{B}$) acting on $Y_{C}$, which we calculated above.  Using it
+and the completeness of the scalar harmonics gives
+\begin{align}
+& \int Y^{AB}_{\ell m}  \bar Y_{AB}^{\ell'm'}  d \O  \nonumber \\
+&=  \frac{1}{r^{4}}\int \left[-\O^{BD} \Big[ 1 - \ell (\ell+1) \Big] D_D Y_{\ell m} D_B 
+\bar Y^{\ell' m'} \right] d \O
+- \frac{1}{2 r^{4}} \ell^{2} \l \ell + 1 \r^{2} \d_{\ell \ell'} \d_{mm'} 
+\\
+&= \frac{1}{2 r^{4}} (\ell-1) \ell \l \ell + 1 \r  (\ell+2) \d_{\ell \ell'} \d_{mm'} .
+\end{align}
+A similar, though slightly longer calculation for the odd-parity case gives
+\begin{align}
+\int X^{AB}_{\ell m} \bar X_{AB}^{\ell'm'}  d \O 
+&= \frac{1}{2 r^{4}} (\ell-1) \ell \l \ell + 1 \r  (\ell+2) \d_{\ell \ell'} \d_{mm'} .
+\end{align}
+For the divergence of the tensor harmonics we first consider the even-parity
+case,
+\begin{align}
+D^{B} Y^{\ell m}_{AB} 
+&= \frac{1}{r^{2}} \O^{BC} D_{C}\left[ D_{A} D_{B} Y^{\ell m} 
++ \frac{1}{2} \ell \l \ell + 1 \r \O_{AB}  Y^{\ell m} \right], \\
+&= \frac{1}{r^{2}} \O^{BC} \l D_{A} D_{C}  D_{B} Y^{\ell m} 
++ R_{B \ \ CA}^{\ \ D} D_{D} Y^{\ell m} \r 
++ \frac{1}{2 r^{2}} \ell \l \ell + 1 \r D_{A} Y^{\ell m},\\
+&=  \frac{1}{r^{2}} \left[ 1 - \frac{1}{2} \ell \l \ell + 1 \r  \right] 
+Y_{A}^{\ell m}.
+\end{align}
+For the odd-parity harmonics we have
+\begin{align}
+D^{B} X_{AB}^{\ell m} 
+& = \frac{1}{2} \frac{1}{r^{2}} 
+\O^{BD} D_{D} \left[ D_{B} X_{A}^{\ell m} + D_{A} X_{B}^{\ell m} \right], \\
+& = \frac{1}{2r^{2}}\Big[ 1- \ell (\ell+1) \Big] X^{\ell m}_{A} 
++ \frac{1}{2r^{2}}  \O^{BD} \l D_{A} D_{D} X_{B}^{\ell m}
++ R_{BCDA} X_{\ell m}^{C} \r.
+\end{align}
+The divergence of $X_{B}^{\ell m}$ vanishes, so we are left with
+\begin{align}
+D^{B} X^{\ell m}_{AB} 
+& = \frac{1}{2r^{2}}\Big[ 1- \ell (\ell+1) \Big] X^{\ell m}_{A} 
++ \frac{1}{2r^{2}}  \O^{BD}
+r^{2} \l \O_{BD} \O_{CA} - \O_{BA} \O_{CD} \r X_{\ell m}^{C}, \\
+&=  \frac{1}{r^{2}} \left[ 1 - \frac{1}{2} \ell \l \ell + 1 \r  \right] 
+X^{\ell m}_{A}.
+\end{align}
+
+\section{Regge-Wheeler Harmonics}
+
+\label{reggewheeler}
+
+\begin{eqnarray*}
+(\hat{e}_1)^{lm} &=& 
+\left( \begin{array}{ccc}
+0  & -\frac{1}{\s}\Yp & \s \Yt \\
+.  & 0                                & 0                        \\
+.  & 0                                & 0 
+\end{array}\right)
+\\
+(\hat{e}_2)^{lm} &=& 
+\left( \begin{array}{ccc} 
+0 & 0 & 0 \\
+0 & \frac{1}{\s}(\Ytp-\cot\t \Yp) & . \\
+0 & -\frac{\s}{2}[\Ytt-\cot\t 
+    \Yt-\frac{1}{\sin^2\t}\Ypp]           & 
+            -\s [\Ytp-\cot\t \Yp]
+\end{array}\right)
+\\
+(\hat{f}_1)^{lm} &=& 
+\left( \begin{array}{ccc}
+  0 & \Yt & \Yp \\
+  . & 0   & 0           \\
+  . & 0   & 0 
+\end{array}\right)
+\\
+(\hat{f}_2)^{lm} &=& 
+\left( \begin{array}{ccc}
+\Y & 0 & 0 \\
+0      & 0 & 0 \\
+0      & 0 & 0 
+\end{array}\right)
+\\
+(\hat{f}_3)^{lm} &=& 
+\left( \begin{array}{ccc}
+0 & 0  & 0                  \\
+0 & \Y & 0                  \\
+0 & 0  & \sin^2\t \Y 
+\end{array}\right)
+\\
+(\hat{f}_4)^{lm} &=& 
+\left( \begin{array}{ccc}
+0 & 0                   & 0 \\
+0 & \Ytt & . \\
+0 & \Ytp-\cot \t \Yp & \Ypp+ \s \c \Yt
+\end{array}\right)
+\end{eqnarray*}
+
+\section{Transformation Between Cartesian and Spherical Coordinates}
+
+First, the transformations between metric components in $(x,y,z)$ and $(r,\t,\p)$ coordinates. Here, $\rho=\sqrt{x^2+y^2}=r\s$,
+\begin{eqnarray*}
+  \frac{\partial x}{\partial r}
+  &=&
+  \sin\t\cos\p 
+  =
+  \frac{x}{r}
+\\
+  \frac{\partial y}{\partial r}
+  &=&
+  \sin\t\sin\p 
+  =
+  \frac{y}{r}
+\\
+  \frac{\partial z}{\partial r}
+  &=&
+  \cos\t 
+  =
+  \frac{z}{r}
+\\
+  \frac{\partial x}{\partial \t}
+  &=&
+  r\cos\t\cos\p 
+  =
+  \frac{xz}{\rho}
+\\
+  \frac{\partial y}{\partial \t}
+  &=&
+  r\cos\t\sin\p 
+  =
+  \frac{yz}{\rho}
+\\
+  \frac{\partial z}{\partial \t}
+  &=&
+  -r\sin\t 
+  =
+  -\rho
+\\
+  \frac{\partial x}{\partial \p}
+  &=&
+  -r\sin\t\sin\p
+  =
+  -y
+\\
+  \frac{\partial y}{\partial \p}
+  &=&
+  r\sin\t\cos\p 
+  =
+  x
+\\
+  \frac{\partial z}{\partial \p}
+  &=&
+  0
+\end{eqnarray*}
+
+
+\begin{eqnarray*}
+  \gamma_{rr} &=&
+  \frac{1}{r^2}
+     (x^2\gamma_{xx}+
+      y^2\gamma_{yy}+
+      z^2\gamma_{zz}+
+      2xy\gamma_{xy}+
+      2xz\gamma_{xz}+
+      2yz\gamma_{yz})
+\\
+  \gamma_{r\t} &=&
+  \frac{1}{r\rho}
+     (x^2 z \gamma_{xx}
+     +y^2 z \gamma_{yy}
+     -z \rho^2 \gamma_{zz}
+     +2xyz \gamma_{xy}
+     +x(z^2-\rho^2)\gamma_{xz}
+     +y(z^2-\rho^2)\gamma_{yz})
+\\
+  \gamma_{r\p} &=&
+  \frac{1}{r}
+     (-xy\gamma_{xx}
+      +xy\gamma_{yy}
+      +(x^2-y^2)\gamma_{xy}
+      -yz \gamma_{xz}
+      +xz\gamma_{yz})
+\\
+  \gamma_{\t\t} &=&
+  \frac{1}{\rho^2}
+  (x^2z^2\gamma_{xx}
+  +2xyz^2\gamma_{xy}
+  -2xz\rho^2\gamma_{xz}
+  +y^2z^2\gamma_{yy}
+  -2yz\rho^2\gamma_{yz}
+  +\rho^4\gamma_{zz})
+\\
+  \gamma_{\t\p} &=&
+  \frac{1}{\rho}
+  (-xyz\gamma_{xx}
+   +(x^2-y^2)z\gamma_{xy}
+   +\rho^2 y \gamma_{xz}
+   +xyz\gamma_{yy}
+   -\rho^2 x \gamma_{yz})
+\\
+  \gamma_{\p\p} &=&
+   y^2\gamma_{xx}
+   -2xy\gamma_{xy}
+   +x^2\gamma_{yy}
+\end{eqnarray*}   
+or,
+\begin{eqnarray*}
+\gamma_{rr}&=&
+\sin^2\t\cos^2\p\gamma_{xx}
++\sin^2\t\sin^2\p\gamma_{yy}
++\cos^2\t\gamma_{zz}
++2\sin^2\theta\cos\p\sin\p\gamma_{xy}
++2\sin\t\cos\t\cos\p\gamma_{xz}
+\\
+&&
++2\s\c\sin\p\gamma_{yz}
+\\
+\gamma_{r\t}&=&
+r(\s\c\cos^2\phi\gamma_{xx}
++2*\s\c\sin\p\cos\p\gamma_{xy}
++(\cos^2\t-\sin^2\t)\cos\p\gamma_{xz}
++\s\c\sin^2\p\gamma_{yy}
+\\
+&&
++(\cos^2\t-\sin^2\t)\sin\p\gamma_{yz}
+-\s\c\gamma_{zz})
+\\
+\gamma_{r\p}&=&
+r\s(-\s\sin\p\cos\p\gamma_{xx}
+-\s(\sin^2\p-\cos^2\p)\gamma_{xy}
+-\c\sin\p\gamma_{xz}
++\s\sin\p\cos\p\gamma_{yy}
+\\
+&&
++\c\cos\p\gamma_{yz})
+\\
+\gamma_{\t\t}&=&
+r^2(\cos^2\t\cos^2\p\gamma_{xx}
++2\cos^2\t\sin\p\cos\p\gamma_{xy}
+-2\s\c\cos\p\gamma_{xz}
++\cos^2\t\sin^2\p\gamma_{yy}
+\\
+&&
+-2\s\c\sin\p\gamma_{yz}
++\sin^2\t\gamma_{zz})
+\\
+\gamma_{\t\p}&=&
+r^2\s(-\c\sin\p\cos\p\gamma_{xx}
+-\c(\sin^2\p-\cos^2\p)\gamma_{xy}
++\s\sin\p\gamma_{xz}
++\c\sin\p\cos\p\gamma_{yy}
+\\
+&&
+-\s\cos\p\gamma_{yz})
+\\
+\gamma_{\p\p}&=&
+r^2\sin^2\t(\sin^2\p\gamma_{xx}
+-2\sin\p\cos\p\gamma_{xy}
++\cos^2\phi\gamma_{yy})
+\end{eqnarray*}
+
+
+We also need 
+the transformation for the radial derivative of the metric components:
+\begin{eqnarray*}
+\gamma_{rr,\eta}&=&
+\sin^2\t\cos^2\p\gamma_{xx,\eta}
++\sin^2\t\sin^2\p\gamma_{yy,\eta}
++\cos^2\t\gamma_{zz,\eta}
++2\sin^2\theta\cos\p\sin\p\gamma_{xy,\eta}
+\\
+&&
++2\sin\t\cos\t\cos\p\gamma_{xz,\eta}
++2\s\c\sin\p\gamma_{yz,\eta}
+\\
+\gamma_{r\t,\eta}&=& 
+\frac{1}{r}\gamma_{r\t}+
+r(\s\c\cos^2\phi\gamma_{xx,\eta}
++\s\c\sin\p\cos\p\gamma_{xy,\eta}
++(\cos^2\t-\sin^2\t)\cos\p\gamma_{xz,\eta}
+\\
+&&
++\s\c\sin^2\p\gamma_{yy,\eta}
++(\cos^2\t-\sin^2\t)\sin\p\gamma_{yz,\eta}
+-\s\c\gamma_{zz,\eta})
+\\
+\gamma_{r\p,\eta}&=&
+\frac{1}{r}\gamma_{r\p}+
+r\s(-\s\sin\p\cos\p\gamma_{xx,\eta}
+-\s(\sin^2\p-\cos^2\p)\gamma_{xy,\eta}
+-\c\sin\p\gamma_{xz,\eta}
+\\
+&&
++\s\sin\p\cos\p\gamma_{yy,\eta}
++\c\cos\p\gamma_{yz,\eta})
+\\
+\gamma_{\t\t,\eta}&=&
+\frac{2}{r}\gamma_{\t\t}+
+r^2(\cos^2\t\cos^2\p\gamma_{xx,\eta}
++2\cos^2\t\sin\p\cos\p\gamma_{xy,\eta}
+-2\s\c\cos\p\gamma_{xz,\eta}
+\\
+&&
++\cos^2\t\sin^2\p\gamma_{yy,\eta}
+-2\s\c\sin\p\gamma_{yz,\eta}
++\sin^2\t\gamma_{zz,\eta})
+\\
+\gamma_{\t\p,\eta}&=&
+\frac{2}{r}\gamma_{\t\p}+
+r^2\s(-\c\sin\p\cos\p\gamma_{xx,\eta}
+-\c(\sin^2\p-\cos^2\p)\gamma_{xy,\eta}
++\s\sin\p\gamma_{xz,\eta}
+\\
+&&
++\c\sin\p\cos\p\gamma_{yy,\eta}
+-\s\cos\p\gamma_{yz,\eta})
+\\
+\gamma_{\p\p,\eta}&=&
+\frac{2}{r}\gamma_{\p\p}+
+r^2\sin^2\t(\sin^2\p\gamma_{xx,\eta}
+-2\sin\p\cos\p\gamma_{xy,\eta}
++\cos^2\phi\gamma_{yy,\eta})
+\end{eqnarray*}
+
+\section{Integrations Over the 2-Spheres}
+
+
+This is done by using Simpson's rule twice. Once in each coordinate 
+direction. Simpson's rule is
+\begin{equation}
+\int^{x_2}_{x_1} f(x) dx = 
+  \frac{h}{3} [f_1+4f_2+2f_3+4f_4+\ldots+2f_{N-2}+4 f_{N-1}+f_N]
+  +O(1/N^4)
+\end{equation}
+$N$ must be an odd number.
+
+
+\begin{thebibliography}{9}
+\bibitem{abrahams94}    Abrahams A.M. \& Cook G.B. 
+                        ``Collisions of boosted black holes: 
+                          Perturbation theory predictions of 
+                          gravitational radiation'' 
+                        {\em Phys. Rev. D} 
+                        {\bf 50} 
+                        R2364-R2367 
+                        (1994).
+\bibitem{abrahams95}    Abrahams A.M., Shapiro S.L. \& Teukolsky S.A.  
+                        ``Calculation of gravitational wave forms from 
+                          black hole collisions and disk collapse: Applying
+                          perturbation theory to numerical spacetimes''
+                        {\em Phys. Rev. D.} 
+                        {\bf 51}
+                        4295
+                        (1995).
+\bibitem{abrahams96a}   Abrahams A.M. \& Price R.H. 
+                        ``Applying black hole perturbation
+                          theory to numerically generated spacetimes'' 
+                        {\em Phys. Rev. D.} 
+                        {\bf 53} 
+                        1963 
+                        (1996).
+\bibitem{abrahams96b}   Abrahams A.M. \& Price R.H. 
+                        ``Black-hole collisions from Brill-Lindquist 
+                          initial data: Predictions of perturbation theory'' 
+                        {\em Phys. Rev. D.} 
+                        {\bf 53} 
+                        1972 
+                        (1996).
+\bibitem{abram}         Abramowitz, M. \& Stegun A. 
+                        ``Pocket Book of Mathematical Functions 
+                          (Abridged Handbook of Mathematical Functions'', 
+                        Verlag Harri Deutsch 
+                        (1984).
+\bibitem{andrade96}     Andrade Z., \& Price R.H. 
+                        ``Head-on collisions of unequal mass black holes:
+                          Close-limit predictions'', 
+                        preprint 
+                        (1996).
+\bibitem{anninos95}     Anninos P., Price R.H., Pullin J., Seidel E., 
+                          and Suen W-M. 
+                        ``Head-on collision of two black holes: 
+                          Comparison of different approaches''
+                        {\em Phys. Rev. D.} 
+                        {\bf 52} 
+                        4462 
+                        (1995).
+\bibitem{arfken}        Arfken, G. 
+                        ``Mathematical Methods for Physicists'', 
+                        Academic Press 
+                        (1985).
+\bibitem{baker96}       Baker J., Abrahams A., Anninos P., Brant S., 
+                          Price R., Pullin J. \& Seidel E. 
+                        ``The collision of boosted black holes'' 
+                        (preprint) 
+                        (1996).
+\bibitem{baker97}       Baker J. \& Li C.B.
+                        ``The two-phase approximation for black hole 
+                          collisions: Is it robust''
+                        preprint (gr-qc/9701035),
+                        (1997).
+\bibitem{brandt96}      Brandt S.R. \& Seidel E. 
+                        ``The evolution of distorted rotating black holes III:
+                          Initial data'' 
+                        (preprint) 
+                        (1996).
+\bibitem{cunningham78}  Cunningham C.T., Price R.H., Moncrief V.,
+                        ``Radiation from collapsing 
+                          relativistic stars. 
+                          I. Linearized Odd-Parity Radiation''
+                        {\em Ap. J.}
+                        {\bf 224}
+                        543-667
+                        (1978).
+\bibitem{cunningham79}  Cunningham C.T., Price R.H., Moncrief V.,
+                        ``Radiation from collapsing 
+                          relativistic stars. 
+                          I. Linearized Even-Parity Radiation''
+                        {\em Ap. J.}
+                        {\bf 230}
+                        870-892
+                        (1979).
+\bibitem{landau80}      Landau L.D. \& Lifschitz E.M.,
+                        ``The Classical Theory of Fields''
+                        (4th Edition),
+                        Pergamon Press
+                        (1980).
+\bibitem{mathews}       Mathews J. ``'', 
+                        {\em J. Soc. Ind. Appl. Math.} 
+                        {\bf 10}
+                        768 
+                        (1962).
+\bibitem{moncrief74}    Moncrief V. ``Gravitational perturbations of spherically
+                        symmetric systems. I. The exterior problem''
+                        {\em Annals of Physics} 
+                        {\bf 88}
+                        323-342 
+                        (1974).
+\bibitem{numrec}        Press W.H., Flannery B.P., Teukolsky S.A., \& Vetterling W.T.,
+                        ``Numerical Recipes, The Art of Scientific Computing''
+                        {\em Cambridge University Press} 
+                        (1989).
+\bibitem{price94}       Price R.H. \& Pullin J. 
+                        ``Colliding black holes: The close limit'',
+                        {\em Phys. Rev. Lett.} 
+                        {\bf 72} 
+                        3297-3300 
+                        (1994).
+\bibitem{regge}         Regge T., \& Wheeler J.A. 
+                        ``Stability of a Schwarzschild Singularity'', 
+                        {\em Phys. Rev. D} 
+                        {\bf 108} 
+                        1063 
+                        (1957).
+\bibitem{seidel90}      Seidel E. 
+                        {\em Phys Rev D.} 
+                        {\bf 42} 
+                        1884 
+                        (1990).
+\bibitem{thorne80}      Thorne K.S., 
+                        ``Multipole expansions of gravitational radiation'', 
+                        {\em Rev. Mod. Phys.} 
+                        {\bf 52} 
+                        299 
+                        (1980).
+\bibitem{vish}          Vishveshwara C.V., 
+                        ``Stability of the Schwarzschild metric'',
+                        {\em Phys. Rev. D.} 
+                        {\bf 1} 
+                        2870, 
+                        (1970).
+\bibitem{zerilli70a}    Zerilli F.J., 
+                        ``Tensor harmonics in canonical form for gravitational 
+                          radiation and other applications'', 
+                        {\em J. Math. Phys.} 
+                        {\bf 11} 
+                        2203, 
+                        (1970).
+\bibitem{zerilli70}     Zerilli F.J., 
+                        ``Gravitational field of a particle falling 
+                          in a Schwarzschild geometry analysed in 
+                          tensor harmonics'',
+                        {\em Phys. Rev. D.} 
+                        {\bf 2} 
+                        2141, 
+                        (1970).
+\end{thebibliography}
+
+% END CACTUS THORNGUIDE
+
+\end{document}

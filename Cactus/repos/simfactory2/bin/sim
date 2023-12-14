@@ -1,0 +1,40 @@
+#! /bin/bash
+
+# Shell wrapper around the SimFactory, so that we can locate the
+# "Python" executable
+
+# Look for SimFactory's Python executable
+file="sim.py"
+
+dirs=". ../lib ./simfactory/lib ../simfactory/lib"
+for dir in $dirs; do
+    cmd=$(dirname "$0")"/$dir/$file"
+    if [ -f "$cmd" ]; then
+        break
+    fi
+    unset cmd
+done
+if [ -z "$cmd" ]; then
+    echo "Could not find sim.py"
+    exit 1
+fi
+
+# Forward the call
+if [ -z "$SIMFACTORY_PYTHONEXECS" ] ; then
+  SIMFACTORY_PYTHONEXECS="python3 python python2"
+fi
+for PYEXE in $SIMFACTORY_PYTHONEXECS
+do
+# import shutil to get an external module and catch bad default pythons
+    $PYEXE - > /dev/null 2>&1 << EOF
+import shutil
+EOF
+    if [ $? = 0 ]
+    then
+        exec $PYEXE "$cmd" "$@"
+        exit $?
+    fi
+done
+
+echo "Could not find usable python executable. Looked for $SIMFACTORY_PYTHONEXECS."
+exit 1

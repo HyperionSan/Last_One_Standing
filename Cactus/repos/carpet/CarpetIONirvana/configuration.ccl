@@ -1,0 +1,7 @@
+# Configuration definitions for thorn CarpetIONirvana
+
+REQUIRES Carpet CarpetLib IOUtil HDF5 Nirvana
+
+OPTIONAL MPI
+{
+}

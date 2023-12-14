@@ -1,0 +1,67 @@
+# Parameter definitions for thorn WorldTube
+# $Header:$
+
+
+KEYWORD boundary_behavior "The type of boundary"
+{
+  "none"            :: "don't extract/inject anything"
+  "extract metric"  :: "extract metric components, lapse and shift"
+  "CCE"             :: "extract metric components, lapse, shift and derivatives for CCE"
+  "CCE_cart"        :: "extract metric components, lapse, shift and (cartesian) derivatives for CCE"
+  "CCM"             :: "to be implemented"
+} "CCE"
+
+
+INT lmax "Maximum extracted l-mode"
+{
+  0:* :: "any positive number"
+} 8
+
+
+CCTK_INT ntubes "The number of worldtubes to be placed"
+{
+  0:42 :: "Any number between 0 and 42"
+} 1
+
+
+
+CCTK_INT which_slice_to_take[42] "Which SphericalSlice to use"
+{
+  0:* :: "Any positive number"
+} 0
+
+
+BOOLEAN seek_const_areal_radius[42] "Set slice radius to a surface of constant areal radius before extracting/injecting"
+{
+} no
+
+
+REAL tolerance "Tolerance for finding areal radius"
+{
+  0:* :: "Any positive number"
+} 1e-6
+
+
+INT max_it "Maximum number of iterations for finding areal radius"
+{
+  1:* :: "any positive number greater than 1"
+} 10
+
+
+CCTK_INT radial_deriv_order "Order of radial derivatives"
+{
+  -1   :: "Use whatever is specified by SummationByParts"
+  2:8  :: "Use this order"
+} -1
+
+
+
+SHARES: SphericalSlice
+USES KEYWORD type[42]
+USES REAL radius[42]
+USES INT nslices AS ss_nslices
+USES INT ntheta
+USES INT nphi
+USES INT nghostzones
+
+

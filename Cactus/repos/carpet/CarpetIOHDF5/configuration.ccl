@@ -1,0 +1,19 @@
+# Configuration definitions for thorn CarpetIOHDF5
+
+REQUIRES Carpet CarpetLib IOUtil HDF5
+
+OPTIONAL MPI
+{
+}
+
+OPTIONAL rnpletal
+{
+}
+
+OPTIONAL SDF
+{
+}
+
+PROVIDES CarpetIOHDF5
+{
+}

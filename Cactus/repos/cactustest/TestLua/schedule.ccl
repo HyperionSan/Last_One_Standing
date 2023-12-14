@@ -1,0 +1,6 @@
+# Schedule definitions for thorn TestLua
+
+SCHEDULE TestLua AT INITIAL
+{
+  LANG: C
+} "Test Lua interface"

@@ -1,0 +1,24 @@
+# Schedule definitions for thorn KerrQuasiIsotropic
+
+if (CCTK_Equals(initial_data, "KQI_ana"))
+{
+
+  if (schedule_in_ADMBase_InitialData)
+  {
+      SCHEDULE GROUP KQI_analytic_Group IN ADMBase_InitialData
+      {
+      } "KQI_analytic initial data group"
+  }
+  else
+  {
+      SCHEDULE GROUP KQI_analytic_Group AT Initial AFTER ADMBase_InitialData BEFORE ADMBase_PostInitial 
+      {
+      } "KQI_analytic initial data group"
+  }
+
+  SCHEDULE KQI_analytic IN KQI_analytic_Group
+  {
+    LANG: C
+  } "Create analytic initial data for a RN-BH coupled to a Proca"
+
+}

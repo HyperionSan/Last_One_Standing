@@ -1,0 +1,8 @@
+# Schedule definitions for thorn EOSBase_General
+# $Header$
+
+
+schedule group EOSBase_GeneralRegister AT WRAGH
+{
+
+} "Register EOS Thorns with EOSBase_General"

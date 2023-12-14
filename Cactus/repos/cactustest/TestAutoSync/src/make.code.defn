@@ -1,0 +1,7 @@
+# Main make.code.defn file for thorn TestAutoSync
+
+# Source files in this directory
+SRCS = autosync.c
+
+# Subdirectories containing source files
+SUBDIRS = 

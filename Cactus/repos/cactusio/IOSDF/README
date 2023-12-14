@@ -1,0 +1,32 @@
+Cactus Code Thorn IOSDF
+Author(s)    : Thomas Radke
+Maintainer(s): Cactus team
+Licence      : LGPL
+--------------------------------------------------------------------------
+
+1. Purpose
+
+This thorn does 1D, 2D, and 3D output of grid variables in SDF file format.
+
+1D output slices through the edge (in octant mode) or center
+(in all origin-centered modes) of the grid in the x,y, and z directions.
+If the grid is cubed it will also slice in the diagonal direction.
+
+2D output is done for the xy, xz, and yz plane.
+
+3D output is simply done for the full 3D grid variables.
+
+The IO methods "IOSDF_1D", "IOSDF_2D", and "IOSDF_3D" are registered 
+which can be called by other thorns via CCTK_OutputVarAsByMethod()
+to output a variable without specifying it in the parameter file.
+
+
+2. Additional information
+
+See the thorn documentation and check out the "Data Visualization with DV and
+xvs" webpage http://www.cactuscode.org/VizTools/DataVaultXVSutils.html.
+
+
+3. Acknowledgements
+
+Thanks to Luis Lehner who had the idea for this thorn.

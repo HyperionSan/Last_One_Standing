@@ -1,0 +1,14 @@
+CVS info   : $Header:$
+
+Cactus Code Thorn HarmonicDecomposition
+Thorn Author(s)     : Christian Reisswig <reisswig@aei.mpg.de>
+Thorn Maintainer(s) : Christian Reisswig <reisswig@aei.mpg.de>
+--------------------------------------------------------------------------
+
+Purpose of the thorn:
+
+This thorn is ment to replace LSUDevelopment/SphericalHarmonics.
+It is more general with respect to extraction spheres (spheres don't need
+to have constant coordinate radius!)
+and is based on SphericalSlice.
+

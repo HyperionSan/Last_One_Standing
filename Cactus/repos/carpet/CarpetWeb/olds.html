@@ -1,0 +1,549 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Old News</title>
+  </head>
+  
+  <body>
+
+    <h1 align="center">Old News</h1>
+
+    <p><a href="index.html"><b>New News...</b></a></p>
+
+    <table><tr><td valign="top">
+    <p><b>March 30, 2009:</b> We have ported Carpet to
+      the <a href="http://www-03.ibm.com/systems/deepcomputing/bluegene/">BlueGene/P</a>
+      architecture, using
+      the <a href="http://www.alcf.anl.gov/resources/storage.php">Surveyor</a>
+      system at the <a href="http://www.alcf.anl.gov/">ALCF</a>.  The
+      graph to the right shows preliminary performance and scaling
+      results, comparing different compilers and options
+      (<a href="http://gcc.gnu.org/">gcc</a>, <a href="http://www.ibm.com/software/awdtools/xlcpp/">IBM's
+      XL compilers</a> without OpenMP, and IBM's XL compilers
+      with <a href="http://www.openmp.org/">OpenMP</a>, which required
+      reducing the optimisation level).  For these benchmarks, the
+      problem size was reduced to about one eighth of the standard
+      size, using 13<sup>3</sup> grid points per core.  The results
+      show that Carpet scales fine up to the size of the total machine
+      (4k cores), but further work on compiler options is
+      required.</p>
+    </td><td valign="top">
+    <p><a href="scaling-surveyor/results-surveyor.pdf"><img
+          src="scaling-surveyor/results-surveyor.png"
+          width="180" alt="AMR benchmark results" /></a></p>
+    </td></tr></table>
+
+    <table><tr><td valign="top">
+    <p><b>March 20, 2009:</b> Carpet can now perform <i>performance
+      experiments</i> by artificially increasing the size or the
+      number of MPI messages exchanged between processes.  This can
+      help determine whether either the communication bandwidth or the
+      communication latency are a bottleneck of a particular
+      simulation.  The figure to the right shows results for the
+      standard <a href="http://www.cct.lsu.edu/~eschnett/McLachlan/">McLachlan</a>
+      AMR benchmark run on
+      the <a href="http://en.wikipedia.org/wiki/Cray_XT4">Cray XT4</a>
+       <a href="http://www.nics.tennessee.edu/computing-resources/kraken">Kraken</a>, using 25<sup>3</sup> grid points per core.  These
+      results indicate that the additional latency from increasing the
+      number of messages has no significant effect, and hence the
+      benchmark is bandwidth limited for this problem size.</p>
+    </td><td valign="top">
+    <p><a href="scaling-whatif/results-whatif.pdf"><img
+          src="scaling-whatif/results-whatif.png"
+          width="180" alt="AMR benchmark results" /></a></p>
+    </td></tr></table>
+    
+    <table><tr><td valign="top">
+    <p><b>March 16, 2009:</b> Erik Schnetter and Steve Brandt
+      published a white
+      paper <a href="http://www.cct.lsu.edu/CCT-TR/CCT-TR-2009-4"><i>Relativistic
+      Astrophysics on the SiCortex Architecture</i></a>.  This paper
+      expands on a
+      <a href="http://www.sicortex.com/news_events/campaigns/lsu_webinar">webinar</a>
+      by Erik and Steve that was hosted
+      by <a href="http://www.sicortex.com/">SiCortex</a>.</p>
+    <p>The graph at the right shows Carpet's parallel scalability
+      using
+      the <a href="http://www.cct.lsu.edu/~eschnett/McLachlan/">McLachlan</a>
+      code with nine levels of AMR for a set of current HPC systems.
+      The results have been rescaled to the architectures' theoretical
+      single-core peak performance.  This makes it possible to compare
+      Carpet's scalability on different architectures.  (It is not
+      possible to compare the systems' absolute performance in this
+      figure.)</p>
+    </td><td valign="top">
+    <p><a href="sicortex/results-scaled.pdf"><img
+          src="sicortex/results-scaled.png"
+          width="180" alt="AMR benchmark results" /></a></p>
+    </td></tr></table>
+    
+    <hr />
+
+    <table><tr><td valign="top">
+    <p><b>November 9, 2008:</b> In the context of
+      the <a href="http://www.cct.lsu.edu/xirel/">XiRel project</a>,
+      we re-designed Carpet's communication layer to avoid many
+      operations that had a cost of O(<var>N</var>), growing linearly
+      with the number of MPI processes.  Such costs are generally not
+      acceptable when running on several thousand cores, and have to
+      be reduced e.g. to O(log <var>N</var>).  Carpet now stores the
+      communication schedule (mostly) in a distributed manner,
+      increasing performance and reducing its memory requirement.
+      These improvements are currently being tested; preliminary
+      scaling results are shown in the figure to the right.</p>
+    </td><td valign="top">
+    <p><a href="scaling-improved/results-best.pdf"><img
+          src="scaling-improved/results-best.png"
+          width="180" alt="AMR benchmark results" /></a></p>
+    </td></tr></table>
+
+    <p><b>June 25, 2008:</b> We are happy to announce
+      the <a href="http://www.cct.lsu.edu/~eschnett/SimFactory"><i>Simulation
+      Factory</i></a>, a tool to help access remote HPC systems,
+      manage source trees, and submit and control simulations.  The
+      Simulation Factory contains a set of abstractions of the tasks
+      which are necessary to set up and successfully finish numerical
+      simulations using the Cactus framework.  These abstractions hide
+      tedious low-level management tasks, they capture "best
+      practices" of experienced users, and they create a log trail
+      ensuring repeatable and well-documented scientific results.
+      Using these abstractions, many types of potentially disastrous
+      user errors are avoided, and different supercomputers can be
+      used in a uniform manner.</p>
+
+    <table><tr><td valign="top">
+      <p><b>March 29, 2008:</b> We have benchmarked McLachlan, a new
+      BSSN-type vacuum Einstein code, using Carpet for unigrid and AMR
+      calculations.  We compare several current large machines:
+        <a href="http://www.nersc.gov/nusers/systems/franklin/">Franklin</a>
+      (NERSC), <a href="http://www.loni.org/systems/system.php?system=QueenBee">Queen
+      Bee</a> (LONI),
+      and <a href="http://www.tacc.utexas.edu/services/userguides/ranger/">Ranger</a>
+      (TACC).
+      <!-- These machines have different architectures and
+      interconnects.--></p>
+    </td><td valign="top">
+        <p><a
+              href="scaling-amr/results-carpet-1lev.pdf"><img
+              src="scaling-amr/results-carpet-1lev.png" width="180"
+              alt="Unigrid benchmark results" /></a></p>
+    </td><td valign="top">
+        <p><a
+              href="scaling-amr/results-carpet-9lev.pdf"><img
+              src="scaling-amr/results-carpet-9lev.png" width="180"
+              alt="AMR benchmark results" /></a></p>
+    </td></tr></table>
+
+    <table><tr><td valign="top">
+    <p><b>March 1, 2008:</b> Carpet has a logo!  This logo is
+      a <a href="http://en.wikipedia.org/wiki/Sierpinski_carpet">Sierpiński
+      carpet</a>, which is a fractal pattern with
+      a <a href="http://en.wikipedia.org/wiki/Hausdorff_dimension">Hausdorff
+      dimension</a> of 1.89279.</p>
+    </td><td valign="top">
+        <p><a href="logo/Sierpinski.pdf"><img src="logo/Sierpinski.png"
+              width="100" alt="Carpet logo (a Sierpiński
+              carpet)" /></a></p>
+    </td></tr></table>
+
+    <p><b>March 1, 2008:</b> We have improved the development version
+    of Carpet significantly:<br /></p>
+    <ul>
+      <li><p>The data structures and algorithms storing and handling
+      the communication schedule are much more efficient on large
+      numbers (several hundred or more) processors.  This makes Carpet
+      scale to more than 8,000 cores.</p></li>
+
+      <li><p>The interface for defining and making dynamic changes to
+      grid hierarchies is simpler, and buffer zones are handled in a
+      cleaner manner.  This makes it easier to write user code which
+      defines or updates the grid hierarchy, and reduces the chance of
+      inconsistencies therein.</p></li>
+
+      <li><p>During checkpointing and recovery, the grid structure is
+      saved and restored by default.  This avoids accidental changes
+      upon recovery.</p></li>
+
+      <li><p>The efficiency of I/O has been increased, especially for
+      HDF5 based binary I/O.  It is possible to combine several
+      variables into one file to reduce the number of output
+      files.</p></li>
+
+      <li><p>A new thorn LoopControl offers iterators over grid
+      points, implemented as C-style macros.  These iterators allow
+      additional important loop-level optimisations, such
+      as <a href="http://en.wikipedia.org/wiki/Loop_tiling">loop
+      tiling</a> or
+      <a href="http://www.openmp.org/">OpenMP</a> parallelisation.
+      Efficient cache handling and hybrid communication models have a
+      large potential for performance improvements on current and
+      future architectures.</p></li>
+    </ul>
+    <p>More details can be found <a href="version-4.html">here</a>.
+    These improvements are largely due
+    to <a href="http://www.cct.lsu.edu/~eschnett/">Erik Schnetter</a>
+    (LSU),
+    <a href="http://www.aei.mpg.de/~tradke/">Thomas Radke</a> (AEI), and
+    <a href="http://www.tapir.caltech.edu/~cott/">Christian D. Ott</a>
+    (UA).  Special thanks go to Christian Reisswig and Luca
+    Baiotti.</p>
+
+    <p><b>March 1, 2008:</b> The development version of Carpet is now
+    maintained using <a href="http://git.or.cz/">git</a> instead
+    of <a href="http://www.darcs.net/">darcs</a>.  Git offers a very
+    similar set of features to darcs, most importantly supporting
+    decentralised development.  Git has a much larger user community
+    than darcs, and we hope that this makes it easier to use.
+    The <a href="get-carpet.html">download instructions</a> contain
+    details on using git to obtain Carpet, and point to further
+    information.  (The darcs repository for the development version
+    will not see any further changes.)</p>
+
+    <p><b>March 1, 2008:</b> The repository for the development
+    version of Carpet moved today to
+    a <a href="http://carpetcode.dyndns.org/">new server</a>.  The
+    stable versions of Carpet continue to be served from the old
+    server for the time being.  We plan to move all of carpetcode.org
+    to this new server in the future.  The new server is a courtesy
+    of <a href="http://www.tapir.caltech.edu/~cott/">Christian
+    D. Ott</a>.</p>
+
+    <table><tr><td valign="top">
+      <p><b>January 14, 2008:</b> Carpet's communication
+        infrastructure has been improved significantly, making Carpet
+        scale to at least 4,000 processors, including mesh refinement.
+        Using "friendly user time"
+        on <a
+        href="http://www.tacc.utexas.edu/services/userguides/ranger/">Ranger</a>,
+        the new 60,000
+        core <a href="http://www.teragrid.org/">TeraGrid</a>
+        supercomputer
+        at <a href="http://www.tacc.utexas.edu/">TACC</a>, we measured
+        the benchmark results below for a numerical relativity kernel
+        solving the BSSN equations.  These benchmarks emply a hybrid
+        communication scheme
+        combining <a href="http://www-unix.mcs.anl.gov/mpi/">MPI</a>
+        and
+        <a href="http://www.openmp.org/">OpenMP</a>, using the shared
+        memory capabilities of Ranger's nodes to reduce the memory
+        overhead of parallelisation.  We are grateful for the help we
+        received from Ranger's support team.</p>
+      <p>The graph below shows weak scaling tests for both unigrid and
+        mesh refinement benchmarks.  The problem size per core was
+        kept fixed, and there were 4 OpenMP threads per MPI process,
+        with 1 MPI process per socket.  The benchmark was also run
+        with the PUGH driver for comparison for certain core counts.
+        As the graphs show, this benchmark scales near perfectly for
+        unigrid, and has only small variations in run time for nine
+        levels of mesh refinement.</p>
+    </td><td valign="top">
+        <p><a
+              href="scaling-ranger/results-ranger.pdf"><img
+              src="scaling-ranger/results-ranger.png" width="234"
+              alt="Scaling graph for Ranger" /></a></p>
+    </td></tr></table>
+
+    <hr />
+
+    <p><b>October 3, 2007:</b> Carpet's timing infrastructure has been
+      extended to automatically measure both time spent computing and
+      time spent in I/O.  The performance of large simulations depends
+      not only on the computational efficiency and communication
+      latency, but also on the throughput to file servers.  These new
+      statistics give a real-time overview and can point out
+      performance problems.  The statistics are collected in the
+      existing <tt>Carpet::timing</tt> variables.</p>
+
+    <p><b>August 30, 2007:</b> So far this year, ten of the
+      publications from three research groups examining the dynamics
+      of binary black hole systems are based on simulations performed
+      with Cactus and Carpet:<br />
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <a href="http://www.journals.uchicago.edu/ApJ/journal/issues/ApJ/v661n1/71342/71342.html">Astrophys. J. <b>661</b>, 430-436 (2007)</a>
+      (<a href="http://arxiv.org/abs/gr-qc/0701143">arXiv:gr-qc/0701143</a>)<br />
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <a href="http://link.aps.org/abstract/PRL/v99/e041102">Phys. Rev. Lett. <b>99</b>, 041102 (2007)</a>
+      (<a href="http://arxiv.org/abs/gr-qc/0701163">arXiv:gr-qc/0701163</a>)<br />
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <a href="http://www.journals.uchicago.edu/ApJ/journal/issues/ApJL/v659n1/21515/brief/21515.abstract.html">Astrophys. J. <b>659</b>, L5-L8 (2007)</a>
+      (<a href="http://arxiv.org/abs/gr-qc/0701164">arXiv:gr-qc/0701164</a>)<br />
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <a href="http://link.aps.org/abstract/PRL/v98/e231102">Phys. Rev. Lett. <b>98</b>, 231102 (2007)</a>
+      (<a href="http://arxiv.org/abs/gr-qc/0702133">arXiv:gr-qc/0702133</a>)<br />
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <a href="http://www.iop.org/EJ/abstract/0264-9381/24/15/009/">Class. Quantum Grav. <b>24</b>, 3911-3918 (2007)</a>
+      (<a href="http://arxiv.org/abs/gr-qc/0701038">arXiv:gr-qc/0701038</a>)<br />
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <a href="http://arxiv.org/abs/0705.3829">arXiv:0705.3829 [gr-qc]</a><br />
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <a href="http://arxiv.org/abs/0706.2541">arXiv:0706.2541 [gr-qc]</a><br />
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <a href="http://arxiv.org/abs/0707.2559">arXiv:0707.2559 [gr-qc]</a><br />
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <a href="http://arxiv.org/abs/0708.3999">arXiv:0708.3999 [gr-qc]</a><br />
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <a href="http://arxiv.org/abs/0708.4048">arXiv:0708.4048 [gr-qc]</a><br />
+      These publications mainly examine the spin dynamics and the
+      gravitational wave recoil in BBH systems.  Since not all
+      research groups use Cactus and Carpet, this represents only part
+      of the published work on this subject.</p>
+
+    <table><tr><td valign="top">
+      <p><b>August 26, 2007:</b> In experiments with hybrid
+        communication schemes
+        combining <a href="http://www-unix.mcs.anl.gov/mpi/">MPI</a>
+        and
+        <a href="http://www.openmp.org/">OpenMP</a>, we found a 20%
+        speed improvement when using a single node
+        of <a
+        href="http://www.ncsa.uiuc.edu/UserInfo/Resources/Hardware/Intel64Cluster/">Abe</a>
+        at <a href="http://www.ncsa.uiuc.edu">NCSA</a>, and a
+        substantial scaling improvement when using 1024 and more CPUs.
+        (Abe has 8 CPUs per node.)  These experiments included cache
+        optimisations when traversing the 3D arrays.  The tests were
+        performed with a modified version of
+        the <a
+        href="http://www.cactuscode.org/">Cactus</a> <a
+        href="http://www.cactuscode.org/WaveToyDemo/">WaveToy</a>
+        example application without using I/O or analysis methods.</p>
+    </td><td valign="top">
+        <p><a
+              href="hybrid-scaling/results-wavetoy-abe.pdf"><img
+              src="hybrid-scaling/results-wavetoy-abe.png" width="200"
+              alt="Scaling graph for Abe" /></a></p>
+    </td></tr></table>
+
+    <p><b>August 15, 2007:</b> We are happy to hear that our
+      proposal <i>ALPACA: Cactus tools for Application Level Profiling
+      And Correctness Analysis</i> will be funded by
+      <a
+      href="http://www.nsf.gov/">NSF's</a> <a
+      href="http://www.nsf.gov/publications/pub_summ.jsp?ods_key=nsf07503">SDCI</a>
+      programme for three years.
+      The <a
+      href="http://www.cactuscode.org/Development/alpaca">ALPACA</a>
+      project is aiming at developing complex, collaborative
+      scientific applications, appropriate for highly scalable
+      hardware architectures, providing fault tolerance, advanced
+      debugging, and transparency against new developments in
+      communication, programming, and execution models.  Such tools
+      are especially rare at the application level, where they are
+      most critically needed.</p>
+
+    <p><b>July 31, 2007:</b> We are happy to hear that our
+    proposal <i>XiRel: Cyberinfrastructure for Numerical
+    Relativity</i> will be funded by
+    <a href="http://www.nsf.gov/">NSF's</a> <a href="http://www.nsf.gov/funding/pgm_summ.jsp?pims_id=6681">PIF</a>
+    programme for three
+    years.  <a href="http://www.cct.lsu.edu/xirel/">XiRel</a> is
+    collaborative proposal
+    by <a href="http://www.cct.lsu.edu/">LSU</a>, <a href="http://gravity.psu.edu/numrel/">PSU</a>,
+    and <a href="http://www.phys.utb.edu/numrel/">UTB</a>
+    (now <a href="http://ccrg.rit.edu/">RIT</a>).  The central goal of
+    XiRel is the development of a highly scalable, efficient, and
+    accurate adaptive mesh refinement layer based on the current
+    Carpet driver, which will be fully integrated and supported in
+    Cactus and optimised for numerical relativity.</p>
+
+    <p><b>February 26, 2007:</b> The thorn <tt>LSUPETSc</tt>
+      implements a generic elliptic solver for Carpet's multi-patch
+      infrastructure, based
+      on <a
+      href="http://www-unix.mcs.anl.gov/petsc/petsc-as/">PETSc</a>.
+      It assumes touching (not overlapping) patches, and uses
+      inter-patch interface conditions very similar to those developed
+      by <a href="http://arxiv.org/abs/gr-qc/0510016">Harald
+      Pfeiffer</a>.  <tt>LSUPETSc</tt> can solve "arbitrary" systems
+      of coupled, non-linear elliptic equations.  It does not support
+      mesh refinement.</p>
+
+    <p><b>January 12, 2007:</b> In order to be able to restructure
+      some of Carpet's internals without disturbing ongoing production
+      simulations, we have created an <i>experimental version</i>.
+      The main goals of this experimental version are to improve its
+      performance on many (&gt;100) processors and to re-arrange some
+      internal details to simplify future development.  Few new
+      features are planned, but some of the changes may be
+      incompatible.</p>
+
+    <hr />
+
+    <p><b>December 15, 2006:</b>
+      The <a href="http://numrel.aei.mpg.de/">AEI</a> hosted a small
+      workshop to improve the performance of the AEI/LSU CCATIE code
+      for binary black hole simulations, which uses Carpet as AMR
+      driver.  We examined especially the effect of various grid
+      structures on accuracy and speed and speeded up the wave
+      extraction routine.  We were able to improve the overall
+      performance of the code by a factor of six for a certain
+      benchmark problem simulating a QC-0 configuration.</p>
+
+    <p><b>September 26, 2006:</b> We are preparing a new release of
+    Carpet.  This will be Carpet version 3.  Among other things, this
+    version makes it easier to use dynamic grid structures, shows
+    better scaling behaviour than version 2, and has better support
+    for multiple patches.  A detailed list of changes
+    is <a href="version-3.html">here</a>.  The
+    the <a href="get-carpet-darcs.html">downloading instructions</a>
+    for Carpet explain how to access this version.</p>
+
+    <p><b>February 26, 2006:</b> We have started to collect
+    a <a href="publications.html">list of publications and theses</a>
+    that use Carpet.  Please tell us if you have written a publication
+    or a thesis using Carpet.</p>
+
+    <p><b>February 25,
+    2006:</b> <a href="http://www.aei.mpg.de/~cott/">Christian Ott</a>
+    has contributed code to Carpet, making the refined regions track
+    apparent horizon centroids, merging and un-merging refined regions
+    as necessary.  (<a href="movies/bh2.gif">Movie</a>, animated gif,
+    730&nbsp;kB.)  After Burkhard Zink's mechanism
+    which <a href="http://arxiv.org/abs/gr-qc/0501080">tracks the
+    density maximum in a star</a>, this is the second implementation
+    of a production level adaptive mesh refinement criterion in
+    Carpet.</p>
+
+    <p><b>February 25, 2006:</b> The
+    official <a href="http://www.cactuscode.org/Benchmarks/">Cactus
+    benchmarks</a> now include benchmarks with Carpet.  You can assess
+    Carpet's scaling and compare its performance on different machines
+    by generating graphs from the benchmark result database on these
+    pages.</p>
+
+    <hr />
+
+    <p><b>July 15, 2005:</b> We have now a page that links to <a
+    href="status-reports.html">all past montly status reports</a>.</p>
+
+    <p><b>June 6, 2005:</b> We have updated the <a
+    href="get-carpet-darcs.html">downloading instructions for
+    Carpet</a>.</p>
+
+    <p><b>June 6, 2005:</b> Version 1.0.3 of the pre-compiled darcs
+    binary is <a href="get-carpet-darcs.html">now available</a>.</p>
+
+    <p><b>April 13, 2005:</b> Thomas Radke has implemented a new
+    communication scheme in Carpet.  Instead of sending many small
+    messages in an interleaved manner, Carpet now collects all
+    messages into an internal buffer and sends only one big message
+    with MPI.  This circumvents certain problems with internal
+    limitations of MPICH, and it also improves the performance
+    greatly.</p>
+
+    <p><b>March 9, 2005:</b> We have started to move towards a new
+    stable version of Carpet.</p>
+
+    <hr />
+
+    <p><b>December 7, 2004:</b> Jonathan Thornburg is organising a <a
+    href="design-walkthrough.html">Carpet Design Walkthrough</a>,
+    which will take place December 13 to 15 at the AEI and will be
+    broadcast via the accessgrid and/or telephone.</p>
+
+    <p><b>Sepbember 18, 2004:</b> There is now a new repository for
+    the development version of Carpet.  This repository is managed by
+    <a href="http://darcs.net/">darcs</a> instead of <a
+    href="http://www.nongnu.org/cvs/">CVS</a>.  Darcs has a number of
+    advantages, such as being able to use it while offline, or keeping
+    some changes to yourself while developing.  This development
+    version is <a href="get-carpet-darcs.html">publicly available</a>,
+    and we encourage you to <a
+    href="work-with-darcs.html">contribute</a>.  Note that the stable
+    version of Carpet is still distributed via CVS.</p>
+
+    <p><b>August 24, 2004:</b> The version of Carpet in the CVS
+    repository is now stable.  That means that this version will see
+    no substantial further development.  One of its main goal is to
+    not change, so that parameter files continue to work unchanged
+    with identical results.  We will continue to correct errors that
+    we find in this version of Carpet; however, if this would
+    necessitate major changes, and there is a work-around, then this
+    might not happen in the interest of stability.</p>
+
+    <p><b>July 31, 2004:</b> Carpet seems to have reached a point
+    where it is stable enough to be useful for at least some projects.
+    Consequently, people expressed the wish to have a version of
+    Carpet which is stable and sees no disrupting development.  The
+    idea is to have two "branches" of Carpet: a stable version for
+    production use, and a development version which might not be as
+    stable.  We plan to make the split in about three weeks.  The
+    discussion about this is held on the mailing list; your input is
+    welcome.</p>
+
+    <p><b>April 7, 2004:</b> Up to now, all Carpet thorns have been
+    living in a single arrangement for Cactus.  This caused problems,
+    because stable thorns, development thorns, and outdated thorns
+    were sitting next to each other, confusing newcomers.  We have <a
+    href="get-carpet-darcs.html">moved the Carpet arrangement</a> to a
+    new repository and split it into four.  Access to the old Carpet
+    arrangement has been disabled.</p>
+
+    <p><b>March 3, 2004:</b> We have recently had trouble with I/O
+    throuth the <a
+    href="http://vis.lbl.gov/~jshalf/FlexIO/">FlexIO</a>
+    library.  We suspect that it might have a bug that causes HDF5
+    output to fail under certain, random conditions.  We have written
+    a new thorn CarpetIOHDF5 which uses the <a
+    href="http://www.hdfgroup.org/HDF5/">HDF5</a> library directly,
+    while remaining compatible to the FlexIO file format.  Please test
+    this thorn, and report any problems or incompatibilities you
+    find.</p>
+
+    <p>In <b>January 2004</b>, <a
+    href="http://www.tat.physik.uni-tuebingen.de/~kobras/">Daniel
+    Kobras</a> set up <a href="http://bugs.carpetcode.org/">Bugzilla
+    for Carpet</a>.  <a href="http://www.bugzilla.org/">Bugzilla</a>
+    is a bug-tracking system that will, so we hope, help us remember
+    what is missing or broken in Carpet.</p>
+
+    <hr />
+
+    <p>In <b>October 2003</b>, Erik Schnetter, Scott H. Hawley, and
+    Ian Hawke published the preprint "Evolutions in 3D numerical
+    relativity using fixed mesh refinement" as <a
+    href="http://arXiv.org/abs/gr-qc/0310042">gr-qc/0310042</a>.  Its
+    main point is to present tests of Carpet with the BSSN code (AEI's
+    spacetime evolution code), and to show that mesh refinement does
+    not introduce instabilities.</p>
+
+    <p>In <b>August 2003</b>, <a
+    href="http://www.carpetcode.org/">these web pages</a> were
+    created.</p>
+
+    <p><b>May 2003</b> has informally been termed <a
+    href="CarpetMonth/index.html">"Carpet month"</a>.  In a flurry of
+    activity, bugs were fixed and some features added.  The BSSN code
+    of the numerical relativity group at the <a
+    href="http://www.aei.mpg.de/">AEI</a> now works together with
+    Carpet.</p>
+
+    <hr />
+
+    <p>
+      <a href="http://www.xemacs.org/About/created.html"><img
+      src="cbxSmall.jpg" alt="Created with XEmacs!" height="36"
+      width="100" /></a>
+      
+      <a href="http://www.anybrowser.org/campaign/"><img
+      src="logoab8.png" alt="Best Viewed With Any Browser" height="31"
+      width="88" /></a>
+
+      <a href="http://validator.w3.org/check?uri=referer"><img
+      src="valid-xhtml10.png" alt="Valid XHTML 1.0!" height="31"
+      width="88" /></a>
+    </p>
+    
+    <address><a href="mailto:schnetter@cct.lsu.edu">Erik Schnetter</a></address>
+<p>
+<!-- Created: Tue Aug 12 12:12:08 CEST 2003 -->
+<!-- hhmts start -->
+Last modified: Feb 15 2011
+<!-- hhmts end -->
+</p>
+
+  </body>
+</html>

@@ -1,0 +1,9 @@
+# Main make.code.defn file for thorn EOSBase_General
+# $Header$
+
+# Source files in this directory
+SRCS = 	EOSBase_Register.c \
+	EOS_Utils.c
+
+# Subdirectories containing source files
+SUBDIRS = 

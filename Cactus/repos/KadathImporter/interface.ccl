@@ -1,0 +1,5 @@
+# Interface definition for thorn KadathImporter
+
+IMPLEMENTS: KadathImporter
+
+INHERITS: grid ADMBase HydroBase

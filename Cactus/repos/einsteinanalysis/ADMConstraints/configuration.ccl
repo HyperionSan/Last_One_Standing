@@ -1,0 +1,4 @@
+# Configuration definition for thorn CactusEinstein/ADMConstraints
+# $Header$
+
+REQUIRES Boundary CartGrid3D SpaceMask

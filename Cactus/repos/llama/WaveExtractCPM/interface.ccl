@@ -1,0 +1,221 @@
+# Interface definition for thorn WaveExtractCPM
+
+implements: WaveExtractCPM
+
+inherits: grid admbase staticconformal io sphericalsurface
+
+uses include: carpetinterp2.hh
+
+private:
+
+INT gridsizes_group TYPE=ARRAY DIM=1 SIZE=100 DISTRIB=CONSTANT tags='checkpoint="no"'
+{
+  int_nphi, int_ntheta 
+} "gridsizes stored as variables"
+
+INT handles_group TYPE=SCALAR tags='checkpoint="no"'
+{
+  sum_handle
+} "handles for reduction operators"
+
+INT do_nothing_group TYPE=SCALAR tags='checkpoint="no"'
+{
+  do_nothing
+} "if equal to 1, then WaveExtractCPM won't do anything (example: all detectors are out of range)"
+
+REAL sym_factor_group TYPE=SCALAR tags='checkpoint="no"'
+{
+  sym_factor
+} "symmmetry factor for integrals (depends on domain, sym_factor=2 for bitant for example)"
+
+REAL interp_metric_arrays TYPE=ARRAY DIM=2 SIZE=maxntheta,maxnphi DISTRIB=DEFAULT tags='checkpoint="no"'
+{
+  gxxi, gxyi, gxzi,
+  gyyi, gyzi, gzzi,
+  psii,
+  dx_gxxi, dy_gxxi, dz_gxxi,
+  dx_gxyi, dy_gxyi, dz_gxyi,
+  dx_gxzi, dy_gxzi, dz_gxzi,
+  dx_gyyi, dy_gyyi, dz_gyyi,
+  dx_gyzi, dy_gyzi, dz_gyzi,
+  dx_gzzi, dy_gzzi, dz_gzzi,
+  dx_psii, dy_psii, dz_psii,
+  
+  #SHH CHANGE
+  
+    dt_gxxi, dt_gxyi, dt_gxzi, dt_gyyi, dt_gyzi, dt_gzzi,
+
+    gtxi, gtyi, gtzi,
+    dt_gtxi, dt_gtyi, dt_gtzi,
+    dx_gtxi, dx_gtyi, dx_gtzi,
+    dy_gtxi, dy_gtyi, dy_gtzi,
+    dz_gtxi, dz_gtyi, dz_gtzi,
+  
+} "2D (theta,phi) Arrays for holding the metric and conformal factor and their first derivatives interpolated onto the extraction coordinate sphere"
+
+REAL surface_arrays TYPE=ARRAY DIM=2 SIZE=maxntheta,maxnphi DISTRIB=DEFAULT tags='checkpoint="no"'
+{
+  interp_x,interp_y,interp_z,
+  psi_ext_deriv,
+  ctheta, cphi, sintheta, costheta, sinphi, cosphi,
+  dr_gxxi, dr_gxyi, dr_gxzi, dr_gyyi, dr_gyzi, dr_gzzi,
+  dr_psii,
+  
+    grr, grth, grphi, gthth, gthphi, gphiphi,
+    dr_gthth, dr_gthphi, dr_gphiphi,
+  
+    #SHH CHANGES
+
+    dr_gtxi, dr_gtyi, dr_gtzi,
+    
+    gtr, gtth, gtphi, 
+    dr_gtth, dr_gtphi,
+    dt_gthth, dt_gphiphi, dt_gthphi,
+    dt_grth, dt_grphi,
+    
+    # INTERPOLATED VALUES
+    #Needed for Psi_Odd (Cunningham-Price-Moncrief function)
+    htRe_i, dr_htRe_i, dt_hrRe_i,
+    htIm_i, dr_htIm_i, dt_hrIm_i,
+    
+    #Needed for dt_Psi_Odd (This is the 1/2 * original Regge-Wheeler function)
+    hrRe_i, h2Re_i, dr_h2Re_i,
+    hrIm_i, h2Im_i, dr_h2Im_i,
+
+    #Needed for Psi_Even (Zerilli-Moncrief function)
+    hrrRe_i, jrRe_i, K_Re_i, G_Re_i, dr_K_Re_i,
+    hrrIm_i, jrIm_i, K_Im_i, G_Im_i, dr_K_Im_i,
+    
+    #Needed for dt_Psi_Even 
+    htrRe_i, jtRe_i, dr_jtRe_i, dt_jrRe_i, dt_K_Re_i, dt_G_Re_i,
+    htrIm_i, jtIm_i, dr_jtIm_i, dt_jrIm_i, dt_K_Im_i, dt_G_Im_i
+    
+#  h1i, H2i, Gi, Ki, c1i, c2i, dGi, dKi, dc2i
+  
+#  ih1i,iH2i,iGi,iKi,ic1i,ic2i,idGi,idKi,idc2i
+  
+} "2D (theta,phi) grid arrays for points on the sphere"
+
+
+REAL surface_integrands TYPE=ARRAY DIM=2 SIZE=maxntheta,maxnphi DISTRIB=DEFAULT tags='checkpoint="no"'
+{
+  weights,thetaweights, phiweights,
+  int_tmp1,int_tmp2,int_tmp3,int_tmp4,int_tmp5,
+  int_tmp6,int_tmp7,int_tmp8,int_tmp9,
+  int_tmp10,int_tmp11,int_tmp12,int_tmp13,int_tmp14,
+  int_tmp15,int_tmp16,int_tmp17,int_tmp18,
+  int_tmp19,int_tmp20,
+  int_tmp21,int_tmp22,int_tmp23,int_tmp24,int_tmp25,
+  int_tmp26,int_tmp27,int_tmp28,int_tmp29,
+  int_tmp30,int_tmp31,int_tmp32,int_tmp33,int_tmp34
+} "weights and temporary integrands"
+
+REAL Schwarzschild_Mass_Radius_group TYPE=SCALAR tags='checkpoint="no"'
+{
+  dtau_dt, sph_grr, sph_gthth, sph_dr_gthth, sph_gphiphi,
+  rsch2, rsch, drsch_dri, dri_drsch, S_factor, 
+  Schwarzschild_Mass, Schwarzschild_Radius
+} "Schwarzschild radius, mass and assorted spherical background pieces"
+
+REAL Schwarzschild_Mass_Radius_Results_group TYPE=ARRAY DIM=1 SIZE=maximum_detector_number DISTRIB=CONSTANT tags='checkpoint="no"'
+{
+  Schw_Masses, Schw_Radii
+} "contains Schwarzschild mass/radius from all detectors"
+
+REAL MoncriefQ_Results_group TYPE=ARRAY DIM=3 SIZE=maximum_detector_number,l_mode,2*m_mode+1 DISTRIB=CONSTANT tags='checkpoint="no"'
+{
+# SHH CHANGE 
+# - new notation, Psi_even and Psi_odd conforming to Martel and Poisson (2005)
+# Note that Psi_odd is actually twice the *time integral* of Qodd!
+    
+    Psi_odd_Re_Array,
+    Psi_odd_Im_Array,
+    Psi_even_Re_Array,
+    Psi_even_Im_Array,
+    
+    dt_Psi_odd_Re_Array,
+    dt_Psi_odd_Im_Array,
+    dt_Psi_even_Re_Array,
+    dt_Psi_even_Im_Array,
+
+    h_Re_Array,
+    h_Im_Array
+    
+#  Qodd_Re_Array,
+#  Qeven_Re_Array,
+#  Qodd_Im_Array,
+#  Qeven_Im_Array
+} "contains Psi_even, Psi_odd, dt_Psi_even, dt_Psi_odd wave indicators from all detectors"
+#"contains Moncrief Qeven, Qodd wave indicators from all detectors"
+
+INT l_m_modes_info_group TYPE=SCALAR tags='checkpoint="no"'
+{
+  l_min, l_max, l_step,
+  m_min, m_max, m_step,
+  max_det_no_param
+} "Information about the modes used for extraction"
+
+# m_mode goes from index=1 for m=m_min and then up to m_max+1
+# FIXME : imaginary part not implemented at the moment
+REAL MoncriefQ TYPE=ARRAY DIM=2 SIZE=l_mode,2*m_mode+1 DISTRIB=CONSTANT tags='checkpoint="no"'
+{
+# SHH CHANGE 
+# - new notation, Psi_even and Psi_odd conforming to Martel and Poisson (2005)
+# Note that Psi_odd is actually twice the *time integral* of Qodd!
+
+    Psi_odd_Re,
+    Psi_odd_Im,
+    Psi_even_Re,
+    Psi_even_Im,
+
+    dt_Psi_odd_Re,
+    dt_Psi_odd_Im,
+    dt_Psi_even_Re,
+    dt_Psi_even_Im,
+    
+#  Qodd_Re,Qodd_Im,
+    #  Qeven_Re,Qeven_Im
+    h_Re,
+    h_Im
+} "Psi_even, Psi_odd, dt_Psi_even, dt_Psi_odd wave indicators, real & imaginary part"
+#"Moncrief Qeven, Qodd wave indicators, real & imaginary part"
+
+
+# FIXME : implement this. g00 is needed to calculate dtau_dt
+#REAL g00_group TYPE=GF
+#{
+#  g00
+#} "g00 is needed to calculate proper time. this is not implemented at the moment"
+
+REAL metric_tmp TYPE=GF tags='tensortypealias="DD_sym" checkpoint="no" prolongation="none"'
+{
+  gxx_tmp,gxy_tmp,gxz_tmp,gyy_tmp,gyz_tmp,gzz_tmp
+} "temp metric for 3d rotation"
+
+
+# Current Detector Number
+INT current_detector_group TYPE=SCALAR tags='checkpoint="no"'
+{
+  current_detector
+} "the index number of the current detector"
+
+REAL current_detector_radius_group TYPE=SCALAR tags='checkpoint="no"'
+{
+  current_detector_radius
+} "coordinate radius of the current detector"
+
+INT my_out_every_det[100] TYPE=SCALAR tags='checkpoint="no"' "output frequency"
+
+CCTK_INT FUNCTION \
+   MergerHandler_WeHaveMerger()
+USES FUNCTION MergerHandler_WeHaveMerger
+	  
+	  
+CCTK_REAL FUNCTION \
+  MergerHandler_MergerTime()
+USES FUNCTION MergerHandler_MergerTime
+
+CCTK_INT FUNCTION IO_TruncateOutputFiles \
+  (CCTK_POINTER_TO_CONST IN GH)
+
+REQUIRES FUNCTION IO_TruncateOutputFiles

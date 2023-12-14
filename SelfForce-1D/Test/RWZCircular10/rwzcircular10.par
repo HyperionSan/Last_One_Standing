@@ -1,0 +1,25 @@
+&params
+equation_name = 'rwz_schwarzschild'
+n_elems = 128
+order = 10
+t_size = 20
+tsigma = 0.000001
+Sminus = -20.0
+p_orb = 10.0
+ecc = 0.0
+use_particle = .true.
+mass = 1.0
+lmin = 2
+lmax = 5
+t_initial = 0.0
+t_final = 10.0
+use_world_tube = .true.
+world_tube_width = 1
+turn_on_source_smoothly = .false.
+use_exact_initial_data = .true.
+output_coords_for_exact = .true.
+exact_initial_data_lmax = 5
+input_directory = '.'
+out0d_every = 40
+out1d_every = -1
+/

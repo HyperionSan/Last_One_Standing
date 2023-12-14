@@ -1,0 +1,116 @@
+#! /bin/bash
+
+echo "Preparing:"
+set -x                          # Output commands
+set -e                          # Abort on errors
+
+cd @RUNDIR@-active
+
+echo "Checking:"
+pwd
+hostname
+date
+
+export SPACK_DIR=/home/eschnett/src/spack-view
+
+echo '[BEGIN NODES]'
+# Generate host list
+echo $SLURM_NODELIST
+hostfile="SIMFACTORY/NODES"
+# scontrol show hostnames "$SLURM_NODELIST" >${hostfile}
+for i in $(seq 1 $SLURM_JOB_CPUS_PER_NODE); do
+    scontrol show hostnames "$SLURM_NODELIST"
+done | sort >${hostfile}
+# # Unset all Slurm variables, so that OpenMPI does not use Slurm for
+# # job startup
+# for var in $(env | grep '^SLURM_' | sed -e 's/=.*//'); do
+#     eval "unset '$var'"
+# done
+# # Set up ssh keys
+# ${SPACK_DIR}/bin/mpirun --hostfile "${hostfile}" -np @NUM_PROCS@ --map-by ppr:1:node --bind-to none true
+echo '[END NODES]'
+
+echo '[BEGIN IFCONFIG]'
+/sbin/ifconfig || true
+echo '[END IFCONFIG]'
+
+echo 'Job setup:'
+echo '   Allocated:'
+echo '      Nodes:                      @NODES@'
+echo '      Cores per node:             @PPN@'
+echo '   Running:'
+echo '      MPI processes:              @NUM_PROCS@'
+echo '      OpenMP threads per process: @NUM_THREADS@'
+echo '      MPI processes per node:     @NODE_PROCS@'
+echo '      OpenMP threads per core:    @NUM_SMT@'
+echo '      OpenMP threads per node:    @PPN_USED@'
+
+case @NUM_THREADS@ in
+    (1) bind_to=core; map_by=ppr:1:core; nshep=1; nwork=1;;
+    (2) bind_to=socket; map_by=ppr:6:socket; nshep=1; nwork=2;;
+    (3) bind_to=socket; map_by=ppr:4:socket; nshep=1; nwork=3;;
+    (4) bind_to=socket; map_by=ppr:3:socket; nshep=1; nwork=4;;
+    (6) bind_to=socket; map_by=ppr:2:socket; nshep=1; nwork=6;;
+    (12) bind_to=socket; map_by=ppr:1:socket; nshep=1; nwork=12;;
+    (24) bind_to=none; map_by=ppr:1:node; nshep=2; nwork=12;;
+    (*) bind_to=none; map_by=node; nshep=1; nwork=@NUM_THREADS@;;
+esac
+
+echo "Environment:"
+export GMON_OUT_PREFIX=gmon.out
+export OMP_NUM_THREADS=@NUM_THREADS@
+export OMP_STACKSIZE=8192
+export OMP_MAX_TASKS=500
+export CXX_MAX_TASKS=500
+export PTHREAD_MAX_TASKS=500
+export QTHREAD_NUM_SHEPHERDS="${nshep}"
+export QTHREAD_NUM_WORKERS_PER_SHEPHERD="${nwork}"
+export QTHREAD_STACK_SIZE=65536
+export QTHREAD_GUARD_PAGES=1
+export QTHREAD_INFO=1
+export FUNHPC_MAIN_EVERYWHERE=1
+export CACTUS_NUM_PROCS=@NUM_PROCS@
+export CACTUS_NUM_THREADS=@NUM_THREADS@
+export CACTUS_SET_THREAD_BINDINGS=1
+env | sort >SIMFACTORY/ENVIRONMENT
+
+${SPACK_DIR}/bin/ompi_info
+
+echo "Starting:"
+export CACTUS_STARTTIME=$(date +%s)
+
+# --mca btl_base_verbose 100
+# --mca btl self,sm,tcp
+# --mca btl_tcp_if_include eth0
+# --mca oob_tcp_if_include eth0
+
+time                                            \
+    ${SPACK_DIR}/bin/mpirun                     \
+    -np @NUM_PROCS@                             \
+    --hostfile "${hostfile}"                    \
+    --mca btl self,vader,openib                 \
+    --map-by "${map_by}"                        \
+    --display-map                               \
+    --bind-to "${bind_to}"                      \
+    --report-bindings                           \
+    -x OMP_NUM_THREADS                          \
+    -x OMP_STACKSIZE                            \
+    -x OMP_MAX_TASKS                            \
+    -x CXX_MAX_TASKS                            \
+    -x PTHREAD_MAX_TASKS                        \
+    -x QTHREAD_NUM_SHEPHERDS                    \
+    -x QTHREAD_NUM_WORKERS_PER_SHEPHERD         \
+    -x QTHREAD_STACK_SIZE                       \
+    -x QTHREAD_GUARD_PAGES                      \
+    -x QTHREAD_INFO                             \
+    -x FUNHPC_MAIN_EVERYWHERE                   \
+    -x CACTUS_NUM_PROCS                         \
+    -x CACTUS_NUM_THREADS                       \
+    -x CACTUS_SET_THREAD_BINDINGS               \
+    -x CACTUS_STARTTIME                         \
+    @EXECUTABLE@ -L 3 @PARFILE@
+
+echo "Stopping:"
+date
+
+echo "Done."

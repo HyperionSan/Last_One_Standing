@@ -1,0 +1,59 @@
+Cactus::cctk_run_title = "Unit test for RotatingSymmetry180"
+
+Cactus::cctk_full_warnings         = no
+Cactus::highlight_warning_messages = no
+
+Cactus::cctk_itlast = 0
+
+ActiveThorns = "IOUtil"
+IO::out_dir             = $parfile
+IO::out_fileinfo = "none"
+IO::parfile_write       = no
+IO::out_group_separator = "-"
+IO::verbose = "none"
+
+
+ActiveThorns = "Slab"
+ActiveThorns = "PUGH PUGHSlab PUGHReduce LocalReduce"
+driver::ghost_size = 1
+driver::global_nx = 7
+driver::global_ny = 11
+driver::global_nz = 11
+
+ActiveThorns = "Boundary CartGrid3D CoordBase RotatingSymmetry180 SymBase"
+
+RotatingSymmetry180::verbose = no
+
+CoordBase::domainsize = "minmax"
+CoordBase::xmin =  0.00
+CoordBase::ymin = -1.25
+CoordBase::zmin = -1.25
+CoordBase::xmax = +1.25
+CoordBase::ymax = +1.25
+CoordBase::zmax = +1.25
+CoordBase::dx   =  0.25
+CoordBase::dy   =  0.25
+CoordBase::dz   =  0.25
+
+CoordBase::boundary_size_x_lower     = 1
+CoordBase::boundary_size_y_lower     = 1
+CoordBase::boundary_size_z_lower     = 1
+CoordBase::boundary_size_x_upper     = 1
+CoordBase::boundary_size_y_upper     = 1
+CoordBase::boundary_size_z_upper     = 1
+
+CoordBase::boundary_shiftout_x_lower = 1
+
+CartGrid3D::type = "coordbase"
+
+ActiveThorns = "TestRotatingSymmetry180"
+
+ActiveThorns = "IOBasic"
+IOBasic::outScalar_style = "gnuplot"
+IOBasic::outScalar_every = 1
+IOBasic::outScalar_reductions = "
+  sum
+"
+IOBasic::outScalar_vars  = "
+  TestRotatingSymmetry180::num_diffs
+"

@@ -1,0 +1,566 @@
+#!/usr/bin/env perl
+
+#/*@@
+#  @file    MakeThornList
+#  @date    Thu Feb 20 08:48:04 CST 2020
+#  @author  Roland Haas, Ian Kelley
+#  @desc
+#    This program, given a parameter file, will produce a thornlist, doing the
+#    matching by looking at a 'master thornlist' that is stored in a specific
+#    location, or specified at run-time by the user.
+#  @enddesc
+#@@*/
+
+my $cctk_home;
+BEGIN {
+# try and find Cactus HOME
+if(exists $ENV{CCTK_HOME}) {
+  $cctk_home = $ENV{CCTK_HOME};
+} elsif (-r "lib/sbin/Piraha.pm") {
+  use Cwd qw(getcwd);
+  $cctk_home = &getcwd();
+} else {
+  die "Could not determine Cactus home directory";
+}
+}
+
+my $DEBUG = 0;
+
+use lib "$cctk_home/lib/sbin";
+
+use warnings;
+use strict;
+
+use Piraha;
+use Getopt::Long qw(:config no_ignore_case bundling);
+
+# output usage information
+sub usage
+{
+  die "Incorrect number of args: ".scalar @_ unless scalar @_ == 1;
+  my ($log) = @_;
+
+print $log <<EOF;
+USAGE:
+
+  $0 <parameter files>
+
+  $0 [-output=<output file>] [-master=<master thornlist>] [-desc=<thornlist description>] [-verbose] <parameter file>
+
+SYNOPSIS:
+
+  MakeThornList uses a master thornlist, which contains all the thorns a user
+has access to with all the relevant directives for locating them from CVS,
+to generate a ThornList for checking out a version of Cactus for running
+a given parameter file.
+
+OPTIONS:
+
+  Use the ActiveThorns parameter in <parameter file> as the list of thorns
+required in Cactus.
+
+  -d, --desc=<description>
+	The text <description> will be used for the description directive
+      in the generated thornlist. If this option isn't used, the
+      description directive from the parameter file will be used along
+	with the parameter filename and date, if there is no such directive
+      in the parameter file the description will consist of the parameter
+	filename and date.
+	
+  -h, --help
+      Give information about using this script.
+
+  -m, --master=<master thornlist>
+	The file <master thornlist> will be used as the master thornlist
+      containing the list of thorns with CVS directives to use for
+      generating the parameter file thornlist. If this option is not
+      used, and the environment variable \$CACTUSRC has been set, the
+      file \$CACTUSRC/.cactus/MasterThornList will be used, otherwise the
+      file \$HOME/.cactus/MasterThornList will be used.
+
+  -o, --output=<output file>
+	The created ThornList will be sent to file <output file>. If no
+      file name is given, the default name <base>.th is used, where
+      <base> is the basename of the parameter file used. If this option
+      isn't used the ThornList will be written to standard out.
+
+  -v, --verbose
+	Print debugging information to standard out.
+
+
+EXAMPLES:
+
+Use master thornlist in \$HOME/.cactus/MasterThornList and write final thornlist
+to file:
+
+\t\$ $0 parfile.par
+
+Use custom options:
+
+\t\$ $0 -o=newThornList.th -master=bh.th \\
+          -desc="My bh activethorns" -verbose parfile.par
+
+
+ENVIRONMENT:
+
+	CACTUSRC: The location of the Cactus configuration directory
+
+AUTHOR:
+	
+	Roland Haas <rhaas\@illinois.edu>
+	Ian Kelley, <ikelley\@aei.mpg.de>
+	March 20, 2020
+
+EOF
+}
+
+# parse parameter file for active thorns
+sub get_activethorns
+{
+  die "Incorrect number of args: ".scalar @_ unless scalar @_ == 1;
+  my $parfile = shift;
+
+  my $peg_file = "$cctk_home/src/piraha/pegs/par.peg";
+  my ($grammar,$rule) = piraha::parse_peg_file($peg_file);
+
+  my %variables;
+
+  my $lookup_var = sub {
+    die "Incorrect number of args: ".scalar @_ unless scalar @_ == 1;
+    my $gr = shift;
+    my $retval;
+    if($gr->group(0)->is("env")) {
+      $retval = $ENV{$gr->group(0)->group(0)->substring()};
+    } elsif($gr->group(0)->substring() eq "parfile") {
+      $retval = $parfile;
+      $retval =~ s/[.]par$//;
+    } elsif($gr->group(0)->substring() eq "pi") {
+      $retval = 4.*atan2(1., 1.);
+    }
+    if(exists $variables{$gr->group(0)->substring()}) {
+      $retval = $variables{$gr->group(0)->substring()};
+    }
+    die "Unknown variable: $gr->substring()" unless defined $retval;
+    return $retval;
+  };
+
+  my $string_reparser = sub {
+    die "Incorrect number of args: ".scalar @_ unless scalar @_ == 1;
+    my $s = shift;
+    my $m = new Matcher($grammar, "stringparser", $s);
+    if($m->matches()) {
+      my $out = "";
+      for (my $i = 0 ; $i < $m->groupCount() ; $i++) {
+        my $pn = $m->group($i)->getPatternName();
+        if($pn eq "any" || $pn eq "stringeol" || $pn eq "stringchar") {
+          $out .= $m->group($i)->substring();
+        } elsif($pn eq "stringcomment") {
+          ; # nop
+        } elsif($pn eq "val") {
+          $out .= &$lookup_var($m->group($i));
+        } else {
+          die "Invalid syntax in parameter file string '$s'";
+        }
+      }
+      return $out;
+    } else {
+      return $s;
+    }
+  };
+
+  # from CSTUtils.pl/parse_ccl
+  my $p = piraha::parse_src($grammar, $rule, $parfile);
+  if($p->matches()) {
+    my @activethorns;
+
+    my $params = $p->{gr};
+    for my $group (@{$params->{children}}) {
+      if($group->is("set")) {
+        my $lhs = $group->group(0);
+        my $rhs = $group->group(1);
+        if($lhs->is("active")) {
+          # TODO: src/piraha/Call.cc passes this through meval(), which is a
+          # bit too complex for me
+          if($rhs->is("quot")) {
+            if($rhs->group(0)->is("inquot")) {
+                my $inquot = $rhs->group(0)->substring();
+                my $thorns = &$string_reparser($inquot);
+                $thorns =~ s/^\s+//;
+                $thorns =~ s/\s+$//;
+                push @activethorns, split /\s+/, $thorns;
+            } elsif ($rhs->group(0)->is("fname")) {
+              push @activethorns, $rhs->group(0)->substring() if $rhs->group(0)->substring();
+            } else {
+              die "Invalid synatx";
+            }
+          } elsif($rhs->is("name")) {
+            push @activethorns, $rhs->substring() if $rhs->substring();
+          } else {
+            die "Invalid syntax";
+          }
+        }
+      } elsif($group->is("set_var")) {
+        # TODO: need an evaluator?
+        $variables{$group->group(0)->substring()} = $group->group(1);
+      } else {
+        ; # ignored
+      }
+    }
+    return @activethorns;
+  } else {
+    die "Invalid parameter file $parfile.";
+  }
+}
+
+# parse thornlist for list of available thorns
+sub get_thorns
+{
+  my ($thornlist) = @_;
+  die "Incorrect number of args: ".scalar @_ unless scalar @_ == 1;
+
+  open (my $fh,"<", $thornlist) or die "Could not open $thornlist: $!";
+
+  my %thorns;
+
+  while (<$fh>) {
+    chomp;
+    next if m/^\s*[\#!]/;
+    s/\s*#.*//;
+    next if $_ =~ m/^\s*$/;
+    # TODO: technically (see make.configuration.defn) this could be a directory
+    # other than "arrangements" if PACKAGE_DIR is set by configure
+    if(not -d "$cctk_home/arrangements/$_") {
+      warn "Could not find thorn $_";
+      next;
+    }
+    if(not m!^([^/]+)/([^/]+)$!) {
+      warn "Could not extract thorn name";
+      next;
+    }
+    $thorns{lc $2} = "$1/$2";
+  }
+
+  close $fh;
+
+  return %thorns;
+}
+
+# parse configuration.ccl files for dependencies
+sub get_dependencies
+{
+  my ($thorns, $requires_thorns, $requires, $optional, $optional_ifactive, $provides) = @_;
+  die "Incorrect number of args: ".scalar @_ unless scalar @_ == 6;
+
+  my $peg_file = "$cctk_home/src/piraha/pegs/config.peg";
+  my ($grammar,$rule) = piraha::parse_peg_file($peg_file);
+
+  foreach my $thorn (sort keys %{$thorns}) {
+    $requires_thorns->{$thorn} = [];
+    $requires->{$thorn} = [];
+    $optional->{$thorn} = [];
+    $optional_ifactive->{$thorn} = [];
+    $provides->{$thorn} = [];
+
+    print STDERR "Parsing $thorn\n" if $DEBUG;
+    my $cclfile = "$cctk_home/arrangements/$thorns->{$thorn}/configuration.ccl";
+    next if (! -r $cclfile);
+
+    my $p = piraha::parse_src($grammar, $rule, $cclfile);
+    if($p->matches()) {
+      my $config = $p->{gr};
+      for my $group (@{$config->{children}}) {
+        if($group->is("provopt")) {
+          my $key = $group->group(0)->substring();
+          my @names;
+          for(my $i = 1 ; $i < $group->groupCount() ; $i++) {
+            if($group->group($i)->is("name")) {
+              push @names, $group->group($i)->substring();
+            } else {
+              last;
+            }
+          }
+          if(lc $key eq "optional") {
+            push @{$optional->{$thorn}}, @names;
+          } elsif(lc $key eq "optional_ifactive") {
+            push @{$optional_ifactive->{$thorn}}, @names;
+          } elsif(lc $key eq "provides") {
+            push @{$provides->{$thorn}}, @names;
+          } else {
+            die "Invalid syntax";
+          }
+        } elsif($group->is("requires")) {
+          if($group->group(0)->is("thorns")) {
+            foreach my $name (@{$group->group(0)->{children}}) {
+              die unless $name->is("name");
+              push @{$requires_thorns->{$thorn}}, $name->substring();
+            }
+          } elsif($group->group(0)->is("name_with_ver")) {
+            foreach my $name_with_ver (@{$group->{children}}) {
+              die unless $name_with_ver->is("name_with_ver");
+              die unless $name_with_ver->group(0)->is("name");
+              push @{$requires->{$thorn}},
+                   $name_with_ver->group(0)->substring();
+            }
+          } else {
+            die "Invalid syntax";
+          }
+        }
+      }
+    } else {
+      die "Invalid configuration file $cclfile.";
+    }
+  }
+}
+
+# activate required thorns dependencies
+sub activate_required_thorns
+{
+  my ($activeset, $requires_thorns) = @_;
+  die "Incorrect number of args: ".scalar @_ unless scalar @_ == 2;
+  my ($anychange, $didchange) = (0,0);
+
+  do {
+    $didchange = 0;
+    foreach my $thorn (sort keys %{$activeset}) {
+      foreach my $req (@{$requires_thorns->{$thorn}}) {
+        if(not exists $activeset->{lc $req}) {
+          $anychange = 1;
+          $didchange = 1;
+          $activeset->{lc $req} = $req;
+        }
+      }
+    }
+  } while($didchange);
+  return $anychange;
+}
+
+# activate required capabilities dependencies
+sub activate_required
+{
+  my ($activeset, $requires_thorns, $requires, $provides) = @_;
+  die "Incorrect number of args: ".scalar @_ unless scalar @_ == 4;
+  my ($anychange, $didchange) = (0,0);
+
+  # map capabilities to thorns
+  my %provided_by;
+  foreach my $thorn (sort keys %{$provides}) {
+    foreach my $cap (@{$provides->{$thorn}}) {
+      die "Multiple thorns providing $cap" if defined $provided_by{lc $cap};
+      $provided_by{lc $cap} = $thorn;
+    }
+  }
+
+  do {
+    $didchange = &activate_required_thorns($activeset, $requires_thorns);
+    foreach my $thorn (sort keys %{$activeset}) {
+      foreach my $cap (@{$requires->{$thorn}}) {
+        my $req = $provided_by{lc $cap};
+        die "No thorn providing $cap" if not $req;
+        if(not exists $activeset->{lc $req}) {
+          $anychange = 1;
+          $didchange = 1;
+          $activeset->{lc $req} = $req;
+        }
+      }
+    }
+  } while($didchange);
+  return $anychange;
+}
+
+#TODO: should I not enable "optional" thorns? They are "optional" after all.
+# activate all dependencies starting from required thorns, then required caps
+# then optional caps
+sub activate_dependencies
+{
+  my ($activethorns, $thorns, $requires_thorns, $requires, $optional, $optional_ifactive, $provides) = @_;
+  die "Incorrect number of args: ".scalar @_ unless scalar @_ == 7;
+  my ($anychange, $didchange) = (0,0);
+
+  my %activeset = map {(lc $_,$_)} @{$activethorns};
+
+  # map capabilities to thorns
+  my %provided_by;
+  foreach my $thorn (sort keys %{$provides}) {
+    foreach my $cap (@{$provides->{$thorn}}) {
+      die "Multiple thorns providing $cap" if defined $provided_by{lc $cap};
+      $provided_by{lc $cap} = $thorn;
+    }
+  }
+
+  do {
+    $didchange = &activate_required(\%activeset, $requires_thorns, $requires,
+                                    $provides);
+    foreach my $thorn (sort keys %activeset) {
+      foreach my $cap (@{$optional->{lc $thorn}}) {
+        my $req = $provided_by{lc $cap};
+        next if not $req; # no thorn provides the capability
+        if(not exists $activeset{lc $req}) {
+          $anychange = 1;
+          $didchange = 1;
+          $activeset{$req} = $req;
+        }
+      }
+    }
+  } while($didchange);
+  return sort values %activeset;
+}
+
+# write modified thornslist
+sub write_thornlist
+{
+  my ($outfh, $thornlist, $masterlist, $description) = @_;
+  die "Incorrect number of args: ".scalar @_ unless scalar @_ == 4;
+
+  my %activeset = map {($_,1)} @{$thornlist};
+
+  # description at top of file
+  print $outfh "!DESC \"$description\"\n" if $description;
+
+  # of the thorns listed in the master file, keep only those in thornlist
+  # this keeps #DISABLED lines around. I cannot remove them since simfactory
+  # will modify thornlists and disable some thorns while trying to enable
+  # others (eg LAPACK vs OpenBLAS).
+  open (my $fh,"<", $masterlist) or die "Could not open $masterlist: $!";
+  while(<$fh>) {
+    if (m/^\s*?!(.*?)\s+(.*)/) {
+      # a directive, print it unless it's DESC
+      print $outfh $_ if($1 ne 'DESC');
+    } elsif(m!^\s*(\w+/\w+)!) {
+      # a thorn, check if we want it to be active
+      my $thorn = $1;
+      print STDERR "found $thorn\n" if $DEBUG;
+      if(exists $activeset{$thorn}) {
+        print $outfh $_;
+        delete $activeset{$thorn};
+      }
+    } else {
+      print $outfh $_;
+    }
+  }
+  close $fh;
+
+  # now print all thorns in thornlist that were not in the master list
+  if(%activeset) {
+    print $outfh "\n\n";
+    print $outfh "# Private thorns\n";
+    print $outfh "!TARGET   = arrangements\n";
+    print $outfh "!TYPE     = ignore\n";
+    print $outfh "!CHECKOUT =\n";
+    foreach my $thorn (@{$thornlist}) {
+      print $outfh "$thorn\n" if exists $activeset{$thorn};
+    }
+  }
+}
+
+# main code
+my ($description, $help, $masterlist, $output);
+if (not GetOptions ("d|desc" => \$description,
+                    "h|help" => \$help,
+                    "m|master=s" => \$masterlist,
+                    "o|output=s" => \$output,
+                    "v|verbose!" => \$DEBUG)) {
+  &usage(*STDERR);
+  exit 1;
+}
+if(scalar @ARGV < 1) {
+  &usage(*STDERR);
+  exit 1;
+}
+if($help) {
+  &usage(*STDERR);
+  exit 0;
+}
+
+# we need to look around for the ''master thornlist''
+if(not defined $masterlist) {
+  my $thorndir = defined $ENV{"CACTUSRC"} ? $ENV{"CACTUSRC"} : $ENV{"HOME"};
+  $thorndir =~ s/\/$//;
+
+  # see if we can find the master thornlist.
+  # try 'MasterThornList' first, use 'ThornList' if that couldn't be found
+  my @thornlist_candidates = ("${thorndir}/.cactus/MasterThornList",
+                              "${thorndir}/.cactus/ThornList");
+  foreach my $th (@thornlist_candidates) {
+    if(-r "${th}") {
+      $masterlist = $th;
+      last;
+    }
+  }
+  if (not $masterlist) {
+    print STDERR "$0: Cannot find the master thornlist. Tried ",
+                 join(", ",@thornlist_candidates),".\n";
+    exit 1;
+  }
+}
+
+my $outfh;
+if($output) {
+  open ($outfh, ">", $output) or die "Could not open $output: $!";
+} else {
+  $outfh = *STDOUT;
+}
+
+my @activethorns;
+foreach my $parfile (@ARGV) {
+  print STDERR "Parsing parameter file $parfile\n" if $DEBUG;
+  push (@activethorns, &get_activethorns($parfile));
+}
+# remove duplicate thorns
+@activethorns = sort keys %{{map {($_ => 1)} @activethorns}};
+print STDERR "ActiveThorn = \"",join(" ", @activethorns), "\"\n" if $DEBUG;
+
+print STDERR "Finding thorn sources from $masterlist\n" if $DEBUG;
+my %thorns = &get_thorns($masterlist);
+
+if($DEBUG) {
+  print STDERR "Thorn mappings found:\n";
+  foreach my $thorn (@activethorns) {
+    print STDERR "$thorn -> $thorns{lc $thorn}\n";
+  }
+}
+
+print STDERR "Reading requires\n" if $DEBUG;
+my (%requires_thorns, %requires, %optional, %optional_ifactive, %provides);
+&get_dependencies(\%thorns, \%requires_thorns, \%requires, \%optional, \%optional_ifactive, \%provides);
+
+if($DEBUG) {
+  print "Found dependencies:\n";
+  foreach my $thorn (sort keys %thorns) {
+    print "Thorn $thorn requires: ".join(", ",@{$requires{$thorn}})."\n";
+    print "Thorn $thorn requires thorns: ",
+          join(", ",@{$requires_thorns{$thorn}}),"\n";
+    print "Thorn $thorn provides: ",join(", ",@{$provides{$thorn}}),"\n";
+    print "Thorn $thorn optional: ",join(", ",@{$optional{$thorn}}), "\n";
+    print "Thorn $thorn optional_ifactive: ",
+          join(", ", @{$optional_ifactive{$thorn}}),"\n";
+  }
+}
+
+# build final list of active thorns based on requires, optional and
+# optional_ifactive
+# do not add optional_ifactive to thorn list, they are only used if active and
+# were not activated
+
+print STDERR "Adding auto-activated thorns\n" if $DEBUG;
+my @new_activethorns =
+  &activate_dependencies(\@activethorns, \%thorns, \%requires_thorns,
+                         \%requires, \%optional, \%optional_ifactive,
+                         \%provides);
+
+# some thorns may not be in the master thornlist either if the master thornlist
+# is inconsistent and does not contain all thorns itself requires or if
+# ActiveThorns lists some that do not exist
+my @missing_thorns;
+foreach my $thorn (@new_activethorns) {
+  if(not exists $thorns{lc $thorn}) {
+    push @missing_thorns, $thorn;
+  }
+}
+if(@missing_thorns) {
+  die "Thorn(s) ".join(", ", sort @missing_thorns)." needed by parameter files ".
+      join(", ", @ARGV). " not located in master thornlist $masterlist";
+}
+
+print STDERR "Writing new Thornlist\n" if $DEBUG;
+my @new_thornlist = map {$thorns{lc $_}} @new_activethorns;
+&write_thornlist($outfh, \@new_thornlist, $masterlist, $description);

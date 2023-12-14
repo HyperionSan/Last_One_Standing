@@ -1,0 +1,73 @@
+
+!DESC "SC2001.par"
+
+!REPOSITORY_LOCATION cvs.cactuscode.org
+!REPOSITORY_NAME /cactusdevcvs
+!REPOSITORY_TYPE pserver
+!REPOSITORY_USER cvs_anon
+
+CactusBase/Boundary
+CactusBase/CartGrid3D
+CactusBase/IOASCII
+CactusBase/IOBasic
+CactusBase/IOUtil
+CactusBase/Time
+
+CactusBench/BenchADM
+
+CactusConnect/HTTPDExtra
+CactusConnect/HTTPD
+
+CactusEinstein/ADMConstraints
+CactusEinstein/AHFinder
+CactusEinstein/Einstein
+CactusEinstein/IDLinearWaves
+
+CactusElliptic/EllBase
+
+CactusExternal/FlexIO
+CactusExternal/jpeg6b
+
+CactusIO/IOJpeg
+
+CactusPUGH/PUGH
+CactusPUGH/PUGHInterp
+CactusPUGH/PUGHReduce
+CactusPUGH/PUGHSlab
+
+CactusPUGHIO/IOFlexIO
+CactusPUGHIO/IsoSurfacer
+
+CactusWave/WaveToyC
+CactusWave/IDScalarWaveC
+CactusWave/WaveBinarySource
+
+AlphaThorns/IOHDF5
+AlphaThorns/Spawner
+AlphaThorns/FileAdvertiser
+
+BetaThorns/IOHDF5Util
+BetaThorns/IOStreamedHDF5
+BetaThorns/Socket
+
+!REPOSITORY_LOCATION cvs.cactuscode.org
+!REPOSITORY_NAME /arrangements
+GridNomad/GridFileServer
+GridNomad/GridMigrationServer
+GridNomad/GridResourceBase
+GridNomad/GridResourceSimple
+GridNomad/WormAIS
+GridNomad/WormBase
+GridNomad/WormNG
+GridNomad/WormPing
+GridNomad/XMLRPC
+
+!REPOSITORY_LOCATION cvs.aei.mpg.de
+!REPOSITORY_NAME /numrelcvs
+AEIThorns/ADM_BSSN
+AEIThorns/BAM_Elliptic
+
+!REPOSITORY_LOCATION cvs.aei.mpg.de
+!REPOSITORY_NAME /numrelcvs
+AEIDevelopment/FishEye
+ 

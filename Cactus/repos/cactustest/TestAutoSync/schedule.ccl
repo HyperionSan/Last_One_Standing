@@ -1,0 +1,82 @@
+# Schedule definitions for thorn TestAutoSync
+
+STORAGE: Var1[2] TransferVar[1] Var2[2]
+
+SCHEDULE TestAutoSync_RegisterBCs AT WRAGH
+{
+  options: global
+
+  LANG: C
+} "Register physical boudary condition"
+
+SCHEDULE TestAutoSync_Init AT initial
+{
+  WRITES: Var1(all), TransferVar(all), Var2(all)
+
+  LANG: C
+} "Set up data"
+
+SCHEDULE TestAutoSync_Evolve1 AT evol
+{
+  READS: Var1_p(all)
+  WRITES: Var1(interior)
+
+  LANG: C
+} "Step variable 1"
+
+# legacy b/c handling to check that one can switch back and forth seemlessly
+if (CCTK_EQUALS(presync_mode, "off") || psync_both) {
+  SCHEDULE TestAutoSync_SelectBCsForVar1 AT evol AFTER TestAutoSync_Evolve1
+  {
+    LANG: C
+    OPTIONS: level
+
+    SYNC: var1
+  } "Select boundary conditions for variables 1"
+
+  SCHEDULE GROUP ApplyBCs AS TestAutoSync_ApplyBCsForVar1 AT evol AFTER TestAutoSync_SelectBCsForVar1
+  {
+  } "Apply boundary conditions to variable 1"
+}
+
+SCHEDULE TestAutoSync_Transfer AT evol AFTER TestAutoSync_Evolve1
+{
+  READS: Var1(all)
+  WRITES: TransferVar(all)
+
+  LANG: C
+} "Copy data in transfer variable"
+
+if (CCTK_EQUALS(presync_mode, "presync-only")) {
+  SCHEDULE TestAutoSync_Evolve2 AT evol AFTER TestAutoSync_Transfer
+  {
+    READS: TransferVar(all)
+    WRITES: Var2(interior)
+
+    LANG: C
+  } "Step variable 2"
+} else { /* test mixing presync aware and unaware code */
+  SCHEDULE TestAutoSync_Evolve2 AT evol AFTER TestAutoSync_Transfer
+  {
+    LANG: C
+  } "Step variable 2"
+
+  SCHEDULE TestAutoSync_SelectBCsForVar2 AT evol AFTER TestAutoSync_Evolve2
+  {
+    LANG: C
+    OPTIONS: level
+
+    SYNC: var2
+  } "Select boundary conditions for variables 2"
+
+  SCHEDULE GROUP ApplyBCs AS TestAutoSync_ApplyBCsForVar2 AT evol AFTER TestAutoSync_SelectBCsForVar2
+  {
+  } "Apply boundary conditions to variable 2"
+
+  SCHEDULE TestAutoSync_Dummy IN ANALYSIS
+  {
+    LANG: C
+
+    WRITES: var1(all), var2(all), transfervar(all)
+  } "Dummy routine to mark everything valid and prevent SYNC in output"
+}

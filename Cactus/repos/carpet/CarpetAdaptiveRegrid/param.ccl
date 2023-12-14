@@ -1,0 +1,58 @@
+# Parameter definitions for thorn CarpetAdaptiveRegrid
+
+# Refinement criteria for automatic refining
+
+CCTK_INT min_width "Minimum width of refined region" STEERABLE=always
+{
+  1:* :: "must be positive"
+} 8
+
+CCTK_REAL min_fraction "Minimum fraction of points in need of refinement in a refined region" STEERABLE=always
+{
+  0:1 :: "must be positive and less than one"
+} 0.75
+
+CCTK_REAL max_error "Maximum allowed error for non-refined grid points" STEERABLE=always
+{
+  *:* :: "everything goes"
+} 1.0
+
+CCTK_STRING error_var "Name of grid function that contains the error" STEERABLE=always
+{
+  ".*" :: "must be the name of a grid function"
+} ""
+
+CCTK_INT regrid_every "Regrid every n time steps" STEERABLE=always
+{
+  -1   :: "regrid never"
+   0   :: "regrid during initial data calculation only"
+   1:* :: "regrid every n time steps"
+} 0
+
+CCTK_INT pad "Number of cells that the error should be padded" STEERABLE=always
+{
+  0:* :: "Non negative"
+} 2
+
+CCTK_BOOLEAN verbose "Should we be verbose"
+{
+} "no"
+
+CCTK_BOOLEAN veryverbose "Should we be very verbose"
+{
+} "no"
+
+CCTK_BOOLEAN maskpicture "Should we print a picture of the mask"
+{
+} "no"
+
+CCTK_INT refinement_levels "Number of initial refinement levels (including the base level)" STEERABLE=always
+{
+  1:* :: "must be positive, and must not be larger than Carpet::max_refinement_levels"
+} 1
+
+CCTK_STRING coordinates "List of bounding box coordinates for the initial data" STEERABLE=always
+{
+  "^$" :: "leave empty for no refinement"
+  ".*" :: "[ [ ([<xmin>,<ymin>,<zmin>]:[<xmax>,<ymax>,<zmax>]:[<xstride>,<ystride>,<zstride>]), ... ], ... ]"
+} ""

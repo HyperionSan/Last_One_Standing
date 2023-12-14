@@ -1,0 +1,55 @@
+# $Header$
+
+!DESC "Cactus Computational Toolkit"
+
+!REPOSITORY_TYPE pserver
+!REPOSITORY_LOCATION cvs.cactuscode.org
+!REPOSITORY_NAME /cactus
+                
+CactusBase/Boundary
+CactusBase/CartGrid3D
+CactusBase/CoordBase
+CactusBase/IOASCII
+CactusBase/IOBasic
+CactusBase/IOUtil
+CactusBase/InitBase
+CactusBase/LocalInterp
+CactusBase/LocalReduce
+CactusBase/MoL
+CactusBase/SymBase
+CactusBase/Time
+       
+CactusConnect/HTTPD
+CactusConnect/HTTPDExtra
+CactusConnect/Socket
+           
+CactusElliptic/EllBase             
+CactusElliptic/EllPETSc 
+CactusElliptic/EllSOR              
+
+CactusExternal/BLAS
+CactusExternal/FFTWlib
+CactusExternal/FlexIO
+CactusExternal/GSL
+CactusExternal/HDF5
+CactusExternal/LAPACK
+CactusExternal/LORENE
+CactusExternal/PETSc
+CactusExternal/SDF
+CactusExternal/jpeg6b
+            
+CactusIO/IOJpeg
+
+CactusPUGH/PUGH                    
+CactusPUGH/PUGHInterp                  
+CactusPUGH/PUGHReduce
+CactusPUGH/PUGHSlab
+
+CactusPUGHIO/IOFlexIO              
+CactusPUGHIO/IOHDF5
+CactusPUGHIO/IOHDF5Util
+CactusPUGHIO/IOPanda
+CactusPUGHIO/IsoSurfacer
+
+CactusUtils/NaNChecker		   
+CactusUtils/TimerReport

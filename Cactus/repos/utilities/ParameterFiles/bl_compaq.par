@@ -1,0 +1,158 @@
+#########################################################
+# Black hole collision
+# - two black hole punctures (Brill-Lindquist) starting from rest
+# - ADM evolution
+# - 1+log lapse, vanishing shift
+# - waves, apparent horizon
+# BB, 12/00
+#########################################################
+
+# hdf5 does not work for now -- Radke is working on it
+#ActiveThorns = "iojpeg PUGHSlab Socket jpeg6b PUGH PUGHReduce PUGHInterp CartGrid3d Boundary Time IOASCII IOBasic IOUtil PsiKadelia IOAHFinderHDF5 Einstein IDAnalyticBH ADM ADMconstraints AHFinder HTTPD HTTPDExtra isosurfacer iohdf5 iostreamedhdf5 iohdf5util"
+ActiveThorns = "iojpeg PUGHSlab Socket jpeg6b PUGH PUGHReduce PUGHInterp CartGrid3d Boundary Time IOASCII IOBasic IOUtil PsiKadelia Einstein IDAnalyticBH ADM ADMconstraints AHFinder HTTPD HTTPDExtra isosurfacer"
+
+#---------------------------------------------------------------------------
+# General 
+
+pugh::storage_verbose                   = "report"
+pugh::timer_output                      = "yes"
+cactus::cctk_timer_output               = "full"
+
+IO::out_dir         			= "bl.out"
+IO::verbose = "standard"
+
+driver::global_nx  			= 87
+driver::global_ny  			= 87
+driver::global_nz  			= 87
+
+grid::dxyz         			= .06
+
+grid::type         			= "byspacing"
+grid::domain       			= "full"
+
+time::dtfac 				= 0.25
+
+cactus::cctk_itlast        		= 380
+
+#---------------------------------------------------------------------------
+# Initial Data 
+
+einstein::initial_data  		= "bl_bh"
+
+idanalyticbh::bl_nbh			= 2
+
+idanalyticbh::bl_M_1			= 0.4
+idanalyticbh::bl_M_2                    = 0.6
+
+idanalyticbh::bl_y0_1			= 0.5
+idanalyticbh::bl_y0_2			= -0.5
+
+#---------------------------------------------------------------------------
+# Evolution
+
+einstein::evolution_system 		= "adm" 
+
+einstein::initial_lapse	  		= "one"
+einstein::slicing         		= "1+log"
+
+#---------------------------------------------------------------------------
+# AHFinder
+
+ahfinder::ahf_active     		= "yes"
+ahfinder::ahf_veryverbose 		= "no"
+ahfinder::ahf_findevery   		= 50
+
+ahfinder::ahf_lmax      		= 5
+ahfinder::ahf_ntheta    		= 50
+ahfinder::ahf_nphi      		= 50
+
+ahfinder::ahf_phi       		= "yes"
+ahfinder::ahf_flow      		= "yes"
+ahfinder::ahf_flowa			= 0.2
+
+ahfinder::ahf_r0	      		= 3.0
+
+#ahfinder::ahf_HDF5output                = "yes"
+
+ahfinder::ahf_guessold                  = "yes"
+
+# look for three horizons
+
+ahfinder::ahf_find3			= "yes"
+
+ahfinder::ahf_r0_1                      = 3
+ahfinder::ahf_yc_1                      = 0.5
+
+ahfinder::ahf_r0_2                      = 3
+ahfinder::ahf_yc_2                      = -0.5
+
+
+psikadelia::scale_with_radius           = "yes"
+psikadelia::radius_power                = 2
+
+#---------------------------------------------------------------------------
+# Wave Extraction
+
+#extract::num_detectors                  = 2
+#extract::itout                          = 0
+#extract::verbose                        = "no"   
+#extract::Nt                         	= 50
+#extract::Np                          	= 50
+#extract::origin_x                       = 0.
+#extract::origin_y                       = 0.
+#extract::origin_z                       = 0.
+#extract::all_modes                      = "yes"
+#extract::l_mode                         = 2
+#extract::detector1                      = 2.0
+#extract::detector2                      = 2.5
+
+#--------------------------------------------------------------------------
+# Output
+
+IOASCII::out1D_every 			= 5
+IOASCII::out1D_vars 		 	= "psikadelia::psi4re einstein::grr einstein::alp"
+
+IOBasic::outInfo_every 			= 1
+IOBasic::outInfo_vars 			= "einstein::alp"
+
+
+#IOHDF5::checkpoint                    	= "yes"
+#IO::recover                            = "no"
+#IO::checkpoint_every                   = "1"
+#IO::checkpoint_dir                     = "./"
+
+#--------------------------------------------------------------------------
+# Fancy stuff
+
+httpd::use_pthreads		= "yes"
+httpd::port 			= 7089
+httpd::pause 			= 0
+# http announce not needed, can just use stdout
+#httpd::announce_server_url = "yes"
+#httpd::announce_server_url_outdir = "bl.out/announce"
+
+IO::out_downsample_x          = 2
+IO::out_downsample_y          = 2
+IO::out_downsample_z          = 2
+
+
+IOASCII::out2D_vars  = "psikadelia::psi4re einstein::alp einstein::grr"
+IOASCII::out2D_every = 10
+IOASCII::out_format  = ".7g"
+
+IOJpeg::out_every   		= 10
+IOJpeg::out_vars		= "einstein::alp psikadelia::psi4re"
+IOJpeg::mode             	= "remove"
+IOJpeg::colormap        	= "auto"
+IOJpeg::colormap_factor  	= 16 
+
+#IOStreamedHDF5::outHDF5_every 	= 1
+#IOStreamedHDF5::out_vars      	= "einstein::alp"
+#IOStreamedHDF5::data_port       = 7556
+
+isosurfacer::dataport           = 7557 
+isosurfacer::controlport        = 7558 
+IsoSurfacer::out_format      = "SOCK"
+IsoSurfacer::out_vars         = "EINSTEIN::alp"
+isosurfacer::isovalue           = 0.99
+IsoSurfacer::out_every   = 1 

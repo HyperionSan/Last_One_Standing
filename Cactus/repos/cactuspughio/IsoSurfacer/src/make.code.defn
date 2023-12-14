@@ -1,0 +1,8 @@
+# Main make.code.defn file for thorn IsoSurfacer
+# $Header$
+
+# Source files in this directory
+SRCS =	Startup.c IsoSurfacerInit.c IsoSurfacer.c \
+       	NuSurfacer.c Sockets.c
+
+

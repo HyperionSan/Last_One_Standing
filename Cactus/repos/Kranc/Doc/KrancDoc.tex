@@ -1,0 +1,1412 @@
+\documentclass{report}
+
+\usepackage{tabularx}
+\usepackage{ltablex}
+\usepackage{graphicx}
+\usepackage{alltt}
+\usepackage{hyperref}
+
+\addtolength{\oddsidemargin}{-0.25in}
+\addtolength{\textwidth}{1in}
+\addtolength{\textheight}{1.5in}
+\addtolength{\voffset}{-0.5in}
+\linespread{1.3}
+\setlength{\parindent}{0in}
+\setlength{\parskip}{1.5ex plus 0.5ex minus 0.2ex}
+
+
+\newcommand{\tablewidth}{\textwidth}
+\newcommand{\mathdialogue}[2]
+{
+  \begin{center}
+  \begin{tabular}[t]{rl}
+  {\tt In := } & \parbox{10cm}{\tt {#1}} \\
+\\
+  {\tt Out = } & \parbox{10cm}{#2} \\
+  \end{tabular}
+  \end{center}
+}
+\newcommand{\mathinput}[1]
+{
+  \begin{tt}
+  \begin{center}
+    #1
+  \end{center}
+  \end{tt}
+}
+\newcommand{\Tud}[3]{  #1 ^#2 _{\phantom{#2} #3}}
+
+\newcommand{\fixme}[1]{\textcolor{red}{#1}}
+
+\title{Kranc User Guide}
+\author{Sascha Husa, Ian Hinder, and Jonah Miller}
+
+
+\begin{document}
+\maketitle
+\tableofcontents
+\chapter{Introduction}
+
+\section{Kranc}
+Kranc is a suite of Mathematica-based computer-algebra packages, which
+comprise a toolbox to convert certain (tensorial) systems of partial
+differential evolution equations to parallelized C code for
+solving initial boundary value problems.  Kranc can be used as a rapid
+prototyping system for physicists or mathematicians handling
+complicated systems of partial differential equations, but through
+integration into the Cactus computational toolkit it is also possible
+to produce efficient parallelized production codes.  Our work is
+motivated by the field of numerical relativity, where Kranc is used as
+a research tool by the authors.  The initial version of Kranc was
+described in \cite{KrancPaper}, and subsequent enhancements in
+\cite{IHPhDThesis}.  The user-visible portion of Kranc has
+subsequently been redesigned.  The material in this document is drawn
+from these two sources, and has been updated to be consistent with the
+current version of Kranc.
+
+\section{Cactus}
+
+The {\em Cactus Computational Toolkit} is an open-source problem
+solving environment originally developed in the numerical relativity
+community.  It is arranged as a central {\em flesh} and a collection
+of modules called {\em thorns} which all communicate with the
+flesh.  Many thorns are provided, and the user writes additional thorns
+in C or Fortran which solve their particular physics problem.  Cactus
+is particularly suited to the numerical solution of time dependent
+partial differential equations.
+
+Kranc is concerned with taking an abstract mathematical description of
+a system of PDEs and producing working computer code.  It does this by
+generating Cactus thorns, allowing use of all the infrastructure
+provided by Cactus.
+
+For example, Kranc makes uses of existing Cactus thorns which provide:
+\begin{itemize}
+\item Parameter file parsing.
+\item Memory management for variables associated with the
+computational grid.
+\item Scheduling of parts of the code based upon parameters.
+\item Standard efficient time integrators such as fourth order
+  Runge-Kutta via the {\em MoL} thorn written by I.~Hawke.
+\item Mesh refinement \cite{Schnetter}; i.e., using variable resolution
+across the numerical grid, so that the computational resources are
+focused on interesting parts of the simulation.
+\item Automatic parallelization of the code via MPI to run across multiple
+processors on a supercomputer or cluster, both to improve
+computational speed and to use larger grids than can be stored in the
+memory of a single node.
+\item Output of grid variables to permanent storage in a structured
+format, for example HDF5.
+\end{itemize}
+These tasks are completely separate from the physics and numerical
+analysis side of the problem, but are necessary in most numerical
+codes.
+
+\section{Overview of the Kranc system}
+
+Kranc provides a Mathematica function called {\em CreateThorn}.  The
+user must construct arguments and data structures for this function
+describing the thorn they wish to create.  Kranc generates code and
+Cactus CCL files for:
+
+\begin{itemize}
+\item Declaring the grid functions which the simulation will use;
+\item Registering the grid functions for the evolved variables with
+  the MoL thorn;
+\item Computing the right hand sides of evolution equations so that the
+time integrator can compute the evolved variables at the next time
+step;
+\item Computing finite differences, both using built-in definitions of
+  standard centred finite differencing operators, as well as allowing
+  the user to create customised operators;
+\item Performing a user-specified calculation at each point of the grid.
+\end{itemize}
+
+User-specified calculations will typically set certain grid variables
+as functions of others, and can be used for various purposes including
+making a change of variables or computing intermediate or analysis
+quantities from evolved variables.
+
+The most important data structure in Kranc is a {\em Calculation}
+structure.  It encapsulates the idea of assigning new values to grid
+functions in a loop over grid points based upon evaluating expressions
+involving other grid functions.  Calculations contain lists of
+assignment statements for different grid functions, and these are
+evaluated at each point on the grid.  Calculations can also contain
+temporary variables called {\em shorthands} into which are placed
+intermediate expressions which are used later in the
+calculation.  Calculations also contain additional information needed
+by the Kranc system, such as a name for the calculation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% \chapter{Getting Started}
+
+%% \section{Tutorial for new Cactus users}
+
+%% This section provides a step-by-step tutorial for Kranc for people who
+%% have not used Cactus before.  It will lead you through downloading
+%% Cactus and Kranc, building one of the example Kranc thorns, compiling
+%% the thorn into a Cactus executable, running the executable and
+%% analysing the output.  People who have used Cactus before and already
+%% have a working setup should skip this section and use
+%% Sec.~\ref{sec:tutcur} instead.
+
+%% The first step is to create a Cactus directory.  Everything will then
+%% be downloaded into this directory and compiled there.
+
+%% \begin{verbatim}
+%%   mkdir Cactus
+%%   cd Cactus
+%% \end{verbatim}
+
+%% Download Kranc into the newly created Cactus directory:
+%% \begin{verbatim}
+%%   git clone git://github.com/ianhinder/kranc
+%% \end{verbatim}
+
+%% Download the Cactus {\em GetComponents} script and make it executable.
+%% This script allows you to download Cactus thorns from many different
+%% repositories listed in a ``ThornList''.
+%% \begin{verbatim}
+%%   wget http://www.cactuscode.org/download/GetComponents
+%%   chmod u+x GetComponents
+%% \end{verbatim}
+
+%% Download Cactus and several thorns specified in the Kranc example thornlist:
+%% \begin{verbatim}
+%%   ./GetComponents --root=. kranc/Auxiliary/Cactus/thornlist.th
+%% \end{verbatim}
+
+%% Configure Cactus to run on your local machine.  You will need a C
+%% compiler.  See the Cactus documentation for more information on this
+%% step if Cactus does not configure automatically on your system.
+%% \begin{verbatim}
+%%   make wave-config ThornList=kranc/Auxiliary/Cactus/thornlist.th
+%% \end{verbatim}
+
+%% Build a Cactus executable:
+%% \begin{verbatim}
+%%   make wave
+%% \end{verbatim}
+
+%% Run the Cactus executable with the example wave equation parameter file:
+%% \begin{verbatim}
+%%   cd Kranc/Examples
+%%   mpirun ../../exe/cactus_wave wave.par
+%% \end{verbatim}
+
+%% Analyse the output of the simulation:
+%% \begin{verbatim}
+%%   ygraph wave/phi.x.asc
+%% \end{verbatim}
+
+%% \section{Tutorial for Current Cactus Users}
+%% \label{sec:tutcur}
+
+%% Change into your Cactus directory and download the current version of Kranc:
+%% \begin{verbatim}
+%%   cd Cactus
+%%   git clone git://github.com/ianhinder/kranc
+%% \end{verbatim}
+
+%% Make a symbolic link from the Kranc examples to the arrangements directory:
+%% \begin{verbatim}
+%%   ln -s ../kranc/Examples arrangements/KrancExamples
+%% \end{verbatim}
+
+%% Make a symbolic link from the Kranc support arrangement into your Cactus tree:
+%% \begin{verbatim}
+%%   ln -s ../kranc/Auxiliary/Cactus/KrancNumericalTools arrangements/KrancNumericalTools
+%% \end{verbatim}
+
+%% Go into the KrancExamples arrangement and build the Wave thorn:
+%% \begin{verbatim}
+%%   cd arrangements/KrancExamples
+%%   ../../kranc/Bin/kranc Wave.m
+%% \end{verbatim}
+
+%% It is assumed that Mathematica is available on your path with the name
+%%  "math", or at the location
+%%  \verb|/Applications/Mathematica.app/Contents/MacOS/MathKernel| for Mac OS.
+
+%% You should get a thorn generated in the current directory called Wave.
+
+%% Add \verb|KrancExamples/Wave| and \verb|KrancNumericalTools/GenericFD| to the
+%%  thornlist of one of your configurations, or make one from scratch.
+
+%% Recompile Cactus.
+
+%% Run Cactus with the parameter file wave.par found in
+%%  \verb|arrangements/KrancExamples|.
+
+%% Examine the 1D output phi.x.asc and pi.x.asc.
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Using Kranc}
+\label{chp:usingkranc}
+
+%% \section{Types of arguments}
+
+%% Mathematica allows two types of arguments to be passed to a function.
+%% {\em positional arguments} and {\em named arguments} (referred to in
+%% the Mathematica book as {\em optional arguments}).  It is possible for
+%% some named arguments to be omitted from a function call; in this case
+%% a suitable default will be chosen.  Positional arguments are useful
+%% when there are few arguments to a function, and their meaning is clear
+%% in the calling context.  Named arguments are preferred when there are
+%% many arguments, as the argument names are given explicitly in the
+%% calling context.  Named arguments are given after the positional
+%% arguments in the form \verb|ArgumentName -> argumentvalue|.  For
+%% example:
+
+%% \begin{center}
+%% \begin{minipage}{0.8 \textwidth}
+%% \begin{verbatim}
+%% f[x, y, Sum -> True, Verbose -> True]
+%% \end{verbatim}
+%% \end{minipage}
+%% \end{center}
+%% Here the x and y are positional arguments, and Sum and Verbose are
+%% named arguments.
+
+\section{Data structures}
+
+The user needs to pass information to Kranc in a structured way.
+Mathematica does not have the concept of a C++ class or a C structure,
+in which collections of named objects are grouped together for ease of
+manipulation.  Instead, we have defined a {\em Kranc structure} as a
+list of rules of the form {\tt {\it key} -> {\it value}}.  We have
+chosen to use the Mathematica rule symbol ``{\tt ->}'' for syntactic
+convenience.
+
+For example, one might describe a person using a ``Person'' structure
+as follows:
+
+\begin{center}
+\begin{minipage}{0.8 \textwidth}
+\begin{verbatim}
+alice = {Name -> "Alice",
+         Age -> 20,
+         Gender -> Female}
+\end{verbatim}
+\end{minipage}
+\end{center}
+
+Based on this concept a number of data structures have been defined
+which will be used to describe the thorn to construct.  Each of these
+data structures is introduced below.
+
+
+\subsection{Data structure: Calculation}
+
+Calculation structures are the core of the Kranc system.  A Calculation
+structure has the following form:
+
+\begin{center}
+\begin{tabularx}{\tablewidth}{|l|X|X|l|}
+  \hline
+  \bf Key & \bf Type & \bf Description & \bf Default\\
+  \hline
+  Name & String & The name of the calculation & (none) \\
+  Equations & List of rules & The assignments that this calculation will perform & \{\} \\
+  Schedule & List of Strings & Cactus schedule specifications & Automatic \\
+  Shorthands & List of Symbols & Temporary variables which will be used in this calculation & \{\} \\
+  Where &  Everywhere / Interior / Boundary & Which part of the grid this calculation will be performed on & Everywhere \\
+  Conditional & conditional-expression &A conditional expression which determines whether this calculation should be performed. & True \\
+  ConditionalOnKeyword & \{String, String\} &
+    The calculation will only be performed if the parameter named by the first string has the value specified by the second string.   &  \\
+  ConditionalOnKeywords & \{\{String, String\}, \ldots \} &
+    The same as ConditionalOnKeyword, but all the parameters must have their corresponding values for the calculation to be performed.&  \\
+  ConditionalOnTextuals & List of Strings & Conditional expressions to be inserted in the Cactus schedule.ccl for the calculation to be performed. & \{\} \\
+  CollectList & List of Symbols & Variables which will be used by Collect in Simplify & \{\} \\
+  NoSimplify & True/False & Whether to disable simplification of the equations for this calculation & False \\
+  DeclarationIncludes & List of Strings & Cactus include files to use in this thorn & \{\} \\
+  \hline
+\end{tabularx}
+\end{center}
+
+Only the {\it Name} key is required; all the others take default
+values if omitted.
+
+\subsubsection{Name}
+
+The name of a calculation is a string which will be used as the
+function name in Cactus, as well as the base of the filename of the
+source file implementing the calculation in the generated thorn.
+
+Example:
+
+\begin{center}
+\begin{minipage}{0.8 \textwidth}
+\begin{verbatim}
+Name -> "wave_calc_rhs"
+\end{verbatim}
+\end{minipage}
+\end{center}
+
+\subsubsection{Equations}
+
+The equation list is a list of assignments to perform in the
+calculation loop.  Each equation is of the form
+\begin{center}
+\begin{minipage}{0.8 \textwidth}
+\begin{verbatim}
+variable -> expression
+\end{verbatim}
+\end{minipage}
+\end{center}
+When the calculation is performed, for each point in the grid, {\it
+expression} is evaluated and placed into the grid function {\it
+variable}.  Here {\it expression} may contain partial derivatives of
+grid functions which have been defined in a PartialDerivatives
+structure.  {\it variable} may be either a grid function or a
+shorthand.  Using the notation {\tt dot[{\it gf}]} for {\it variable}
+represents a time derivative of the grid function {\it gf}; this
+should be used when the calculation is scheduled in {\tt MoL\_CalcRHS}
+for calculating the right hand sides of the evolution equations.
+
+It is possible to use the same variable (either a grid function or a
+shorthand) on both the left hand side and the right hand side of an
+equation assignment.  However, in that case the variable must not be
+differentiated on the right hand side, as this would lead to a result
+which depended on the ordering of the loop over the grid points, which
+is almost certainly not what is intended.  Kranc will detect such a
+differentiation and abort with an error.  See the option
+ProhibitAssignmentToGridFunctionsRead to CreateThorn in
+Sec.\ref{sec:createthornopts} if you want to prohibit such assignments
+altogether.
+
+\subsubsection{Schedule}
+
+This is a list of Cactus schedule specifications describing when in
+the simulation the calculation will be performed.  Multiple schedule
+strings can be provided to allow the calculation to be scheduled at
+multiple points.  Omitting the schedule information causes Kranc to
+schedule the calculation automatically.  Currently, this is used for
+analysis quantities which are scheduled in \verb|MoL_PseudoEvolution|
+and have boundary conditions applied after them.
+
+Examples:
+
+\begin{center}
+\begin{minipage}{0.8 \textwidth}
+\begin{verbatim}
+Schedule -> {"at INITIAL"}
+Schedule -> {"in MoL_CalcRHS"}
+Schedule -> {"at ANALYSIS"}
+\end{verbatim}
+\end{minipage}
+\end{center}
+
+\subsubsection{Shorthands}
+
+This is a list of variables which are to be considered as shorthands
+for the purposes of this calculation.  These are temporary variables
+which are defined locally in the loop and are not grid functions
+defined over the whole grid.  They are used as intermediate variables
+when setting more complicated grid functions.  Since they are defined
+only pointwise, they cannot be differentiated.
+
+Examples:
+
+\begin{center}
+\begin{minipage}{0.8 \textwidth}
+\begin{verbatim}
+Shorthands -> {a,b}
+Shorthands -> {hInv[ua,ub], alpha, Ric[la,lb]}
+\end{verbatim}
+\end{minipage}
+\end{center}
+
+\subsubsection{Where}
+
+Different calculations need to be evaluated on different portions of
+the numerical grid.  For example, a calculation which implements a
+boundary condition needs to be performed on the boundary points only.
+A calculation which contains derivatives needs to be performed on the
+interior of the grid only.  A calculation which does not contain
+derivatives can be performed even in the ghost zones, so that a
+potentially time-consuming synchronisation can be avoided.  The Where
+option can have values of Everywhere, Interior or Boundary
+corresponding to these choices.  There is currently no check that a
+calculation containing derivatives is not performed on the entire
+grid, nor that the number of ghost zones selected by the user at run
+time is compatible with the finite differencing operator chosen.
+
+Examples:
+\begin{center}
+\begin{minipage}{0.8 \textwidth}
+\begin{verbatim}
+Where -> Everywhere
+\end{verbatim}
+\end{minipage}
+\end{center}
+
+\subsubsection{Conditional}
+
+This key allows a calculation to be performed conditionally based on
+parameters set by the user at run time.  Setting
+\begin{center}
+\begin{minipage}{0.8 \textwidth}
+\begin{verbatim}
+Conditional -> <expr>
+\end{verbatim}
+\end{minipage}
+\end{center}
+where \verb|<expr>| is a boolean expression over parameter names and
+literal values will cause the calculation to be performed only if the
+expression evaluates to true at runtime.
+
+The expression can contain \verb|&&| (and), \verb!||! (or), \verb|!|
+(not) operators as well as symbolic parameter names and numeric and
+string constants.
+
+Comparison of parameters with literal values can be expressed using
+\verb|<param> == <value>| or \verb|<param> != <value>|.
+
+In the case that a parameter name cannot be represented as a
+Mathematica symbol (e.g.~if it contains underscores), it should be
+represented as \verb|Parameter[<string>]| where \verb|<string>| is a
+string containing the parameter name.
+
+Note that the construct \verb|<string> == <string>| will be evaluated
+immediately by Mathematica as either True or False, and so should not
+be used.
+ 
+Example:
+
+\begin{center}
+\begin{minipage}{0.8 \textwidth}
+\begin{verbatim}
+Conditional -> lapseCondition == "1+log" && fdOrder == 4
+\end{verbatim}
+\end{minipage}
+\end{center}
+
+\subsubsection{ConditionalOnKeyword}
+
+(deprecated: use Conditional instead)
+
+This key allows a calculation to be performed conditionally based on
+the value of a parameter set by the user at run time.  Setting
+\begin{center}
+\begin{minipage}{0.8 \textwidth}
+\begin{verbatim}
+ConditionalOnKeyword -> {<param>, <value>}
+\end{verbatim}
+\end{minipage}
+\end{center}
+where \verb|<param>| is a string naming a keyword parameter defined in
+the KeywordParameters option to CreateThorn will cause the calculation
+to be performed only if that parameter is set to \verb|<value>|.
+
+Example:
+
+\begin{center}
+\begin{minipage}{0.8 \textwidth}
+\begin{verbatim}
+ConditionalOnKeyword -> {"gauge_condition", "harmonic"}
+\end{verbatim}
+\end{minipage}
+\end{center}
+
+\subsubsection{ConditionalOnKeywords}
+
+(deprecated: use Conditional instead)
+
+The ConditionalOnKeywords key takes a list of
+\verb|{<param>, <value>}| pairs as described under
+ConditionalOnKeyword.  All the parameters must match for the
+calculation to be scheduled.
+
+\subsubsection{ConditionalOnTextuals}
+
+(deprecated: use Conditional instead)
+
+This key can be set to a string which is used verbatim in the Cactus
+schedule.ccl file.  Any valid Cactus conditional string can be used.
+
+\subsubsection{CollectList}
+
+The arrangement of the terms in the equations can have a significant
+effect on both compile time and run time.  It is often helpful to tell
+Mathematica to collect the coefficients of certain types of term,
+rather than expanding out entire expressions.  The user can include a
+{\em CollectList} entry in a calculation; this is a list of variables
+whose coefficients should be collected during simplification.
+
+\subsubsection{NoSimplify}
+
+Setting this option to True stops Kranc from simplifying the right
+hand sides of expressions in this calculation.  This could be used
+because the user has found a way of writing the expressions which
+leads to faster code than if Kranc's simplification is used, or
+because the expressions are so complicated that the simplification
+takes a very long time to perform.
+
+Example:
+
+\begin{center}
+\begin{minipage}{0.8 \textwidth}
+\begin{verbatim}
+NoSimplify -> True
+\end{verbatim}
+\end{minipage}
+\end{center}
+
+\subsubsection{DeclarationIncludes}
+
+This is a list of filenames which will be \verb|#include|ed in the
+generated code inside the calculation function but before the loop
+over grid points.
+
+\subsubsection{{\it Calculation Example}}
+
+The following example is taken from the Kranc implementation of the
+NOR formulation of Einstein's equations.  It is a calculation which
+describes the time evolution equation for the lapse function $\alpha$
+in {\em harmonic slicing}.  It uses the TensorTools package to
+represent tensorial quantities.
+
+\begin{center}
+\begin{minipage}{0.8 \textwidth}
+\begin{verbatim}
+lapseEvolveCalc = 
+{
+  Name -> "nor_harmonic_slicing",
+  Schedule -> {"in MoL_CalcRHS"},
+  Shorthands -> {trK, hInv[ua,ub]},
+  Equations -> 
+  {
+     hInv[ua,ub] -> MatrixInverse[h[ua,ub]],
+     trK -> K[la,lb] hInv[ua,ub],
+     dot[alpha] -> alpha^2 trK
+  }
+};
+\end{verbatim}
+\end{minipage}
+\end{center}
+(The {\it MatrixInverse} function is provided by TensorTools to
+generate an expression for the inverse matrix.)
+
+
+
+\subsection{Data structure: PartialDerivatives}
+
+The user can define partial derivative operators and associated finite
+difference approximations of these operators.  This allows different
+discretizations of the PDE system.
+
+A finite difference operator maps grid functions to grid functions.
+We restrict to those operators which are polynomials in {\em shift}
+operators.  In one dimension, the shift operator $E_+$ is defined as 
+\begin{eqnarray}
+E_+ v_j \equiv v_{j+1}
+\end{eqnarray}
+It is clear that
+\begin{eqnarray}
+(E_+)^n v_j = v_{j+n}
+\end{eqnarray}
+and negative powers $n$ take on the obvious meaning.  In three
+dimensions, there is one shift operator for each dimension:
+\begin{eqnarray}
+E_{+1} v_j \equiv v_{j+(100)} \qquad
+E_{+2} v_j \equiv v_{j+(010)} \qquad
+E_{+3} v_j \equiv v_{j+(001)}
+\end{eqnarray}
+where here $j = j_1 j_2 j_3$ is a multi-index.
+
+The PartialDerivatives structure is a list of definitions of partial
+derivative operators in terms of finite difference approximations:
+
+\begin{center}
+\begin{minipage}{0.8 \textwidth}
+\begin{tt}
+\{  {\it name}[i\_, j\_, \ldots] -> {\it defn}, ...  \}
+\end{tt}
+\end{minipage}
+\end{center}
+
+where {\it name} is the name for the partial derivative, and {\it
+defn} is an algebraic expression in shift operators representing the
+difference operator.  The shift operator $E_{+i}$ is written as {\tt
+shift[i]}.  The form {\tt spacing[i]} can be used in {\it defn} to
+represent the grid spacing in the $i$ direction.  The parameters {\tt
+i, j, \ldots} are used in {\it defn} to represent the direction of
+differentiation for the first, second, etc.  derivatives.  Partial
+derivatives with the same name but a different number of arguments
+(i.e., for first and second derivatives) are allowed in the
+PartialDerivatives structure.
+
+Since the definitions of the difference operators are written in terms
+of Mathematica expressions, higher level operators can be constructed
+from {\tt shift} and {\tt spacing}.  For example, Kranc predefines
+
+\begin{center}
+\begin{minipage}{0.8 \textwidth}
+\begin{verbatim}
+DPlus[n_]  := (shift[n] - 1)/spacing[n];
+DMinus[n_] := (1 - 1/shift[n])/spacing[n];
+DZero[n_]  := (DPlus[n] + DMinus[n])/2;
+\end{verbatim}
+\end{minipage}
+\end{center}
+
+As an example, we give here a PartialDerivatives structure containing
+the definition of the standard second order accurate difference
+operators, as well as the $D_0^2$ discretization.
+
+\begin{center}
+\begin{minipage}{0.8 \textwidth}
+\begin{verbatim}
+derivs = {
+  PDstandard2nd[i_] -> DZero[i],
+  PDstandard2nd[i_, j_] -> DPlus[i] DMinus[j],
+  PDzero2nd[i_] -> DZero[i],
+  PDzero2nd[i_, j_] -> DZero[i] DZero[j]
+}
+\end{verbatim}
+\end{minipage}
+\end{center}
+
+In a calculation, a partial derivative is written in the form
+
+\begin{center}
+\begin{minipage}{0.8 \textwidth}
+\begin{tt}
+{\it name}[{\it gridfunction}, i, j, \ldots]
+\end{tt}
+\end{minipage}
+\end{center}
+
+For example, a one dimensional advection equation $\partial_t u =
+\partial_x u$ with semidiscrete form $\partial_t v_j = D_{01} v_j$
+could be described as
+
+\begin{center}
+\begin{minipage}{0.8 \textwidth}
+\begin{tt}
+dot[v] -> PDstandard2nd[v,1]
+\end{tt}
+\end{minipage}
+\end{center}
+
+The PartialDerivatives structure can also be used to define operators
+for artificial dissipation.  Given a semidiscrete scheme
+\begin{eqnarray}
+\partial_t v(t)_j = F_j(v(t);t)
+\end{eqnarray}
+we can add Kreiss-Oliger style artificial dissipation by modifying the
+scheme to read
+\begin{eqnarray}
+\partial_t v_j(t) = F_j(v(t);t) - \sigma \sum_i h_i^3 (D_{+i} D_{i})^2 v_j
+\end{eqnarray}
+
+We define a differencing operator {\tt Diss2nd} in the
+PartialDerivatives structure with no directional arguments
+
+\begin{center}
+\begin{minipage}{0.8 \textwidth}
+\begin{verbatim}
+Diss2nd[] -> - sigma Sum[spacing[i]^3 (DPlus[i] DMinus[i])^2, 
+                         {i, 1, 3}]
+\end{verbatim}
+\end{minipage}
+\end{center}
+
+using the standard Mathematica function for summations.  An evolution
+equation representing the advection equation with dissipation could
+then be written as
+
+\begin{center}
+\begin{minipage}{0.8 \textwidth}
+\begin{verbatim}
+dot[v] -> PDstandard2nd[v,1] + Diss2nd[v]
+\end{verbatim}
+\end{minipage}
+\end{center}
+
+A PartialDerivatives structure is given as an argument to the thorn
+generation function CreateThorn.
+
+\subsection{Data structure: GroupDefinition}
+
+A {\tt GroupDefinition} structure lists the grid functions that are
+members of a specific Cactus group.  A list of such structures should
+be supplied to CreateThorn function so that Kranc can determine which
+group each grid function belongs to.
+
+The form of a GroupDefinition structure is
+\begin{center}
+\begin{minipage}{0.8 \textwidth}
+\begin{tt}
+\{{\it groupname}, \{{\it variable1, variable2, \ldots}\}\}
+\end{tt}
+\end{minipage}
+\end{center}
+{\it groupname} is a string, and the {\it variables} are symbols.  For
+example,
+\begin{center}
+\begin{minipage}{0.8 \textwidth}
+\begin{tt}
+\{"sol", \{phi, pi\}\}
+\end{tt}
+\end{minipage}
+\end{center}
+would represent a group called {\tt sol} with variables {\tt phi} and
+{\tt pi}.
+
+The group name can be prefixed with the name of the Cactus
+implementation that provides the group followed by two colons
+(e.g.~``ADMBase::metric'').
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{TensorTools}
+
+The TensorTools package was written specifically for the Kranc system,
+though it is in no way tied to it.  It is necessary to perform certain
+operations on tensorial quantities, and there was no free software
+available which met the requirements.
+
+%% TensorTools has the following features:
+%% \begin{itemize}
+%% \item{It expands covariant derivatives in terms of partial derivatives
+%% and Christoffel symbols (more than one covariant derivative can be
+%% defined)}
+%% \item{It expands Lie derivatives in terms of partial derivatives}
+%% \item{Dummy indices can be automatically relabelled to avoid
+%% conflicts}
+%% \item{Abstract tensor expressions can be converted into component
+%% expressions}
+%% \end{itemize}
+
+%% {\bf Note: I no longer use any of the above features apart from
+%% expansion into components.  I prefer to do these type of calculation
+%% by hand.  The reason is that the way the BSSN Gammas appear from the
+%% Christoffel symbols is important, and they are not visible if you use
+%% these techniques.}
+
+\subsection{Representation of tensor quantities}
+
+Tensorial expressions are entered in the same syntax as is used by
+MathTensor, a commercial tensor manipulation package which can be used
+instead of TensorTools.  An abstract tensor consists of a {\em kernel}
+and an arbitrary number of abstract {\em indices}, each of which can
+be {\em upper} or {\em lower}.  Abstract indices are alphabetical
+characters (a-z, A-Z) prefixed with either an l or a u depending on
+whether the index is considered to be lower or upper.  The tensor is
+written using square brackets as
+\begin{center}
+\begin{tt}
+kernel [ indices separated by commas ]
+\end{tt}
+\end{center}
+%
+For example, $T_a^{\phantom{a}b}$ would be written as {\tt T[la,ub]}.
+There is no automatic index raising or lowering with any metric.
+%
+Entering a tensorial expression causes it to be displayed in standard
+mathematical notation:
+\mathdialogue{T[la,lb]}{$T_{ab}$}
+%
+Internally, tensors are represented as {\tt Tensor[{\it kernel},
+TensorIndex[{\it label}, {\it type}], ...]} where {\it label} is the
+alphabetical index, and {\it type} is either ``u'' or ``l'' depending
+on the position of the index.  This representation helps in pattern
+matching, and allows TensorTools to identify whether a certain object
+is a tensor or not.
+
+\subsection{Expansion of tensorial expressions into components}
+
+As an example, the TensorTools function {\tt MakeExplicit} converts an
+expression containing abstract tensors into a list of component
+expressions:
+\begin{center}
+  \begin{tabular}[t]{rl}
+  {\tt In := } & \parbox{10cm}{\tt MakeExplicit[T[la, lb]g[ub, uc]]} \\
+\\
+  {\tt Out = } &  \begin{tabular}[t]{rll}
+\{ & g11 T11 & + g21 T12 + g31 T13, g12 T11 + g22 T12 + g32 T13, \\
+   & g13 T11 & + g23 T12 + g33 T13, g11 T21 + g21 T22 + g31 T23, \\
+   & g12 T21 & + g22 T22 + g32 T23, g13 T21 + g23 T22 + g33 T23, \\
+   & g11 T31 & + g21 T32 + g31 T33, g12 T31 + g22 T32 + g32 T33, \\
+   & g13 T31 & + g23 T32 + g33 T33\}\\
+  \end{tabular} \\
+  \end{tabular}
+  \end{center}
+
+Note here that there is no distinction made between upper and lower
+indices in the component form.  TensorTools was written mainly for
+automated code generation rather than symbolic manipulation; different
+kernels should be used for the different forms if this is a problem.
+
+%% \subsection{Covariant derivatives}
+
+%% TensorTools allows the user to define more than one covariant
+%% derivative.  The following defines a covariant derivative operator
+%% {\tt CD} with Christoffel symbol {\tt H}:
+%% %
+%% \mathinput{DefineConnection[CD,H]}
+%% %
+%% The function {\tt CDtoPD} is used to replace covariant derivatives
+%% with partial derivatives in any expression:
+%% %
+%% \mathdialogue
+%% {
+%%   CDtoPD[CD[V[ua],lb]]
+%% }
+%% {
+%%   $V^a,\,_b + H^a_{\phantom{a}bc} V^c$
+%% }
+%% %
+%% The function {\tt MakeExplicit} will automatically do this before
+%% converting expressions into components.  In order to convert an
+%% expression containing a covariant derivative into components,
+%% TensorTools first simplifies the expression.  In the following, $x$
+%% and $y$ represent expressions which may contain tensorial indices.  The
+%% following steps are performed to simplify the expression:
+%% \begin{itemize}
+%% \item{Replace any high order covariant derivatives with repeated
+%% application of a first order covariant derivative.  This ensures that
+%% we only need to know how to evaluate a first derivative.
+%% $$\nabla_d \nabla_a V^b \to \nabla_d ( \nabla_a V^b)$$}
+%% \item{Replace the covariant derivative of a product using the Leibniz
+%% rule: $$ \nabla_a (x y) \to (\nabla_a x) y + x (\nabla_a y) $$}
+%% \item{Replace the covariant derivative of a sum using the linearity
+%% property: $$ \nabla_a (x + y) \to \nabla_a x + \nabla_a y $$}
+%% \item{Replace the covariant derivative of an arbitrary expression
+%% containing tensorial indices with its expansion in terms of a
+%% partial derivative and Christoffel symbols, one for each
+%% index in the expression:  e.g.~$$\nabla_a V^b \to \partial_a V^b +
+%% \Gamma^{b}_{\phantom{b}ac} V^c$$ }
+%% \end{itemize}
+
+
+%% \subsection{Lie derivatives}
+
+%% The Lie derivative of an expression $x$ with respect to a vector $V$ is
+%% written
+%% \mathinput{Lie[x,V]}
+%% where $V$ has been registered using {\tt DefineTensor} and is written {\em without}
+%% indices.  The function {\tt LieToPD} is used to replace Lie derivatives
+%% with partial derivatives:
+%% \mathdialogue
+%% {
+%%   LieToPD[Lie[T[ua,lb], V]]
+%% }
+%% {
+%%   $\Tud T a {b,c} V^c + \Tud T a c \Tud V c {,b} - \Tud T c b V^a_{,c}$
+%% }
+%% %
+%% Lie derivatives of products and sums are supported.
+%% %
+%% The function {\tt MakeExplicit} will automatically perform this replacement
+%% before converting expressions into components.
+
+
+%% \subsection{Automatic dummy index manipulation}
+
+%% When two expressions both containing a dummy index $b$ are multiplied
+%% together, one dummy index is relabelled so as not to conflict with any
+%% other index in the resulting expression:
+
+%% \mathdialogue
+%% {(T[la, lb]g[ub, uc])v[ub, ld, lb]}
+%% {$T_{ab} g^{bc} V^e_{\phantom{e}de}$}
+%% %
+%% This requires that every multiplication be checked for tensorial
+%% operands.  This can be a performance problem, so the feature can be
+%% enabled and disabled with {\tt SetEnhancedTimes[True]} and {\tt
+%% SetEnhancedTimes[False]}.  It is enabled by default.
+
+
+\section{Creating a Kranc thorn}
+
+Prototype: CreateThorn[groups, directory, thornName, namedArgs]\\
+
+Note that if you want to use TensorTools tensors in calculations, you
+must call the CreateThornTT function instead of this one.  It takes the
+same arguments, but they can be tensorial in nature.
+
+\subsubsection{Positional Arguments}
+
+\begin{center}
+\begin{tabularx}{\tablewidth}{|l|l|X|}
+  \hline
+  \bf Argument & \bf Type & \bf Description \\
+  \hline
+  groups & list of GroupDefinition structures & These define what groups each grid function is a member of.  \\
+  directory & string & What directory to create the thorn in.  Usually ".".  \\ 
+  thornName & string & The name to give the thorn.  \\
+  namedArgs & Rule & The named arguments (see below) \\
+  \hline
+\end{tabularx}
+\end{center}
+
+\subsubsection{Named Arguments}
+
+\begin{center}
+\begin{tabularx}{\tablewidth}{|l|X|X|l|}
+  \hline
+  \bf Argument & \bf Type & \bf Description & \bf Default\\
+  \hline
+  Calculations & list of Calculation structures & The calculations to perform & \{\} \\
+
+  DeclaredGroups & list of strings & The names of groups present in the {\tt groups} argument 
+                                     which are to be created as new groups by this thorn.  & \{\} \\
+
+  PartialDerivatives & a PartialDerivatives structure & The partial derivative definitions that
+                                                        are used in this thorn (optional).  & \{\} \\
+
+  RealParameters & list of strings & A list of real-valued parameters that this thorn will
+                                     define and use.  They will all default to zero.  (optional) & \{\} \\
+
+  IntParameters & list of strings & A list of integer-valued parameters that this thorn will
+                                     define and use.  They will all default to zero.  (optional) & \{\} \\
+
+  KeywordParameters & list of KeywordParameterDefinition structures & A list of parameter definition structures for all the keyword parameters which this thorn will define and use.  (optional) & \{\} \\
+
+  ParameterConditions & list of parameter conditions & Each condition
+  is of the form \{\textit{condition}, \textit{message}\}, where
+  \textit{condition} is a boolean expression in parameter names, and
+  \textit{message} is the message for a fatal error which is generated
+  when the thorn starts if \textit{condition} is satisfied & \{\} \\
+
+  InheritedImplementations & list of strings & A list of all the implementations which this thorn
+                                               will inherit from.  This is necessary to use grid functions
+                                               provided by these implementations.  (optional) & \{\} \\
+  \hline
+\end{tabularx}
+\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Additional Features}
+
+In addition to the basic functionality described in Chapter
+\ref{chp:usingkranc}, Kranc provides a number of additional features.
+Each of these features can be used independently, and are typically
+enabled by an option of the form \verb|Use* -> True| in the call to
+\verb|CreateThorn|.
+
+\section{Jacobians}
+
+Kranc allows the user to apply an arbitrary user-defined Jacobian
+transformation (provided in a grid function) to all derivatives.  This
+feature is enabled by setting \verb|UseJacobian -> True| in the
+options to \verb|CreateThorn| or \verb|CreateThornTT|.  This can be
+used to generate codes which work with multi-block schemes.  The use
+of the Jacobian is determined at run time, so a single code can be
+generated which will work both with and without a Jacobian being
+present.
+
+Kranc does not provide the Jacobian grid function; it might be
+provided by an external infrastructure (for example for multi-block
+schemes), or could be provided easily in the user's thorn, or another
+Kranc-generated thorn.  Wherever the Jacobian is provided, it must
+adhere to the following conventions.  There should be one Cactus group
+for the components of the Jacobian matrix and another for the
+components of its first spatial derivative (this is necessary for
+systems containing second spatial derivatives).  The components should
+be real-valued grid functions declared in a similar manner to the
+following:
+
+\begin{verbatim}
+CCTK_REAL jac type=GF timelevels=1
+{
+  J11, J12, J13, J21, J22, J23, J31, J32, J33
+} "Jacobian of the coordinate transformation"
+
+CCTK_REALd djac type=GF timelevels=1
+{
+  dJ111, dJ112, dJ113, dJ122, dJ123, dJ133,
+  dJ211, dJ212, dJ213, dJ222, dJ223, dJ233,
+  dJ311, dJ312, dJ313, dJ322, dJ323, dJ333,
+} "Derivative of the Jacobian"
+\end{verbatim}
+
+The names of the groups and variables are not important, but the order
+of the variables within the groups is critical.
+
+The GenericFD thorn provides two parameters, \verb|jacobian_group| and
+\verb|jacobian_derivative_group| which should be set by the user in their
+parameter file to the names of the Jacobian and Jacobian derivative
+groups.  With the above Jacobian definition, provided by a thorn with
+implementation \verb|MyCoordTransform| the user would set
+
+\begin{verbatim}
+GenericFD::jacobian = "MyCoordTransform::jac"
+GenericFD::jacobian_derivative = "MyCoordTransform::djac"
+\end{verbatim}
+
+The partial derivatives, associated with certain finite difference
+operators, specified in the user's calculation, will then be
+multiplied by the Jacobian.  If the user specifies the following,
+
+\begin{center}
+\begin{minipage}{0.8 \textwidth}
+\begin{verbatim}
+derivs = {
+  PDstandard2nd[i_] -> DZero[i]}
+
+...
+
+dot[v] -> PDstandard2nd[v,1]
+\end{verbatim}
+\end{minipage}
+\end{center}
+
+the code that will actually be generated will be
+
+\begin{center}
+\begin{minipage}{0.8 \textwidth}
+\begin{verbatim}
+dot[v] -> J11 PDstandard2nd[v,1] + J21 PDstandard2nd[v,2]
+          + J31 PDstandard2nd[v,3]
+\end{verbatim}
+\end{minipage}
+\end{center}
+
+Note:
+
+\begin{itemize}
+\item The Jacobian multiplication introduces an additional performance
+  cost to the simulation, so it should not be enabled unless
+  necessary.
+\item If the Jacobian parameters are left unset, the partial
+  derivatives will not be multiplied by any Jacobian, and the
+  performance will be only slightly worse than if UseJacobian was not
+  set and the Jacobian code was not generated (the extra cost comes
+  from the use of run-time conditionals).
+\item The parameter \verb|GenericFD::jacobian_identity_map| can be
+  used with multi-block systems to prevent the use of the Jacobian on
+  one of the maps.  Set this parameter to the map number (e.g.~0)
+  where the Jacobian should not be applied.  This can lead to a
+  significant performance improvement.
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\appendix
+
+\chapter{Kranc internal design}
+
+Kranc is composed of several Mathematica packages.  Each of these
+human readable scripts performs a distinct function.
+The diagram in Figure \ref{fig:kranc_design} illustrates the
+relationships between the Kranc packages KrancThorns, TensorTools,
+CodeGen, Thorn and MapLookup, which are described in the following
+subsections.
+\begin{figure}
+\centering
+\label{fig:kranc_design}
+%\includegraphics[clip,width=0.9\textwidth]{KrancStructureLandscape.eps}
+\caption{Relationships between Kranc packages: 
+Each block represents a package, with the main functions it provides
+indicated with square brackets.  An arrow indicates that one package
+calls functions from another}
+\end{figure}
+Separating the different logically independent components of Kranc
+into different packages promotes code reuse.  For example, none of the
+thorn generation packages need to know anything about tensors, and
+none of the packages other than CodeGen need to know the programming
+language in which the thorn is being generated (C or Fortran).  We
+have chosen to define several types of thorn (setter, evaluator, {\em
+etc.}) but the mechanics of producing a thorn implemented in Thorn and
+CodeGen are completely independent of this decision.
+
+\section{Package: CodeGen}
+
+During the development of the Kranc system, we explored two different
+approaches to generating Cactus files using Mathematica as a
+programming language.  Initially, a very straightforward system was
+used whereby C statements were included almost verbatim in the
+Mathematica script and output directly to the thorn source file.  This
+approach has two main deficiencies:
+\begin{itemize}
+\item{The same block of text might be used in several places in the
+code.  When a bug is fixed in one place, it must be fixed in all.}
+\item{It is not easy to alter the language that is produced.  For
+example, it is difficult to output both C and Fortran.}
+\item{The syntax in the Mathematica source file is ugly, with lots of
+string concatenation, making it difficult to read and edit}.
+\end{itemize}
+
+The CodeGen package provides functions to solve these problems.  To
+address the first problem, Mathematica functions are used to represent
+each block of code.  This allows the block to be customized by giving
+the function arguments.  By making this abstraction, it became very
+easy to change between outputting C and Fortran.
+
+Fundamental to the system is the notion of a {\em block}; in
+Mathematica terms this can be either a string or a list of blocks
+(this definition is recursive).  All the CodeGen functions return
+blocks, and the lists are all flattened and the strings concatenated
+when the final source file is generated.  This is because it is
+syntactically easier in the Mathematica source file to write a
+sequence of statements as a list than to concatenate strings.
+
+Many programming constructs are naturally block-structured; for
+example, C {\tt for} loops need braces after the block of code to loop
+over.  For this reason, it was decided that CodeGen functions could
+take as arguments any blocks of code which needed to be inserted on
+the inside of such a structure.
+
+\section{Package: Thorn}
+
+The Thorn package is used by all the different thorn generators to
+construct the final Cactus thorn.  It takes care of the mechanics of
+writing files to storage and parsing the Kranc structures necessary
+for writing parameter configuration files, grid function definitions
+etc.
+
+\chapter{Reference}
+\label{ch:ref}
+
+This is a reference document for many functions available in Kranc and
+TensorTools. It is mostly aimed at people extending Kranc or writing
+code generation scripts in Kranc. \textbf{Please be aware that none of
+  the functions listed are guaranteed to be supported or included in
+  future versions of Kranc. Use this reference at your own risk.}
+
+\section{User-Level Kranc Commands}
+\label{ch:ref:sec:kranc}
+
+The following is an incomplete reference for user-visible commands in
+Kranc
+\begin{center}
+  \begin{tabularx}{\tablewidth}{|l|X|}
+    \hline
+    \bf Function Prototype & \bf Description\\
+    \hline
+    CreateThorn[thorn] & 
+    Create a general Cactus thorn from a thorn specification structure\\
+    \hline
+    TensorName[g[la, lb]] &
+    get the base name of a tensor object\\
+    \hline
+    EnsureDirectory[] & 
+    create a directory if it does not already exist\\
+    \hline
+    SafeDelete[filename] & 
+    deletes a file only after checking that the file actually exists
+    and is a normal file\\
+    \hline
+    AddSuffix[object,suffixString] &
+    adds a suffix to an object\\
+    \hline
+    GFsFromGroupList[g] &
+    gives the GFs from a group list in the form \{``group'', \{gf1, gf2, ...\}\}\\
+    \hline
+    IsNotEmptyString[x] & 
+    returns False if x == ``'' and True otherwise\\
+    \hline
+    PickMatch[x, form] &
+    returns string x if it matches form, and ``'' otherwise\\
+    \hline
+    SafeStringReplace[x, string1, string2] &
+    replaces string1 in x by string2 if x is a string and otherwise
+    returns x\\
+    \hline
+    String2Char[string] &
+    splits a string into a list of characters\\
+    \hline
+    SortString[string] &
+    returns a string where the characters in the original string have
+    been sorted lexicographically\\
+    \hline
+    GroupStruct[g] &
+    returns a group structure the from \{``group'', \{gf1, gf2, ...\}\}\\
+    \hline
+    ComponentList[T[index]] &
+    creates a list of tensor components\\
+    \hline
+    TextComponentList[T[index]] &
+    call ComponentList and converts to plain text format (no sub-
+    or superscripts)\\
+    \hline
+  \end{tabularx}
+\end{center}
+
+\section{TensorTools Commands}
+\label{ch:ref:sec:tensortools}
+
+The following commands are independent of Kranc. Very similar commands
+are available for the xTensor package of xAct.
+
+\begin{center}
+  \begin{tabularx}{\tablewidth}{|l|X|}
+    \hline
+    \bf Function Prototype & \bf Description\\
+    \hline
+    DefineTensor[kernel] &
+    registers kernel as a TensorTools tensor kernel\\
+    \hline DefineDerivative[pd] &
+    registers a symbol to be used as a derivative operator\\
+    \hline MakeExplicit[x] & converts an expression x containing
+    abstract indices into one containing
+    components instead\\
+    \hline AssertSymmetricIncreasing[tensor] & indicates that when the
+    two-component tensor (e.g. T[la,lb]) is represented as components,
+    no distinction should be made between the two orderings of the
+    indices, and the decreasing order is to
+    be preferred\\
+    \hline
+    AssertSymmetricDecreasing[tensor] & 
+    indicates that when the two-component tensor (e.g. T[la,lb]) is
+    represented as components, no distinction should be made between
+    the two orderings of the indices, and the increasing order is to
+    be preferred.\\
+    \hline 
+    PD[x,i1, i2, ...] & 
+    represents the partial derivative of x with respect to the indices
+    i1, i2, ...\\
+    \hline 
+    Lie[x,V] & 
+    is the Lie derivative of expression x with respect to the
+    TensorTools vector V (specified without an index)\\
+    \hline 
+    FD[x,i1, i2, ...] & 
+    represents the local partial derivative of x with respect to the
+    indices i1, i2, ...\\
+    \hline 
+    MatrixOfComponents[tensor] &
+    returns a matrix of the components of a two-tensor\\
+    \hline
+    Tensor[kernel, index, ...] &
+    represents a TensorTools tensor\\
+    \hline
+    TensorIndex[type, label] &
+    represents a TensorTools tensor index\\
+    \hline
+    TTTensorProduct[x, y, ...] &
+    represents a product of expressions which has already been checked 
+    for duplicated dummy indices\\
+    \hline
+    MakeLocalSymbol[s] &
+    creates a symbol in the current context consisting of the symbol s 
+    suffixed with the letter L\\
+    \hline
+    MatrixInverse[tensor] &
+    converts a tensor component (eg T[1,3]) into the 1,3 component of $T^{-1}$\\
+    \hline
+    CDtoPD[x] &
+    converts all covariant derivatives in x registered using 
+    DefineConnection into partial derivatives\\
+    \hline
+    LieToPD[x] &
+    converts all Lie derivatives in x\\
+    \hline
+    PDtoFD[x] &
+    converts all partial derivatives in x into local partial derivatives\\
+    \hline
+    DefineConnection[cd, pd, ch] &
+    registers a connection with TensorTools.  The covariant derivative
+    operator will be cd, the partial derivative operator will be pd,
+    and the Christoffel symbol will be ch\\
+    \hline
+    DefineJacobian[pd, fd, J, iJ, dJ] &
+    registers a Jacobian with TensorTools.  The partial derivative
+    operator will be pd, the local partial derivative operator will be
+    fd, and the Jacobian, its inverse, and its derivative will be J,
+    iJ, and dJ, respectively\\
+    \hline
+    ResetJacobians & unregisters all Jacobians\\
+    \hline
+    KD[x,y] &
+    is the Kronecker delta symbol.  It can be given tensorial or
+    numerical indices\\
+    \hline
+    Eps[i,j,...] &
+    is the alternating symbol.  It can be given tensorial or numerical
+    indices\\
+    \hline
+    Zero3[i,j,k] &
+    is zero\\
+    \hline
+    Euc[i,j] &
+    is the Euclidian metric.  It can be given tensorial or numerical
+    indices\\
+    \hline
+    SetEnhancedTime[boolean] &
+    enables or disabled automatic checking and relabelling of products
+    for duplicated dummy indices\\
+    \hline
+    RemoveDuplicates[list] &
+    removes any duplicated elements from list.  Useful with
+    MakeExplicit where some of the tensor symmetries cause duplicates
+    to be created\\
+    \hline
+  \end{tabularx}
+\end{center}
+
+The following commands are Kranc-specific additions to TensorTools
+
+\begin{center}
+  \begin{tabularx}{\tablewidth}{|l|X|}
+    \hline
+    \bf Function Prototype & \bf Description\\
+    \hline
+    ReflectionSymmetries & 
+    produces a list of reflection symmetries of a tensor\\
+    \hline
+    ExpandComponents[expr] &
+    converts an expression containing abstract indices into one
+    containing components instead\\
+    \hline
+    IncludeCharacter & 
+    an option for makeExplicit which specifies whether the character
+    should also be included in the generated variable names\\
+    \hline
+    TensorCharacterString[tensor[inds]] &
+    returns a string consisting of a sequence of U's and D's
+    representing the character of tensor\\
+    \hline
+  \end{tabularx}
+\end{center}
+
+% Section incomplete. TODO: make a complete code reference.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% \section{Internal Kranc Commands}
+%% \label{ch:reference:sec:internal}
+%% 
+%% The following is an incomplete list of Kranc commands that can be used
+%% to change the implementation details of the auto-generated code.
+%% 
+%% \begin{center}
+%%   \begin{tabularx}{\tablewidth}{|l|X|}
+%%     \hline
+%%     \bf Function Prototype & \bf Description\\
+%%     \hline
+%%     DefineCCTKFunction[name, type, block] &
+%%     returns a block of code that defines a CCTK function of name
+%%     ``name'' returning type ``type'' with body ``block''\\
+%%     \hline
+%%     DefineCCTKSubroutine[name, block] &
+%%     returns a block of code that defines a CCTK Fortran subroutine of
+%%     name ``name'' with body ``block'''\\
+%%     \hline
+%%     DeclareGridLoopVariables[] &
+%%     returns a block that defines the variables needed during a grid loop\\
+%%     \hline
+%%     InitialiseGridLoopVariables[] & 
+%%     returns a block that initialises variables needed by a grid loop
+%%     using the evolution stencils
+%%     \hline
+%%     ConditionalOnParameter[name, value, block] & 
+%%     returns a block that introduces a conditional expression whereby
+%%     ``block'' is only executed if the Cactus parameter ``name'' has
+%%     value ``value''\\
+%%     \hline
+%%     GridLoop[block] &
+%%     returns a block that is looped over for every 
+%%     grid point.  Must have previously set up the grid loop variables (see 
+%%     InitialiseGridLoopVariables\\
+%%     \hline
+%%   \end{tabularx}
+%% \end{center}
+
+\end{document}

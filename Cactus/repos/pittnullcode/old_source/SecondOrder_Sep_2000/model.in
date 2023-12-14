@@ -1,0 +1,14 @@
+ &Model_Input
+ Mass = 1.
+ R_inf = 2.0
+ R_a = 1.0
+ eps = 1.0
+ t_0 = 0.
+ p_0 = 1.01
+ iot0 = 1 
+ iot2 = 20
+ model_switch = 1
+ L_inf_switch = 1
+ a_inf = 2.0
+ rhol_integrator_switch = 1
+/

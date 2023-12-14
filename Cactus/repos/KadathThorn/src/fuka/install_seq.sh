@@ -1,0 +1,1 @@
+../../../fuka/install_seq.sh

@@ -1,0 +1,8 @@
+# Configuration definition for thorn NullNews
+# $Header$
+
+REQUIRES MPI NullInterp NullGrid NullDecomp
+
+PROVIDES NullNews
+{
+}

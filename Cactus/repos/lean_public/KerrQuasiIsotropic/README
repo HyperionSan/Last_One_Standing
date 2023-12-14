@@ -1,0 +1,32 @@
+Cactus Code Thorn KerrQuasiIsotropic
+Author(s)    : Helvi Witek
+Maintainer(s): Helvi Witek
+Licence      : GPLv2+
+--------------------------------------------------------------------------
+
+1. Purpose
+===========
+KerrQuasiIsotropic provides analytic initial data for a rotating black hole, spinning around the z-axis, in quasi-isotropic coordinates 
+$r_{\rm BL} = R \left( 1 + \frac{r_{\rm BL,+}}{4 R}\right)^{2}$.
+We employ the construction of Liu et al, with our specific construction outlined in Eqs.(46)-(48) of Okawa et al.
+
+2. Applications
+================
+This thorn has been used 
+- as basis of the thorn "Proca/TwoPunctures_KerrProca" 
+  Note: for long-term stable evolutions of highly spinning black holes, we recommend a modified puncture gauge 
+  (see Witek \& Zilh\~{a}o, in progress)
+  that is available in the new_gauge branch of LeanBSSNMoL.
+- to study the evolution of massive scalar/vector fields in rotating BH backgrounds
+- to explore the evolution of the dilaton in Einstein-dilaton Gauss--Bonnet gravity
+
+
+3. References 
+==============
+- Liu et al; https://arxiv.org/abs/1001.4077
+- Okawa et al; https://arxiv.org/abs/1401.1548
+
+see also:
+- Witek \& Zilh\~{a}o; in progress
+- https://arxiv.org/abs/1810.05177
+

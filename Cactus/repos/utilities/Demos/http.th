@@ -1,0 +1,33 @@
+
+!DESC "Web Demo Thornlist"
+
+CactusBase/Boundary               
+CactusBase/CartGrid3D             
+CactusBase/IOASCII                
+CactusBase/IOBasic                
+CactusBase/IOUtil                 
+CactusBase/Time                   
+CactusNet/Announce                
+CactusNet/Download                
+CactusNet/Jpeg                    
+CactusNet/NetGeometry             
+DevThorns/HTTPD
+CactusPUGH/PUGH                   
+CactusPUGH/PUGHSlab               
+CactusPUGHIO/IOHDF5               
+CactusWave/IDScalarWave           
+CactusWave/IDScalarWaveC          
+CactusWave/IDScalarWaveCXX        
+CactusWave/WaveBinarySource       
+CactusWave/WaveToyC               
+CactusWave/WaveToyCXX             
+CactusWave/WaveToyF77             
+CactusWave/WaveToyF90             
+CactusWave/WaveToyFreeF90         
+external/RemoteIO                 
+external/TCPXX                    
+
+!REPOSITORY_NAME /arrangements
+
+Development/Socket                
+Development/StreamedHDF5          

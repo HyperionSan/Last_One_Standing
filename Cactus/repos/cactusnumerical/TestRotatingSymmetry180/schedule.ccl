@@ -1,0 +1,63 @@
+# Schedule definitions for thorn TestRotatingSymmetry180
+
+STORAGE: num_diffs
+
+STORAGE: gf_none_single
+STORAGE: gf_none_vector
+STORAGE: gf_scalar_single
+STORAGE: gf_scalar_vector
+STORAGE: gf_4scalar_single
+STORAGE: gf_4scalar_vector
+STORAGE: gf_u_single
+STORAGE: gf_u_vector
+STORAGE: gf_d_single
+STORAGE: gf_d_vector
+STORAGE: gf_4u_single
+STORAGE: gf_4u_vector
+STORAGE: gf_4d_single
+STORAGE: gf_4d_vector
+STORAGE: gf_uu_sym_single
+STORAGE: gf_uu_sym_vector
+STORAGE: gf_dd_sym_single
+STORAGE: gf_dd_sym_vector
+STORAGE: gf_uu_single
+STORAGE: gf_uu_vector
+STORAGE: gf_dd_single
+STORAGE: gf_dd_vector
+STORAGE: gf_du_single
+STORAGE: gf_du_vector
+STORAGE: gf_ud_single
+STORAGE: gf_ud_vector
+STORAGE: gf_ddd_sym_single
+STORAGE: gf_ddd_sym_vector
+STORAGE: gf_4uu_sym_single
+STORAGE: gf_4uu_sym_vector
+STORAGE: gf_4dd_sym_single
+STORAGE: gf_4dd_sym_vector
+STORAGE: gf_weylscalars_real_single
+STORAGE: gf_weylscalars_real_vector
+STORAGE: gf_veld
+STORAGE: gf_velu
+STORAGE: gf_vel4d
+STORAGE: gf_vel4u
+
+
+schedule TestRotatingSymmetry180_Initialize in CCTK_INITIAL
+{
+  LANG: C
+} "Initialize GF with data"
+
+schedule TestRotatingSymmetry180_SelectBCs in CCTK_POSTINITIAL
+{
+  LANG: C
+  SYNC: gf_none_single, gf_none_vector, gf_scalar_single, gf_scalar_vector, gf_4scalar_single, gf_4scalar_vector, gf_u_single, gf_u_vector, gf_d_single, gf_d_vector, gf_4u_single, gf_4u_vector, gf_4d_single, gf_4d_vector, gf_uu_sym_single, gf_uu_sym_vector, gf_dd_sym_single, gf_dd_sym_vector, gf_uu_single, gf_uu_vector, gf_dd_single, gf_dd_vector, gf_du_single, gf_du_vector, gf_ud_single, gf_ud_vector, gf_ddd_sym_single, gf_ddd_sym_vector, gf_4uu_sym_single, gf_4uu_sym_vector, gf_4dd_sym_single, gf_4dd_sym_vector, gf_weylscalars_real_single, gf_weylscalars_real_vector, gf_veld, gf_velu, gf_vel4d, gf_vel4u
+} "Select BCs"
+
+schedule GROUP ApplyBCs AS TestRotatingSymmetry180_ApplyBCs in CCTK_POSTINITIAL after TestRotatingSymmetry180_SelectBCs
+{
+} "Apply BCs"
+
+schedule TestRotatingSymmetry180_Compare in CCTK_POSTINITIAL after Boundary_ApplyBCs
+{
+  LANG: C
+} "Compute difference to expected answer"

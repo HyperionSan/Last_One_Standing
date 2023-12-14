@@ -1,0 +1,5 @@
+# Configuration definitions for thorn CoordGauge
+
+PROVIDES CoordGauge
+{
+}
